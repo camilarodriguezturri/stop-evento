@@ -54,8 +54,9 @@
         <ol class="pasos" data-anim>
           <li><b>1</b><span>Elegí tu cápsula</span></li>
           <li><b>2</b><span>Sumá tus objetivos</span></li>
-          <li><b>3</b><span>Escribite una nota</span></li>
-          <li><b>4</b><span>Sellala y esperá a stop.</span></li>
+          <li><b>3</b><span>Guardá tu canción</span></li>
+          <li><b>4</b><span>Escribite una nota</span></li>
+          <li><b>5</b><span>Sellala y esperá a stop.</span></li>
         </ol>
       </div>
 
@@ -104,7 +105,6 @@
           <button class="btn btn--secundario" id="btn-inicio-2" type="button" hidden></button>
         </div>
         <button class="link" id="btn-simular" type="button" hidden>Demo: simular que llegó el 27/10</button>
-        <p class="por">un evento de <img src="assets/logo-post.png" alt="post." width="52" height="24"></p>
       </footer>
     </section>
 
@@ -140,7 +140,7 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12H3M10 5l-7 7 7 7"/></svg>
         </button>
         <div class="header__centro">
-          <span class="paso">paso 1 de 4</span>
+          <span class="paso">paso 1 de 5</span>
           <h1 class="header__titulo" id="t-envase" tabindex="-1">Elegí tu cápsula</h1>
         </div>
         <span class="header__lado" aria-hidden="true"></span>
@@ -156,7 +156,7 @@
           Siguiente
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>
         </button>
-        <div class="progreso" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+        <div class="progreso" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></div>
       </footer>
     </section>
 
@@ -168,7 +168,7 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12H3M10 5l-7 7 7 7"/></svg>
         </button>
         <div class="header__centro">
-          <span class="paso">paso 2 de 4</span>
+          <span class="paso">paso 2 de 5</span>
           <h1 class="header__titulo" id="t-objetivos" tabindex="-1">Sumá tus objetivos</h1>
         </div>
         <span class="header__lado" aria-hidden="true"></span>
@@ -206,11 +206,49 @@
           Siguiente
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>
         </button>
-        <div class="progreso" aria-hidden="true"><i></i><i class="on"></i><i></i><i></i></div>
+        <div class="progreso" aria-hidden="true"><i></i><i class="on"></i><i></i><i></i><i></i></div>
       </footer>
     </section>
 
-    <!-- ============ PASO 3 · NOTA ============ -->
+    <!-- ============ PASO 3 · CANCIÓN ============ -->
+    <section class="pantalla" id="p-cancion" data-tema="negro" aria-labelledby="t-cancion" hidden>
+      <div class="cielo" aria-hidden="true"></div>
+      <header class="header" data-anim>
+        <button class="icon-btn" data-volver type="button" aria-label="Volver">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12H3M10 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="header__centro">
+          <span class="paso">paso 3 de 5</span>
+          <h1 class="header__titulo" id="t-cancion" tabindex="-1">Tu canción para darlo todo</h1>
+        </div>
+        <span class="header__lado" aria-hidden="true"></span>
+      </header>
+
+      <div class="contenido">
+        <p class="bajada bajada--centro" data-anim>La que te pone en movimiento. Va a sonar cuando abras la cápsula el 27/10.</p>
+        <div class="disco-elegido" id="disco-elegido" data-anim aria-live="polite"></div>
+        <div class="buscador" data-anim>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+          <label class="sr" for="in-cancion">Buscar una canción</label>
+          <input id="in-cancion" type="search" placeholder="Buscá una canción o artista" autocomplete="off" enterkeyhint="search">
+          <button class="mini-btn mini-btn--claro" id="btn-cancion-azar" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h3l10 10h5M3 17h3l3-3M14 10l2-3h5M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>
+            Aleatorio
+          </button>
+        </div>
+        <ul class="canciones" id="canciones" role="listbox" aria-label="Canciones" data-anim></ul>
+      </div>
+
+      <footer class="pie" data-anim>
+        <button class="btn btn--primario btn--ancho" data-siguiente type="button" aria-disabled="true">
+          Siguiente
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>
+        </button>
+        <div class="progreso" aria-hidden="true"><i></i><i></i><i class="on"></i><i></i><i></i></div>
+      </footer>
+    </section>
+
+    <!-- ============ PASO 4 · NOTA ============ -->
     <section class="pantalla" id="p-nota" data-tema="crema" aria-labelledby="t-nota" hidden>
       <div class="cielo" aria-hidden="true"></div>
       <header class="header" data-anim>
@@ -218,7 +256,7 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12H3M10 5l-7 7 7 7"/></svg>
         </button>
         <div class="header__centro">
-          <span class="paso">paso 3 de 4</span>
+          <span class="paso">paso 4 de 5</span>
           <h1 class="header__titulo" id="t-nota" tabindex="-1">Escribite una nota</h1>
         </div>
         <button class="link link--omitir" id="btn-omitir" type="button">Omitir</button>
@@ -274,11 +312,11 @@
           Siguiente
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>
         </button>
-        <div class="progreso" aria-hidden="true"><i></i><i></i><i class="on"></i><i></i></div>
+        <div class="progreso" aria-hidden="true"><i></i><i></i><i></i><i class="on"></i><i></i></div>
       </footer>
     </section>
 
-    <!-- ============ PASO 4 · SELLAR ============ -->
+    <!-- ============ PASO 5 · SELLAR ============ -->
     <section class="pantalla" id="p-sellar" data-tema="negro" aria-labelledby="t-sellar" hidden>
       <div class="cielo" aria-hidden="true"></div>
       <header class="header" data-anim>
@@ -286,7 +324,7 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12H3M10 5l-7 7 7 7"/></svg>
         </button>
         <div class="header__centro">
-          <span class="paso">paso 4 de 4</span>
+          <span class="paso">paso 5 de 5</span>
           <h1 class="header__titulo" id="t-sellar" tabindex="-1">Sellala y mandala al 27/10</h1>
         </div>
         <span class="header__lado" aria-hidden="true"></span>
@@ -295,7 +333,7 @@
       <div class="escena escena--sellar">
         <div class="deco" id="deco-sellar" aria-hidden="true"></div>
         <div class="nota-slot nota-slot--sellar" id="slot-sellar"></div>
-        <div class="halo" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M50 4l8 9 12-3 3 12 12 3-3 12 9 8-9 8 3 12-12 3-3 12-12-3-8 9-8-9-12 3-3-12-12-3 3-12-9-8 9-8-3-12 12-3 3-12 12 3z"/></svg></div>
+        <div class="silueta" id="silueta-sellar" aria-hidden="true"></div>
         <div class="envase-slot envase-slot--grande" id="envase-sellar"></div>
         <span class="sello" id="sello" aria-hidden="true">s.</span>
         <div class="destello-sello" id="destello" aria-hidden="true"></div>
@@ -307,38 +345,41 @@
           <svg class="mantener__icono" viewBox="0 0 100 100" aria-hidden="true"><use href="#d-candado"/></svg>
         </button>
         <span class="ayuda-sellar" id="ayuda-sellar">Mantené presionado para sellar</span>
-        <div class="progreso" aria-hidden="true"><i></i><i></i><i></i><i class="on"></i></div>
+        <div class="progreso" aria-hidden="true"><i></i><i></i><i></i><i></i><i class="on"></i></div>
       </footer>
     </section>
 
-    <!-- ============ SELLADA ============ -->
-    <section class="pantalla pantalla--exito" id="p-sellada" data-tema="rosa" aria-labelledby="t-sellada" hidden>
+    <!-- ============ SELLADA (toda la pantalla es la pieza para compartir) ============ -->
+    <section class="pantalla pantalla--exito" id="p-sellada" data-tema="negro" aria-labelledby="t-sellada" hidden>
       <div class="cielo" aria-hidden="true"></div>
-      <div class="confeti" id="confeti" aria-hidden="true"></div>
-      <header class="top" data-anim>
+      <div class="deco" id="deco-exito" aria-hidden="true"></div>
+      <header class="top">
         <span class="header__lado" aria-hidden="true"></span>
-        <span class="marca marca--chica" role="img" aria-label="stop."><span class="sticker sticker--azul" data-texto="stop" aria-hidden="true">stop</span><span class="sticker sticker--azul marca__punto" data-texto="." aria-hidden="true">.</span></span>
+        <span class="marca marca--chica" role="img" aria-label="stop."><span class="sticker sticker--rosa" data-texto="stop" aria-hidden="true">stop</span><span class="sticker sticker--rosa marca__punto" data-texto="." aria-hidden="true">.</span></span>
         <button class="icon-btn" id="btn-cerrar" type="button" aria-label="Volver al inicio">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
         </button>
       </header>
-      <h1 class="sticker sticker--azul sticker--grande" id="t-sellada" tabindex="-1" data-texto="¡Felicitaciones!">¡Felicitaciones!</h1>
-      <p class="exito__titulo" data-anim>Tu cápsula ya viaja al futuro.</p>
-
-      <article class="tarjeta" id="tarjeta" data-anim aria-label="Tarjeta para compartir">
-        <div class="deco" id="deco-tarjeta" aria-hidden="true"></div>
-        <span class="tarjeta__kicker">cápsula del tiempo</span>
-        <div class="envase-slot flota" id="envase-exito"></div>
-        <p class="tarjeta__texto" id="tarjeta-texto"></p>
-        <span class="tarjeta__marca">stop. <small>× post.</small></span>
-      </article>
-      <p class="ayuda ayuda--centro" data-anim>Sacale captura y compartila en tus historias.</p>
-
-      <footer class="pie" data-anim>
-        <button class="btn btn--primario" id="btn-listo" type="button">
-          Listo
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>
-        </button>
+      <div class="pieza" id="pieza">
+        <span class="pieza__kicker">mi cápsula del tiempo</span>
+        <h1 class="sticker sticker--azul sticker--grande" id="t-sellada" tabindex="-1" data-texto="¡Sellada!">¡Sellada!</h1>
+        <div class="envase-slot envase-slot--pieza flota" id="envase-exito"></div>
+        <p class="pieza__texto" id="pieza-texto"></p>
+        <ul class="pieza__datos" id="pieza-datos"></ul>
+      </div>
+      <footer class="pie pie--compartir">
+        <p class="ayuda ayuda--centro">Sacale captura y compartila en tus historias o share.</p>
+        <div class="acciones acciones--fila">
+          <button class="btn btn--primario" id="btn-historias" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
+            Historias o share
+          </button>
+          <button class="btn btn--secundario" data-grupo type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 14.5c2.8 0 5 2 5 5"/></svg>
+            Mi grupo
+          </button>
+        </div>
+        <button class="link" id="btn-listo" type="button">Listo, volver al inicio</button>
       </footer>
     </section>
   </main>
@@ -363,6 +404,19 @@
     <p class="carga__texto" id="carga-texto"></p>
     <div class="carga__barra" aria-hidden="true"><i></i></div>
   </div>
+
+  <!-- Compartir con tu grupo dentro de SPOT! -->
+  <dialog class="sheet sheet--grupo" id="dlg-grupo" aria-labelledby="dlg-grupo-titulo">
+    <span class="sheet__asa" aria-hidden="true"></span>
+    <h2 id="dlg-grupo-titulo">Compartir con tu grupo</h2>
+    <p id="dlg-grupo-texto">Tu grupo de SPOT! va a ver tu progreso.</p>
+    <ul class="grupos" id="grupos"></ul>
+    <div class="acciones">
+      <button class="btn btn--primario btn--ancho" id="grupo-enviar" type="button" aria-disabled="true">Enviar</button>
+      <button class="btn btn--secundario" id="grupo-cancelar" type="button">Cancelar</button>
+    </div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <dialog class="sheet" id="dlg-borrar" aria-labelledby="dlg-titulo">
     <h2 id="dlg-titulo">¿Romper la cápsula?</h2>

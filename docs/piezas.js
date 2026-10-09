@@ -135,6 +135,47 @@
     }
   }
 
+  // Insignia "Viaje en el tiempo": despertador hecho de puntos, como el panda de post.
+  function insigniaReloj() {
+    const C = [100, 112], R = 64, P = 7, r = 2.7;
+    const pts = [];
+    const dentro = (x, y) => {
+      const d = Math.hypot(x - C[0], y - C[1]);
+      if (d >= R - 15 && d <= R) return true;                            // aro
+      for (const bx of [56, 144]) if (Math.hypot(x - bx, y - 46) <= 17 && y < 52) return true; // campanas
+      for (let k = 0; k < 12; k++) {                                     // marcas de las horas
+        const a = (k / 12) * Math.PI * 2, largo = k % 3 ? 4 : 10;
+        for (let t = 0; t <= largo; t += 3) {
+          const px = C[0] + Math.sin(a) * (R - 22 - t), py = C[1] - Math.cos(a) * (R - 22 - t);
+          if (Math.hypot(x - px, y - py) < 3.6) return true;
+        }
+      }
+      if (Math.hypot(x - C[0], y - C[1]) < 6) return true;               // centro
+      if (y > 172 && y < 186 && (Math.abs(x - 62) < 8 || Math.abs(x - 138) < 8)) return true; // patas
+      return false;
+    };
+    for (let y = 24; y <= 190; y += P) for (let x = 24; x <= 176; x += P) if (dentro(x, y)) pts.push(`<circle cx="${x}" cy="${y}" r="${r}"/>`);
+    const aguja = (largo) => {
+      let d = '';
+      for (let t = 10; t <= largo; t += P) d += `<circle cx="${C[0]}" cy="${C[1] - t}" r="${r}"/>`;
+      return d;
+    };
+    return '<svg viewBox="0 0 200 200" class="insignia" aria-hidden="true">' +
+      // silueta del sticker: borde crema grueso y relleno de color
+      '<g class="insignia__borde">' +
+        `<circle cx="${C[0]}" cy="${C[1]}" r="${R + 4}"/><circle cx="56" cy="46" r="21"/><circle cx="144" cy="46" r="21"/>` +
+        '<rect x="52" y="168" width="20" height="22" rx="8"/><rect x="128" y="168" width="20" height="22" rx="8"/>' +
+      '</g>' +
+      '<g class="insignia__fondo">' +
+        `<circle cx="${C[0]}" cy="${C[1]}" r="${R + 4}"/><circle cx="56" cy="46" r="21"/><circle cx="144" cy="46" r="21"/>` +
+        '<rect x="52" y="168" width="20" height="22" rx="8"/><rect x="128" y="168" width="20" height="22" rx="8"/>' +
+      '</g>' +
+      `<g class="insignia__puntos">${pts.join('')}</g>` +
+      `<g class="insignia__puntos aguja aguja--hora">${aguja(30)}</g>` +
+      `<g class="insignia__puntos aguja aguja--min">${aguja(46)}</g>` +
+    '</svg>';
+  }
+
   // Cielo de estrellitas titilando, distinto en cada pantalla.
   function cielo(cont, semilla = 1, n = 26) {
     if (!cont) return;
@@ -292,5 +333,5 @@
     });
   }
 
-  window.Piezas = { COLORES, CAPSULAS, ENVASES, envase, sticker, llenar, vaciar, collage, cielo, confeti, crearNota, pintarNota, escalarNota, decorar, mezcla, limpiar };
+  window.Piezas = { COLORES, CAPSULAS, insigniaReloj, ENVASES, envase, sticker, llenar, vaciar, collage, cielo, confeti, crearNota, pintarNota, escalarNota, decorar, mezcla, limpiar };
 })();

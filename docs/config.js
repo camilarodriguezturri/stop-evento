@@ -10,6 +10,34 @@ window.CAPSULA_CONFIG = {
   // Muestra el botón "Demo: simular que llegó el 27/10" (también con ?demo en el link).
   DEMO: true,
 
+  // Canciones para elegir en el paso 3 (también se puede escribir otra).
+  CANCIONES: [
+    { titulo: 'Eye of the Tiger', artista: 'Survivor' },
+    { titulo: "Don't Stop Me Now", artista: 'Queen' },
+    { titulo: 'Lose Yourself', artista: 'Eminem' },
+    { titulo: 'Color esperanza', artista: 'Diego Torres' },
+    { titulo: 'Stronger', artista: 'Kanye West' },
+    { titulo: "Can't Hold Us", artista: 'Macklemore & Ryan Lewis' },
+    { titulo: 'Believer', artista: 'Imagine Dragons' },
+    { titulo: 'Titanium', artista: 'David Guetta ft. Sia' },
+    { titulo: 'Hall of Fame', artista: 'The Script' },
+    { titulo: 'Run the World (Girls)', artista: 'Beyoncé' },
+    { titulo: 'Remember the Name', artista: 'Fort Minor' },
+    { titulo: 'Unstoppable', artista: 'Sia' },
+    { titulo: 'Gonna Fly Now', artista: 'Bill Conti' },
+    { titulo: 'Muchachos', artista: 'La Mosca Tsé-Tsé' },
+    { titulo: 'Thunder', artista: 'Imagine Dragons' },
+    { titulo: 'We Will Rock You', artista: 'Queen' },
+  ],
+
+  // Grupos de la app SPOT! con los que se puede compartir el progreso (ejemplo).
+  GRUPOS: [
+    { nombre: 'Runners del Obelisco', miembros: 24 },
+    { nombre: 'Bici los domingos', miembros: 11 },
+    { nombre: 'Patín en el Rosedal', miembros: 8 },
+    { nombre: 'Team stop.', miembros: 57 },
+  ],
+
   // Objetivos (hasta 6 por cápsula). "pregunta" aparece en la tarjeta del paso 2.
   // "mas: false" = bajar el número es crecer.
   OBJETIVOS: [

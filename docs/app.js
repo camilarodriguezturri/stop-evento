@@ -8,7 +8,7 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const REDUCIDO = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const DEMO = CFG.DEMO || new URLSearchParams(location.search).has('demo');
-  const KEY = 'stop-capsula-v3';
+  const KEY = 'stop-capsula-v4';
   const DIA = 864e5;
   const MAX = 6; // objetivos por cápsula
 
@@ -37,7 +37,8 @@
       lista.push({ txt: def.nombre, tipo, color });
       lista.push({ txt: `${fmt(o.meta)} ${def.corto}`, tipo: i % 2 ? 'circulo' : 'pastilla', color: i % 2 ? 'crema' : 'azul' });
     });
-    if (nota) lista.push({ txt: 'nota', tipo: 'globo', color: 'rosa' }, { txt: 'stop.', tipo: 'flor', color: 'azul' });
+    if (nota && b.cancion) lista.push({ txt: '♪ ' + b.cancion.titulo, tipo: 'pastilla', color: 'rosa' });
+    if (nota) lista.push({ txt: 'nota', tipo: 'globo', color: 'crema' }, { txt: 'stop.', tipo: 'flor', color: 'azul' });
     return lista;
   }
   const MUESTRA = [
@@ -55,7 +56,7 @@
     return cap;
   }
   function nuevoBorrador(objetivos = []) {
-    return { envase: 'trofeo', objetivos, para: 'mi yo del futuro', mensaje: '', color: 'azul' };
+    return { envase: 'trofeo', objetivos, cancion: null, para: 'mi yo del futuro', mensaje: '', color: 'azul' };
   }
 
   function estadoCapsula() {
@@ -291,9 +292,9 @@
 
   // ---------- cómo funciona (se puede omitir) ----------
   const INTRO = [
-    { titulo: 'Guardá tus objetivos en una cápsula', texto: 'Elegís dónde guardarlos y sumás todo lo que querés lograr: correr, pedalear, patinar, descansar…' },
-    { titulo: 'Sellala hasta stop.', texto: 'Te dejás una nota y la cerrás. Nadie la puede abrir hasta el evento.' },
-    { titulo: 'El 27/10 se abre', texto: 'En stop. la abrís, cargás cómo estás y te mostramos cuánto creciste.' },
+    { titulo: 'Una cápsula del tiempo para tu progreso', texto: 'Guardás dónde estás hoy y a dónde querés llegar. Te sirve para medir tu progreso, seguir tu proceso y motivarte.' },
+    { titulo: 'Se abre en cada evento de stop.', texto: 'Tu cápsula queda sellada hasta la próxima fecha de la marca. La próxima es el 27/10.' },
+    { titulo: 'Cada fecha es tu punto de comparación', texto: 'Ese día cargás tus números y los comparás con los de la última vez. Después sellás una nueva hasta el próximo evento.' },
   ];
   let introIdx = 0, introTimer = 0, introAnim = null;
   function pintarIntro(i) {
@@ -560,15 +561,114 @@
   });
   al.nota = () => requestAnimationFrame(pintarPreview);
 
+  // ---------- paso 3: canción ----------
+  const listaCanciones = $('#canciones');
+  const inCancion = $('#in-cancion');
+  const iniciales = (t) => t.replace(/[^\p{L}\p{N} ]/gu, '').split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+  const COLOR_TAPA = ['azul', 'rosa', 'crema'];
+  const tapa = (c, i = 0) => `<span class="tapa tapa--${COLOR_TAPA[i % 3]}" aria-hidden="true"><b>${esc(iniciales(c.titulo))}</b></span>`;
+  const mismaCancion = (a, b) => a && b && a.titulo === b.titulo && a.artista === b.artista;
+
+  function pintarCanciones() {
+    const q = inCancion.value.trim().toLowerCase();
+    const lista = CFG.CANCIONES.filter((c) => !q || (c.titulo + ' ' + c.artista).toLowerCase().includes(q));
+    listaCanciones.textContent = '';
+    lista.forEach((c) => {
+      const i = CFG.CANCIONES.indexOf(c);
+      const li = document.createElement('li');
+      li.innerHTML = `<button type="button" class="cancion" role="option">${tapa(c, i)}<span class="cancion__txt"><strong>${esc(c.titulo)}</strong><small>${esc(c.artista)}</small></span><span class="cancion__check" aria-hidden="true"></span></button>`;
+      const b = $('button', li);
+      b.setAttribute('aria-selected', !!mismaCancion(c, borrador.cancion));
+      b.addEventListener('click', () => elegirCancion(c));
+      listaCanciones.append(li);
+    });
+    // Si no está en la lista, se puede guardar igual.
+    if (q && !lista.length) {
+      const li = document.createElement('li');
+      const propia = { titulo: inCancion.value.trim().slice(0, 40), artista: 'Elegida por vos' };
+      li.innerHTML = `<button type="button" class="cancion cancion--propia">${tapa(propia, 1)}<span class="cancion__txt"><strong>Guardar “${esc(propia.titulo)}”</strong><small>No está en la lista, la guardamos igual</small></span></button>`;
+      $('button', li).addEventListener('click', () => elegirCancion(propia));
+      listaCanciones.append(li);
+    }
+  }
+  function pintarDisco(animar) {
+    const c = borrador.cancion;
+    const cont = $('#disco-elegido');
+    cont.innerHTML = c
+      ? `<span class="disco" aria-hidden="true"><span class="disco__etiqueta">${esc(iniciales(c.titulo))}</span></span><span class="disco-elegido__txt"><small>tu canción</small><strong>${esc(c.titulo)}</strong><span>${esc(c.artista)}</span></span>`
+      : '<span class="disco disco--vacio" aria-hidden="true"></span><span class="disco-elegido__txt"><small>tu canción</small><strong>Todavía no elegiste</strong><span>Tocá una de la lista</span></span>';
+    if (animar && !REDUCIDO) cont.animate({ transform: ['scale(.94)', 'scale(1.03)', 'none'] }, { duration: 420, easing: 'cubic-bezier(.3,1.5,.5,1)' });
+    $('[data-siguiente]', pantallas.cancion).setAttribute('aria-disabled', !c);
+  }
+  function elegirCancion(c) {
+    borrador.cancion = { titulo: c.titulo, artista: c.artista };
+    pintarDisco(true);
+    pintarCanciones();
+  }
+  inCancion.addEventListener('input', pintarCanciones);
+  $('#btn-cancion-azar').addEventListener('click', () => {
+    inCancion.value = '';
+    elegirCancion(CFG.CANCIONES[Math.floor(Math.random() * CFG.CANCIONES.length)]);
+  });
+  al.cancion = () => { pintarDisco(false); pintarCanciones(); };
+
+  // ---------- compartir ----------
+  const aviso = $('#toast');
+  let avisoT = 0;
+  function avisar(texto) {
+    aviso.textContent = texto;
+    aviso.hidden = false;
+    aviso.classList.remove('visible');
+    void aviso.offsetWidth;
+    aviso.classList.add('visible');
+    clearTimeout(avisoT);
+    avisoT = setTimeout(() => { aviso.classList.remove('visible'); setTimeout(() => { aviso.hidden = true; }, 300); }, 2600);
+  }
+
+  // Compartir con tu grupo dentro de la app SPOT!
+  const dlgGrupo = $('#dlg-grupo');
+  const elegidos = new Set();
+  function abrirGrupo(texto) {
+    $('#dlg-grupo-texto').textContent = texto;
+    elegidos.clear();
+    const ul = $('#grupos');
+    ul.textContent = '';
+    CFG.GRUPOS.forEach((g, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<button type="button" class="grupo" aria-pressed="false"><span class="grupo__avatar grupo__avatar--${COLOR_TAPA[i % 3]}">${esc(iniciales(g.nombre))}</span><span class="grupo__txt"><strong>${esc(g.nombre)}</strong><small>${g.miembros} personas</small></span><span class="grupo__check" aria-hidden="true"></span></button>`;
+      const b = $('button', li);
+      b.addEventListener('click', () => {
+        if (elegidos.has(g.nombre)) elegidos.delete(g.nombre); else elegidos.add(g.nombre);
+        b.setAttribute('aria-pressed', elegidos.has(g.nombre));
+        $('#grupo-enviar').setAttribute('aria-disabled', !elegidos.size);
+      });
+      ul.append(li);
+    });
+    $('#grupo-enviar').setAttribute('aria-disabled', 'true');
+    dlgGrupo.showModal();
+  }
+  $('#grupo-enviar').addEventListener('click', (e) => {
+    if (!elegidos.size) { sacudir(e.currentTarget); return; }
+    const lista = [...elegidos];
+    dlgGrupo.close();
+    avisar(`¡Listo! Lo compartiste con ${lista.length === 1 ? lista[0] : lista.length + ' grupos'}.`);
+  });
+  $('#grupo-cancelar').addEventListener('click', () => dlgGrupo.close());
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-grupo]');
+    if (b) abrirGrupo(b.dataset.grupoTexto || 'Tu grupo de SPOT! va a ver tu cápsula.');
+  });
+
   function prepararPasos() {
     inPara.value = borrador.para;
     inMsg.value = borrador.mensaje;
     $(`input[name="color"][value="${borrador.color}"]`).checked = true;
+    inCancion.value = '';
     pintarObjetivos();
   }
 
   // botones "Siguiente"
-  const orden = ['envase', 'objetivos', 'nota', 'sellar'];
+  const orden = ['envase', 'objetivos', 'cancion', 'nota', 'sellar'];
   $$('[data-siguiente]').forEach((b) => b.addEventListener('click', () => {
     if (b.getAttribute('aria-disabled') === 'true') {
       sacudir(b);
@@ -589,6 +689,10 @@
 
   al.sellar = () => {
     capsulaLlena($('#envase-sellar'), borrador.envase, stickersDe(borrador), { animar: true, demora: 250 });
+    // Solo la silueta del objeto, hecha de puntos, detrás de la cápsula.
+    const sil = $('#silueta-sellar');
+    sil.style.setProperty('--m1', `url(assets/capsulas/${borrador.envase}-frente.png)`);
+    sil.style.setProperty('--m2', `url(assets/capsulas/${borrador.envase}-atras.png)`);
     P.pintarNota(notaSellar, borrador);
     notaSellar.style.cssText = '';
     $('#slot-sellar').style.cssText = '';
@@ -649,6 +753,7 @@
       mensaje: P.limpiar(borrador.mensaje),
       color: borrador.color,
       objetivos: borrador.objetivos.map((o) => ({ id: o.id, antes: o.hoy, meta: o.meta })),
+      cancion: borrador.cancion,
       selladaEn: ahora.toISOString(),
       eventoOrigen: CFG.EVENTO_ACTUAL.nombre,
       evento: CFG.PROXIMO_EVENTO.nombre,
@@ -662,6 +767,7 @@
         { duration: 700, easing: 'cubic-bezier(.5,0,.6,1)', fill: 'forwards' },
       ).finished;
       P.llenar(env, stickersDe(borrador, { nota: true }), { animar: true, desde: stickersDe(borrador).length });
+      await new Promise((r) => setTimeout(r, 400));
       await new Promise((r) => setTimeout(r, 900));
       $('#destello').animate({ opacity: [0, 1, 0], transform: ['scale(.2)', 'scale(6)', 'scale(8)'] }, { duration: 650, easing: 'ease-out' });
       await env.animate(
@@ -682,16 +788,28 @@
   // ---------- sellada ----------
   al.sellada = () => {
     const c = datos.capsula;
-    capsulaLlena($('#envase-exito'), c.envase, stickersDe(c, { nota: true }), { animar: true, demora: 600 });
-    $('#tarjeta-texto').textContent = `Se abre el ${fecha(c.abreEn, { day: 'numeric', month: 'long' })} en ${c.evento}`;
-    P.confeti($('#confeti'));
+    capsulaLlena($('#envase-exito'), c.envase, stickersDe(c, { nota: true }), { animar: true, demora: 500 });
+    $('#pieza-texto').textContent = `Se abre el ${fecha(c.abreEn, { day: 'numeric', month: 'long' })} en ${c.evento}`;
+    const datosPieza = [`${c.objetivos.length} ${c.objetivos.length === 1 ? 'objetivo' : 'objetivos'}`, c.cancion && `♪ ${c.cancion.titulo}`, 'una nota para mí'].filter(Boolean);
+    $('#pieza-datos').innerHTML = datosPieza.map((d) => `<li>${esc(d)}</li>`).join('');
+    $('[data-grupo]', pantallas.sellada).dataset.grupoTexto = 'Tu grupo va a ver que sellaste tu cápsula hasta el 27/10.';
+    P.decorar($('#deco-exito'), P.mezcla(1, 7, { y0: 8, y1: 50 }));
     if (!REDUCIDO) {
       $('#t-sellada').animate(
         { transform: ['scale(.4) rotate(-12deg)', 'scale(1.08) rotate(-4deg)', 'scale(1) rotate(-4deg)'], opacity: [0, 1, 1] },
         { duration: 600, delay: 250, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'both' },
       );
+      $$('#pieza-datos li').forEach((li, i) => li.animate({ opacity: [0, 1], transform: ['translateY(10px) scale(.8)', 'none'] }, { duration: 400, delay: 900 + i * 120, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'backwards' }));
     }
   };
+  $('#btn-historias').addEventListener('click', async () => {
+    const c = datos.capsula;
+    const texto = `Sellé mi cápsula del tiempo en SPOT! 🔒 Se abre el ${fecha(c.abreEn, { day: 'numeric', month: 'long' })} en stop.`;
+    try {
+      if (navigator.share) { await navigator.share({ title: 'Mi cápsula del tiempo', text: texto }); return; }
+    } catch (e) { if (e.name === 'AbortError') return; }
+    avisar('Sacale captura a la pantalla y subila a tus historias.');
+  });
   const alInicio = () => { pila.length = 0; ir('inicio', { atras: true }); };
   $('#btn-listo').addEventListener('click', alInicio);
   $('#btn-cerrar').addEventListener('click', alInicio);
@@ -735,6 +853,7 @@
   let barraAnim = null;
 
   let semillaCielo = 40;
+  let idxCarga = 2;
   function slide({ tema, deco = [], html, auto = 6000, interactiva = false, alEntrar }) {
     const el = document.createElement('section');
     el.className = 'slide';
@@ -799,7 +918,26 @@
       },
     }));
 
+    if (c.cancion) {
+      lista.push(slide({
+        tema: 'negro',
+        interactiva: true,
+        deco: P.mezcla(24, 8, { y0: 26, y1: 94 }),
+        html:
+          '<p class="slide__kicker">tu canción de la cápsula</p>' +
+          '<h2 class="slide__titulo">Subí el volumen</h2>' +
+          '<div class="slide__centro"><div class="disco disco--grande" aria-hidden="true"><span class="disco__etiqueta">' + esc(iniciales(c.cancion.titulo)) + '</span></div></div>' +
+          `<p class="slide__cancion"><strong>${esc(c.cancion.titulo)}</strong><span>${esc(c.cancion.artista)}</span></p>` +
+          '<div class="slide__pie">' +
+            `<a class="btn btn--secundario" href="https://open.spotify.com/search/${encodeURIComponent(c.cancion.titulo + ' ' + c.cancion.artista)}" target="_blank" rel="noopener">Escuchar en Spotify</a>` +
+            '<button class="btn btn--primario" type="button" data-seguir>Seguir<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg></button>' +
+          '</div>',
+        alEntrar: (el) => { $('[data-seguir]', el).onclick = () => mostrar(idx + 1); },
+      }));
+    }
+
     // Actualizar números de hoy.
+    idxCarga = lista.length;
     const ahora = c.objetivos.map((o) => ({ ...o, ahora: o.ahora ?? o.antes }));
     lista.push(slide({
       tema: 'crema',
@@ -830,10 +968,10 @@
           c.abiertaEn ||= (c.simulada ? c.abreEn : new Date().toISOString());
           guardar();
           // Rearmar las slides de comparación con los números nuevos.
-          const fijas = slides.slice(0, 3);
-          slides.slice(3).forEach((s) => s.el.remove());
+          const fijas = slides.slice(0, idxCarga + 1);
+          slides.slice(idxCarga + 1).forEach((s) => s.el.remove());
           slides = fijas.concat(slidesComparacion(c));
-          slides.slice(3).forEach((s) => slidesCont.append(s.el));
+          slides.slice(idxCarga + 1).forEach((s) => slidesCont.append(s.el));
           pintarBarras();
           mostrar(idx + 1);
         };
@@ -908,22 +1046,59 @@
         (metasOk ? ` y cumpliste ${metasOk} ${metasOk === 1 ? 'meta' : 'metas'}` : '') + '</h2>' +
         '<div data-resumen style="width:100%"></div>' +
         '<div class="slide__pie" style="margin-top:auto;padding-top:20px">' +
-          '<button class="btn btn--primario" type="button" data-nueva>Sellar una nueva cápsula<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg></button>' +
-          '<button class="btn btn--secundario" type="button" data-cerrar>Cerrar</button>' +
+          '<button class="btn btn--primario" type="button" data-logro>Ver mi logro<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg></button>' +
+          '<button class="btn btn--secundario" type="button" data-grupo data-grupo-texto="Tu grupo va a ver cuánto creciste desde la última vez.">Compartir con mi grupo</button>' +
         '</div>',
       alEntrar: (el) => {
         const cont = $('[data-resumen]', el);
         cont.textContent = '';
         cont.append(listaResumen(c));
-        $('[data-nueva]', el).onclick = () => { cerrarHistoria(); btnInicio.click(); };
-        $('[data-cerrar]', el).onclick = cerrarHistoria;
+        $('[data-logro]', el).onclick = () => mostrar(idx + 1);
         if (!REDUCIDO) $('.sticker', el).animate(
           { transform: ['scale(.3) rotate(-14deg)', 'scale(1.1) rotate(-4deg)', 'scale(1) rotate(-4deg)'] },
           { duration: 650, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'both' },
         );
       },
     });
-    return [...lista, final];
+    // Logro "Viaje en el tiempo", con la estética de los logros de post.
+    const logro = slide({
+      tema: 'negro',
+      interactiva: true,
+      deco: P.mezcla(41, 6, { y0: 4, y1: 38 }),
+      html:
+        '<div class="logro">' +
+          '<span class="logro__banda" aria-hidden="true"></span>' +
+          '<svg class="logro__onda" viewBox="0 0 400 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 34c40 0 60-16 100-16s60 16 100 16 60-16 100-16 60 16 100 16"/><path d="M0 46c40 0 60-16 100-16s60 16 100 16 60-16 100-16 60 16 100 16"/></svg>' +
+          '<div class="logro__insignia">' + P.insigniaReloj() + '</div>' +
+        '</div>' +
+        '<p class="slide__kicker">nuevo logro</p>' +
+        '<h2 class="slide__titulo">Viaje en el tiempo</h2>' +
+        '<p class="slide__texto">Abriste tu cápsula y te comparaste con tu yo del pasado.</p>' +
+        '<div class="slide__pie" style="margin-top:auto;padding-top:20px">' +
+          '<button class="btn btn--primario" type="button" data-grupo data-grupo-texto="Tu grupo va a ver tu logro “Viaje en el tiempo”.">Compartir con mi grupo</button>' +
+          '<button class="btn btn--secundario" type="button" data-nueva>Sellar una nueva cápsula</button>' +
+          '<button class="link" type="button" data-cerrar>Cerrar</button>' +
+        '</div>',
+      alEntrar: (el) => {
+        datos.logros ||= {};
+        datos.logros.viajeEnElTiempo ||= new Date().toISOString();
+        guardar();
+        $('[data-nueva]', el).onclick = () => { cerrarHistoria(); btnInicio.click(); };
+        $('[data-cerrar]', el).onclick = cerrarHistoria;
+        if (!REDUCIDO) {
+          $('.logro__insignia', el).animate(
+            { transform: ['scale(0) rotate(-40deg)', 'scale(1.15) rotate(8deg)', 'scale(1) rotate(-4deg)'] },
+            { duration: 900, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'both' },
+          );
+          // Las agujas giran rápido (viajan en el tiempo) y frenan.
+          $$('.aguja', el).forEach((a, i) => a.animate(
+            { transform: ['rotate(0deg)', `rotate(${i ? 1440 + 90 : 720 - 60}deg)`] },
+            { duration: 2600, easing: 'cubic-bezier(.15,.7,.2,1)', fill: 'forwards' },
+          ));
+        }
+      },
+    });
+    return [...lista, final, logro];
   }
 
   function pintarBarras() {
@@ -939,7 +1114,7 @@
     if (n < 0) n = 0;
     if (n >= slides.length) { cerrarHistoria(); return; }
     // No se puede saltear la carga de números.
-    if (n > 2 && !datos.capsula.abierta) n = 2;
+    if (n > idxCarga && !datos.capsula.abierta) n = idxCarga;
     clearTimeout(timer);
     barraAnim?.cancel();
     slides.forEach((s, i) => { s.el.hidden = i !== n; });
