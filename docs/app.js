@@ -8,7 +8,7 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const REDUCIDO = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const DEMO = CFG.DEMO || new URLSearchParams(location.search).has('demo');
-  const KEY = 'stop-capsula-v1';
+  const KEY = 'stop-capsula-v2';
   const DIA = 864e5;
 
   // ---------- datos ----------
@@ -26,7 +26,7 @@
 
   let borrador = nuevoBorrador();
   function nuevoBorrador(objetivos = []) {
-    return { envase: 'locker', objetivos, para: 'mi yo del futuro', mensaje: '', color: 'azul' };
+    return { envase: 'zapatilla', objetivos, para: 'mi yo del futuro', mensaje: '', color: 'azul' };
   }
 
   function estadoCapsula() {
@@ -40,6 +40,13 @@
   const pantallas = Object.fromEntries($$('.pantalla').map((p) => [p.id.slice(2), p]));
   let actual = pantallas.inicio;
   const pila = [];
+  const COLOR_TEMA = { azul: '#7aa1ff', rosa: '#f79ee1', crema: '#ede8db', negro: '#1d1d1f' };
+
+  // El fondo de la página acompaña el color de la pantalla.
+  function aplicarTema(tema) {
+    document.body.dataset.tema = tema;
+    $('meta[name="theme-color"]').content = COLOR_TEMA[tema];
+  }
 
   async function ir(id, { atras = false } = {}) {
     const desde = actual;
@@ -48,6 +55,7 @@
     if (!atras) pila.push(desde.id.slice(2));
     actual = hacia;
     al[id]?.();
+    aplicarTema(hacia.dataset.tema);
     hacia.hidden = false;
     desde.classList.add('saliendo');
     hacia.classList.add('entrando');
@@ -80,23 +88,31 @@
   }
   document.addEventListener('animationend', (e) => e.target.classList?.remove('sacudir'));
 
-  // ---------- misceláneas ----------
-  P.decorar($('#deco-inicio'), [
-    { t: 'flor', x: '3%', y: '4%', s: 46, c: 'rosa' },
-    { t: 'punto', x: '30%', y: '2%', s: 14, c: 'azul' },
-    { t: 'aro', x: '84%', y: '6%', s: 26 },
-    { t: 'punto-o', x: '88%', y: '34%', s: 22, c: 'azul' },
-    { t: 'flor-hueca', x: '4%', y: '58%', s: 40 },
-    { t: 'punto', x: '18%', y: '86%', s: 20, c: 'rosa' },
-    { t: 'flor', x: '84%', y: '90%', s: 30, c: 'azul', p: 8 },
-    { t: 'punto', x: '58%', y: '92%', s: 10, c: 'crema' },
-    { t: 'aro', x: '44%', y: '84%', s: 16, c: 'azul' },
+  // ---------- misceláneas, estrellitas y objetos flotantes ----------
+  $$('.cielo').forEach((c, i) => P.cielo(c, i + 1));
+  P.flotantes($('#flot-inicio'), [
+    { id: 'zapatilla', x: '-4%', y: '2%', s: 118, r: -18 },
+    { id: 'casco', x: '70%', y: '-2%', s: 112, r: 14 },
+    { id: 'olla', x: '74%', y: '62%', s: 104, r: -8 },
+    { id: 'patin', x: '-6%', y: '64%', s: 108, r: 12 },
+    { id: 'botella', x: '84%', y: '34%', s: 58, r: 24 },
   ]);
-  P.decorar($('#deco-espera'), P.mezcla(3, 8));
-  P.decorar($('#deco-lista'), P.mezcla(5, 8));
-  P.decorar($('#deco-nota'), P.mezcla(2, 5, { y0: 10, y1: 80 }));
-  P.decorar($('#deco-sellar'), P.mezcla(7, 7));
-  P.decorar($('#deco-exito'), P.mezcla(1, 8));
+  P.decorar($('#deco-inicio'), [
+    { t: 'flor', x: '34%', y: '2%', s: 34, c: 'rosa' },
+    { t: 'punto', x: '28%', y: '30%', s: 14, c: 'crema' },
+    { t: 'aro', x: '88%', y: '40%', s: 24 },
+    { t: 'punto-o', x: '58%', y: '10%', s: 18, c: 'rosa' },
+    { t: 'flor-hueca', x: '6%', y: '44%', s: 30 },
+    { t: 'punto', x: '22%', y: '90%', s: 18, c: 'rosa' },
+    { t: 'flor', x: '62%', y: '92%', s: 26, c: 'crema', p: 8 },
+    { t: 'punto', x: '90%', y: '86%', s: 10, c: 'crema' },
+  ]);
+  P.decorar($('#deco-espera'), P.mezcla(3, 9));
+  P.decorar($('#deco-lista'), P.mezcla(5, 9));
+  P.decorar($('#deco-nota'), P.mezcla(2, 6, { y0: 10, y1: 80 }));
+  P.decorar($('#deco-sellar'), P.mezcla(7, 9, { y0: 2, y1: 70 }));
+  P.decorar($('#deco-tarjeta'), P.mezcla(1, 6));
+  $$('[data-fecha-evento]').forEach((el) => { el.textContent = fecha(CFG.PROXIMO_EVENTO.fecha, { day: 'numeric', month: 'long' }); });
 
   // ---------- inicio ----------
   const btnInicio = $('#btn-inicio');
@@ -108,6 +124,8 @@
     const est = estadoCapsula();
     const c = datos.capsula;
     $$('.estado', pantallas.inicio).forEach((el) => { el.hidden = el.dataset.estado !== est; });
+    pantallas.inicio.dataset.tema = { vacio: 'azul', sellada: 'negro', lista: 'rosa', abierta: 'crema' }[est];
+    if (actual === pantallas.inicio) aplicarTema(pantallas.inicio.dataset.tema);
     clearInterval(reloj);
     btnInicio.hidden = false;
     btnInicio2.hidden = true;
@@ -117,7 +135,7 @@
       $('.btn__texto', btnInicio).textContent = 'Armar mi cápsula';
     } else if (est === 'sellada') {
       ponerEnvase($('#envase-espera'), c.envase);
-      $('#espera-evento').textContent = c.evento;
+      $('#espera-evento').textContent = `${c.evento} · ${fecha(c.abreEn, { day: 'numeric', month: 'long' })}`;
       $('#espera-fecha').textContent = 'El ' + fecha(c.abreEn, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       btnInicio.hidden = true;
       btnInicio2.hidden = false;
@@ -128,7 +146,7 @@
     } else if (est === 'lista') {
       ponerEnvase($('#envase-lista'), c.envase);
       $('#lista-texto').textContent =
-        `La sellaste el ${fecha(c.selladaEn)} en ${punto(c.eventoOrigen)} Llegó el momento de ver cuánto creciste.`;
+        `La sellaste el ${fecha(c.selladaEn, { day: 'numeric', month: 'long' })} en ${punto(c.eventoOrigen)} Ahora vas a ver cuánto creciste.`;
       $('.btn__texto', btnInicio).textContent = 'Abrir mi cápsula';
     } else {
       pintarResumenMini();
@@ -225,13 +243,18 @@
     b.className = 'opcion';
     b.setAttribute('role', 'radio');
     b.dataset.id = e.id;
-    b.innerHTML = '<span class="opcion__nombre"></span><span class="opcion__escena"><span class="deco"></span></span>';
+    b.innerHTML = '<span class="opcion__escena"><span class="deco"></span></span><span class="opcion__nombre"></span><span class="opcion__para"></span>';
     $('.opcion__nombre', b).textContent = e.nombre;
+    $('.opcion__para', b).textContent = e.para;
     $('.opcion__escena', b).append(P.envase(e.id));
-    P.decorar($('.deco', b), P.mezcla(11 + i, 6));
+    P.decorar($('.deco', b), P.mezcla(11 + i, 8));
     b.addEventListener('click', () => elegirEnvase(e.id, true));
     carrusel.append(b);
-    puntos.append(document.createElement('i'));
+    const punto = document.createElement('button');
+    punto.type = 'button';
+    punto.setAttribute('aria-label', e.nombre);
+    punto.addEventListener('click', () => elegirEnvase(e.id, true));
+    puntos.append(punto);
   });
 
   function elegirEnvase(id, mover) {
@@ -281,8 +304,48 @@
       else if (borrador.objetivos.length < 3) borrador.objetivos.push({ id: o.id, hoy: o.hoy, meta: o.meta });
       else { sacudir(chips); return; }
       pintarObjetivos();
+      pintarPregunta(true);
     });
     chips.append(b);
+  });
+
+  // Tarjeta de preguntas, como las de Spotify: "Otra pregunta" cambia, "Sumar" la agrega, "Aleatorio" arma 3.
+  const pregunta = $('#pregunta');
+  let preguntaIdx = 0;
+  const libres = () => CFG.OBJETIVOS.filter((o) => !borrador.objetivos.some((x) => x.id === o.id));
+  function pintarPregunta(animar = false) {
+    const lista = libres();
+    const lleno = borrador.objetivos.length >= 3 || !lista.length;
+    const o = lista[preguntaIdx % Math.max(1, lista.length)];
+    pregunta.textContent = lleno ? '¡Listo! Ya sumaste tus 3 objetivos.' : o.pregunta;
+    pregunta.dataset.id = lleno ? '' : o.id;
+    $('#btn-sumar').setAttribute('aria-disabled', lleno);
+    $('#btn-pregunta').setAttribute('aria-disabled', lleno);
+    if (animar && !REDUCIDO) { pregunta.classList.remove('cambia'); void pregunta.offsetWidth; pregunta.classList.add('cambia'); }
+  }
+  function sumarObjetivo(id) {
+    const o = objetivo(id);
+    if (!o || borrador.objetivos.length >= 3 || borrador.objetivos.some((x) => x.id === id)) return false;
+    borrador.objetivos.push({ id: o.id, hoy: o.hoy, meta: o.meta });
+    return true;
+  }
+  $('#btn-pregunta').addEventListener('click', () => { preguntaIdx++; pintarPregunta(true); });
+  $('#btn-sumar').addEventListener('click', (e) => {
+    if (!sumarObjetivo(pregunta.dataset.id)) { sacudir(e.currentTarget); return; }
+    pintarObjetivos();
+    pintarPregunta(true);
+  });
+  $('#btn-aleatorio').addEventListener('click', () => {
+    const mezcla = [...CFG.OBJETIVOS];
+    for (let i = mezcla.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [mezcla[i], mezcla[j]] = [mezcla[j], mezcla[i]];
+    }
+    mezcla.length = 3;
+    borrador.objetivos = [];
+    mezcla.forEach((o) => sumarObjetivo(o.id));
+    pintarObjetivos();
+    pintarPregunta(true);
   });
 
   function stepper(label, valor, def, onCambio, cls = '') {
@@ -338,6 +401,7 @@
       metas.append(card);
     });
     $('[data-siguiente]', pantallas.objetivos).setAttribute('aria-disabled', !borrador.objetivos.length);
+    pintarPregunta();
   }
 
   // ---------- paso 3: nota ----------
@@ -371,6 +435,12 @@
     inMsg.setSelectionRange(inMsg.value.length, inMsg.value.length);
   }));
   $('#form').addEventListener('submit', (e) => e.preventDefault());
+  // Omitir: la cápsula viaja solo con los objetivos y un mensaje de aliento.
+  $('#btn-omitir').addEventListener('click', () => {
+    if (!P.limpiar(inMsg.value)) inMsg.value = '¡Vamos que se puede! Acá están mis objetivos.';
+    pintarPreview();
+    ir('sellar');
+  });
   al.nota = () => requestAnimationFrame(pintarPreview);
 
   function prepararPasos() {
@@ -401,16 +471,12 @@
   let t0 = 0, raf = 0, sellando = false;
 
   al.sellar = () => {
-    $('#sellar-evento').textContent = punto(CFG.PROXIMO_EVENTO.nombre);
     ponerEnvase($('#envase-sellar'), borrador.envase);
-    $('#envase-sellar .envase').classList.add('abierta');
     P.pintarNota(notaSellar, borrador);
     notaSellar.style.cssText = '';
     $('#slot-sellar').style.cssText = '';
     requestAnimationFrame(() => P.escalarNota(notaSellar, 170, 150));
-    const sello = $('#sello');
-    sello.getAnimations().forEach((a) => a.cancel());
-    sello.style.opacity = '';
+    [$('#sello'), $('#destello'), $('#envase-sellar')].forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
     avance.style.strokeDashoffset = LARGO;
     sellando = false;
     $('#ayuda-sellar').textContent = 'Mantené presionado para sellar';
@@ -473,14 +539,16 @@
     };
     guardar();
     if (!REDUCIDO) {
-      const dy = env.getBoundingClientRect().top - slot.getBoundingClientRect().top + 30;
+      const dy = env.getBoundingClientRect().top - slot.getBoundingClientRect().top + env.offsetHeight * .3;
       await slot.animate(
         [{ transform: 'none' }, { transform: 'translateY(-20px) rotate(-4deg)', offset: .3 }, { transform: `translateY(${dy}px) scale(.35)`, opacity: 0 }],
         { duration: 700, easing: 'cubic-bezier(.5,0,.6,1)', fill: 'forwards' },
       ).finished;
-      env.classList.remove('abierta');
-      await new Promise((r) => setTimeout(r, 380));
-      env.animate({ rotate: ['0deg', '-5deg', '5deg', '-3deg', '0deg'] }, { duration: 420 });
+      $('#destello').animate({ opacity: [0, 1, 0] }, { duration: 650, easing: 'ease-out' });
+      await env.animate(
+        { transform: ['scale(1)', 'scale(1.18) rotate(-6deg)', 'scale(.94) rotate(4deg)', 'scale(1)'] },
+        { duration: 650, easing: 'cubic-bezier(.3,1.5,.5,1)' },
+      ).finished;
       await $('#sello').animate(
         [{ opacity: 0, transform: 'scale(2) rotate(-20deg)' }, { opacity: 1, transform: 'scale(.9) rotate(-8deg)', offset: .7 }, { opacity: 1, transform: 'scale(1) rotate(-8deg)' }],
         { duration: 420, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'forwards' },
@@ -495,10 +563,10 @@
   al.sellada = () => {
     const c = datos.capsula;
     ponerEnvase($('#envase-exito'), c.envase);
-    $('#exito-texto').textContent =
-      `Se abre el ${fecha(c.abreEn)} en ${punto(c.evento)} Ahí vas a leer tu nota y ver cuánto creciste.`;
+    $('#tarjeta-texto').textContent = `Se abre el ${fecha(c.abreEn, { day: 'numeric', month: 'long' })} en ${c.evento}`;
+    P.confeti($('#confeti'));
     if (!REDUCIDO) {
-      $('.sticker--grande', pantallas.sellada).animate(
+      $('#t-sellada').animate(
         { transform: ['scale(.4) rotate(-12deg)', 'scale(1.08) rotate(-4deg)', 'scale(1) rotate(-4deg)'], opacity: [0, 1, 1] },
         { duration: 600, delay: 250, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'both' },
       );
@@ -546,13 +614,16 @@
   let timer = 0;
   let barraAnim = null;
 
-  function slide({ bg, deco = [], html, auto = 6000, interactiva = false, alEntrar }) {
+  let semillaCielo = 40;
+  function slide({ tema, deco = [], html, auto = 6000, interactiva = false, alEntrar }) {
     const el = document.createElement('section');
     el.className = 'slide';
+    el.dataset.tema = tema;
     el.hidden = true;
-    el.innerHTML = '<div class="deco" aria-hidden="true"></div>' + html;
+    el.innerHTML = '<div class="cielo" aria-hidden="true"></div><div class="deco" aria-hidden="true"></div>' + html;
+    P.cielo($('.cielo', el), semillaCielo++);
     P.decorar($('.deco', el), deco);
-    return { el, bg, auto, interactiva, alEntrar };
+    return { el, tema, auto, interactiva, alEntrar };
   }
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -563,25 +634,30 @@
     const lista = [];
 
     lista.push(slide({
-      bg: 'var(--azul)',
-      deco: P.mezcla(21, 7, { y0: 30, y1: 92 }),
+      tema: 'negro',
+      deco: P.mezcla(21, 9, { y0: 30, y1: 94 }),
       auto: 5200,
       html:
         `<p class="slide__kicker">cápsula del ${esc(fecha(c.selladaEn, { day: '2-digit', month: '2-digit', year: 'numeric' }))}</p>` +
         `<h2 class="slide__titulo">Hace ${dias} ${dias === 1 ? 'día' : 'días'} sellaste esta cápsula</h2>` +
         `<p class="slide__texto">En ${esc(punto(c.eventoOrigen))} Hoy se abre.</p>` +
-        '<div class="slide__centro"><div class="envase-slot envase-slot--grande tiembla" data-envase></div></div>',
+        '<div class="slide__centro"><div class="envase-slot envase-slot--grande tiembla" data-envase></div></div>' +
+        '<p class="slide__texto" data-abriendo>Abriendo…</p>',
       alEntrar: (el) => {
         const slot = $('[data-envase]', el);
         ponerEnvase(slot, c.envase);
-        setTimeout(() => { slot.classList.remove('tiembla'); $('.envase', slot).classList.add('abierta'); }, REDUCIDO ? 0 : 2200);
+        setTimeout(() => {
+          slot.classList.remove('tiembla');
+          $('.envase', slot).classList.add('abierta');
+          $('[data-abriendo]', el).textContent = '¡Se abrió!';
+        }, REDUCIDO ? 0 : 2200);
       },
     }));
 
     lista.push(slide({
       // Fondo opuesto al color de la nota para que se lea.
-      bg: c.color === 'rosa' ? 'var(--azul)' : 'var(--rosa)',
-      deco: P.mezcla(22, 6, { y0: 28, y1: 92 }),
+      tema: c.color === 'rosa' ? 'azul' : 'rosa',
+      deco: P.mezcla(22, 8, { y0: 28, y1: 94 }),
       auto: 8000,
       html:
         '<p class="slide__kicker">esto te escribiste</p>' +
@@ -605,7 +681,7 @@
     // Actualizar números de hoy.
     const ahora = c.objetivos.map((o) => ({ ...o, ahora: o.ahora ?? o.antes }));
     lista.push(slide({
-      bg: 'var(--crema)',
+      tema: 'crema',
       interactiva: true,
       deco: P.mezcla(23, 3, { y0: 90, y1: 98 }),
       html:
@@ -660,9 +736,9 @@
       const flecha = '<svg class="compara__flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>';
       const llenoDesde = pos(Math.min(o.antes, o.ahora));
       const llenoHasta = pos(Math.max(o.antes, o.ahora));
-      const deco = P.mezcla(30 + i, 7, { y0: 26, y1: 94 });
+      const deco = P.mezcla(30 + i, 9, { y0: 26, y1: 96 });
       return slide({
-        bg: i % 2 ? 'var(--rosa)' : 'var(--azul)',
+        tema: ['azul', 'negro', 'rosa'][i % 3],
         deco,
         auto: 6500,
         html:
@@ -702,7 +778,7 @@
     const crecio = c.objetivos.filter((o) => comparar(o).delta > 0).length;
     const metasOk = c.objetivos.filter((o) => comparar(o).llego).length;
     const final = slide({
-      bg: 'var(--crema)',
+      tema: 'azul',
       interactiva: true,
       deco: P.mezcla(40, 4, { y0: 3, y1: 14 }),
       html:
@@ -748,12 +824,12 @@
     slides.forEach((s, i) => { s.el.hidden = i !== n; });
     idx = n;
     const s = slides[n];
-    historia.style.setProperty('--bg', s.bg);
+    historia.dataset.tema = s.tema;
     historia.classList.toggle('interactiva', s.interactiva);
     [...barras.children].forEach((b, i) => b.classList.toggle('hecha', i < n || (i === n && s.interactiva)));
     s.alEntrar?.(s.el);
     if (!REDUCIDO) {
-      $$(':scope > :not(.deco)', s.el).forEach((el, i) => el.animate(
+      $$(':scope > :not(.deco):not(.cielo)', s.el).forEach((el, i) => el.animate(
         { opacity: [0, 1], transform: ['translateY(16px)', 'none'] },
         { duration: 450, delay: i * 70, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' },
       ));
@@ -772,6 +848,7 @@
     pintarBarras();
     historia.hidden = false;
     document.body.style.overflow = 'hidden';
+    aplicarTema('negro');
     if (!REDUCIDO) historia.animate({ opacity: [0, 1], transform: ['scale(.96)', 'none'] }, { duration: 300, easing: 'cubic-bezier(.2,.8,.2,1)' });
     mostrar(0);
     $('#historia-cerrar').focus();
@@ -783,6 +860,7 @@
     historia.hidden = true;
     document.body.style.overflow = '';
     pintarInicio();
+    aplicarTema(actual.dataset.tema);
   }
 
   $('#zona-atras').addEventListener('click', () => mostrar(idx - 1));

@@ -1,45 +1,46 @@
 # Cápsula del tiempo · stop.
 
-Para **stop.**, el evento de post. Extensión de la app SPOT! con la identidad de [Dedicatorias post.](https://estefigarrido.github.io/dedicatorias-post/)
-(Sora / Reddit Sans / JetBrains Mono, notita festoneada, botones pill), en versión clara:
-fondo `#EDE8DB`, azul `#7AA1FF` y rosa `#F79EE1`.
+Para **stop.**, el evento de post. (27 de octubre). Extensión de la app SPOT! con la identidad de
+[Dedicatorias post.](https://estefigarrido.github.io/dedicatorias-post/) (Sora / Reddit Sans / JetBrains Mono,
+notita festoneada, botones pill) y la estructura de la *Spotify Time Capsule*.
 
 - Sitio: carpeta [`docs/`](docs/) (lista para GitHub Pages, sin build).
 - Probar en local: `cd docs && python3 -m http.server` → <http://localhost:8000>.
 
-## La idea
+## Recorrido
 
-Como la *Playlist para el Futuro* de Spotify, pero con objetivos personales y atada a cada edición de stop.:
+1. **Inicio** (azul): título sticker con objetos 3D flotando y los 4 pasos.
+2. **Paso 1 · Elegí tu cápsula** (negro): carrusel de objetos 3D — zapatilla (runners), casco (ciclistas),
+   patín (quienes patinan), olla (quienes cocinan) y caramañola.
+3. **Paso 2 · Sumá tus objetivos** (rosa): tarjeta de preguntas como la de Spotify, con *Sumar*,
+   *Otra pregunta* y *Aleatorio*. Hasta 3 objetivos con "hoy" y "meta".
+4. **Paso 3 · Escribite una nota** (crema): la notita festoneada de post. Se puede *Omitir*.
+5. **Paso 4 · Sellala** (negro): la cápsula sobre un podio; se mantiene presionado, la nota entra, destello y sello `s.`.
+6. **¡Felicitaciones!** (rosa): confeti y tarjeta para compartir en historias.
+7. **Esperando** (negro): candado y cuenta regresiva al 27/10.
+8. **El 27/10** (rosa): la cápsula tiembla y se abre como *stories*: hace N días la sellaste → tu nota →
+   ¿dónde estás hoy? → una pantalla por objetivo (azul / negro / rosa) → resumen "¡Creciste!".
+9. **Sellar una nueva** arranca desde los números de hoy (y sube la meta si ya la cumpliste).
 
-1. **En stop.** la persona arma su cápsula en 4 pasos:
-   1. **Elegí tu cápsula**: casillero del vestuario, caramañola, pelota que se abre o trofeo con tapa (carrusel animado).
-   2. **Tus objetivos**: hasta 3 (correr, entrenar, fuerza, descansar, menos pantalla…) con *dónde estoy hoy* y *mi meta*.
-   3. **Una nota para tu yo del futuro**: la notita festoneada de post. (`para:` + mensaje), en azul o rosa.
-   4. **Sellala**: mantener presionado; la nota cae adentro, se cierra la tapa y aparece el sello `s.`.
-2. **Mientras tanto** el inicio muestra la cápsula sellada con candado y la cuenta regresiva al próximo evento.
-3. **En la próxima edición de stop.** la cápsula se desbloquea y se abre como *stories*:
-   hace N días la sellaste → tu nota del pasado → ¿dónde estás hoy? (actualizás los números) →
-   una pantalla por objetivo (antes → hoy, % de crecimiento, cuánto falta para la meta) → resumen “¡Creciste!”.
-4. **Sellar una nueva** arranca la próxima cápsula desde los números de hoy (y sube la meta si ya la cumpliste),
-   así cada evento compara contra la última vez.
+## Identidad y animación
 
-### Identidad
-
-- **stop.** está escrito como el logo de post.: Sora regular con interletrado cerrado, letra llena y contorno grueso.
-  Los títulos tipo sticker usan tres capas del mismo texto (contorno oscuro, contorno de color y letra llena sin trazo)
-  para que nunca se vean los bordes internos de la tipografía.
-- **Misceláneas**: mezcla de los puntos de SPOT! (color con borde) y los de post. (puntos oscuros, aros y flores
-  festoneadas). Flotan, las flores giran, los puntos laten y los aros respiran (`piezas.js`, `forma()` y `mezcla()`).
-- Todo tiene animación: títulos que caen, pasos que entran, cápsulas con movimiento propio (dial del casillero,
-  burbujas en la caramañola, pelota que rebota, destello del trofeo), brillo en los botones, cuenta regresiva que gira.
+- Cada pantalla tiene su fondo: azul `#7AA1FF`, rosa `#F79EE1`, crema `#EDE8DB` y negro. Brillo animado en los
+  bordes (como el marco de la cápsula de Spotify) y cielo de estrellitas que titilan.
+- **stop.** en Sora regular con interletrado cerrado, como el logo de post. Los títulos tipo sticker usan tres capas
+  del mismo texto (contorno oscuro, contorno de color y letra llena) para que no se vean bordes internos.
+- **Misceláneas**: puntos de SPOT! y flores/puntos/aros de post. — flotan, giran, laten y respiran.
+- Las cápsulas son imágenes 3D (`docs/assets/capsulas/*.png`), renderizadas con three.js desde
+  [`herramientas/capsulas-3d/escena.html`](herramientas/capsulas-3d/escena.html). Se pueden reemplazar por
+  renders propios con el mismo nombre (PNG con fondo transparente, cuadrado).
 
 ## Configuración
 
 Todo en [`docs/config.js`](docs/config.js):
 
-- `EVENTO_ACTUAL` y `PROXIMO_EVENTO`: nombre y fecha. La cápsula se abre sola cuando llega la fecha.
-- `DEMO`: muestra “Demo: simular que llegó el evento” para probar la apertura sin esperar (también `?demo`).
-- `OBJETIVOS`: la lista de objetivos, con unidad, rango, paso y valores iniciales. `mas: false` = bajar es crecer.
+- `PROXIMO_EVENTO`: nombre y fecha de apertura (27/10/2026, 18 h). La cápsula se abre sola cuando llega.
+- `EVENTO_ACTUAL`: dónde se arma (aparece en "La sellaste el … en …").
+- `DEMO`: muestra "Demo: simular que llegó el 27/10" para probar la apertura sin esperar (también `?demo`).
+- `OBJETIVOS`: lista con nombre, unidad, rango, paso, valores iniciales y la pregunta del paso 2.
 
 Por ahora la cápsula se guarda en el teléfono (`localStorage`). Para que viaje entre dispositivos y la marca
 pueda avisar cuando se abre, el próximo paso es guardarla en Supabase como en Dedicatorias.

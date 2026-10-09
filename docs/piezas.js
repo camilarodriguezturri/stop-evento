@@ -1,93 +1,83 @@
-// Piezas compartidas: las cápsulas deportivas, la notita festoneada y las misceláneas flotantes.
+// Piezas compartidas: las cápsulas (objetos 3D), la notita festoneada, las misceláneas y los fondos animados.
 (() => {
   'use strict';
 
   const COLORES = { azul: '#7aa1ff', rosa: '#f79ee1' };
 
-  // ---------- envases deportivos (viewBox 200 x 220). La tapa va en <g class="tapa"> para animarla. ----------
-  const sombra = '<ellipse class="sombra" cx="100" cy="208" rx="66" ry="8"/>';
+  // ---------- cápsulas: objetos 3D de runners, ciclistas, patinadores y cocineros ----------
   const ENVASES = [
-    {
-      id: 'locker',
-      nombre: 'Un casillero del vestuario',
-      svg: sombra +
-        '<g class="cuerpo">' +
-          '<rect x="42" y="16" width="116" height="188" rx="12" fill="var(--azul)" class="tr"/>' +
-          '<rect x="54" y="28" width="92" height="164" rx="6" fill="var(--oscuro)"/>' +
-          '<path d="M58 92h84" stroke="var(--crema)" stroke-width="4" stroke-linecap="round" opacity=".5"/>' +
-          '<rect x="64" y="58" width="30" height="34" rx="4" fill="var(--rosa)" class="tr fino"/>' +
-          '<circle cx="118" cy="150" r="16" fill="var(--azul)" class="tr fino"/>' +
-        '</g>' +
-        '<g class="tapa">' +
-          '<rect x="54" y="28" width="92" height="164" rx="6" fill="var(--azul)" class="tr"/>' +
-          '<path d="M72 46h56M72 56h56M72 66h56" class="tr fino"/>' +
-          '<rect x="80" y="84" width="40" height="20" rx="5" fill="var(--crema)" class="tr fino"/>' +
-          '<text x="100" y="99" class="envase__num">07</text>' +
-          '<path d="M66 120v40" class="brillo"/>' +
-          '<g class="dial"><circle cx="126" cy="140" r="14" fill="var(--rosa)" class="tr"/><path d="M126 130v8" class="tr fino"/></g>' +
-        '</g>',
-    },
-    {
-      id: 'botella',
-      nombre: 'Una caramañola',
-      svg: sombra +
-        '<g class="cuerpo">' +
-          '<path d="M60 76c0-12 8-18 18-18h44c10 0 18 6 18 18v112c0 10-8 16-18 16H78c-10 0-18-6-18-16z" fill="var(--rosa)" class="tr"/>' +
-          '<path d="M60 112c26 8 54 8 80 0v40c-26 8-54 8-80 0z" fill="var(--azul)" class="tr"/>' +
-          '<text x="100" y="140" class="envase__marca">stop.</text>' +
-          '<path d="M74 82v18M74 166v20" class="brillo"/>' +
-          '<circle class="burbuja" cx="88" cy="186" r="4"/><circle class="burbuja b2" cx="112" cy="190" r="3"/><circle class="burbuja b3" cx="100" cy="184" r="2.5"/>' +
-        '</g>' +
-        '<g class="tapa">' +
-          '<path d="M128 46c22 0 22 26 2 26" class="tr"/>' +
-          '<rect x="72" y="38" width="56" height="24" rx="7" fill="var(--azul)" class="tr"/>' +
-          '<rect x="90" y="16" width="20" height="24" rx="6" fill="var(--crema)" class="tr"/>' +
-          '<path d="M84 44v12M96 44v12M108 44v12M120 44v12" class="tr fino"/>' +
-        '</g>',
-    },
-    {
-      id: 'pelota',
-      nombre: 'Una pelota que se abre',
-      svg: sombra +
-        '<g class="rebota">' +
-          '<g class="cuerpo">' +
-            '<path d="M34 128a66 66 0 0 0 132 0z" fill="var(--azul)" class="tr"/>' +
-            '<path d="M100 128v66M56 128c0 22 10 42 26 56M144 128c0 22-10 42-26 56" class="tr fino"/>' +
-            '<path d="M48 138c4 20 16 36 34 46" class="brillo"/>' +
-          '</g>' +
-          '<g class="tapa">' +
-            '<path d="M34 128a66 66 0 0 1 132 0z" fill="var(--rosa)" class="tr"/>' +
-            '<path d="M100 62v66M56 128c0-22 10-42 26-56M144 128c0-22-10-42-26-56" class="tr fino"/>' +
-            '<path d="M58 98c6-14 16-24 30-30" class="brillo"/>' +
-          '</g>' +
-        '</g>',
-    },
-    {
-      id: 'trofeo',
-      nombre: 'Un trofeo con tapa',
-      svg: sombra +
-        '<g class="cuerpo">' +
-          '<path d="M62 84H46c-10 0-12 10-10 18 4 16 18 24 34 26M138 84h16c10 0 12 10 10 18-4 16-18 24-34 26" class="tr" style="stroke-width:7"/>' +
-          '<path d="M60 74h80v30c0 26-18 42-40 42s-40-16-40-42z" fill="var(--rosa)" class="tr"/>' +
-          '<path d="M74 88v16c0 10 4 18 10 24" class="brillo destello"/>' +
-          '<rect x="90" y="144" width="20" height="22" fill="var(--azul)" class="tr"/>' +
-          '<rect x="64" y="164" width="72" height="16" rx="5" fill="var(--azul)" class="tr"/>' +
-          '<rect x="54" y="178" width="92" height="26" rx="6" fill="var(--oscuro)" class="tr"/>' +
-          '<text x="100" y="197" class="envase__marca envase__marca--clara">stop.</text>' +
-        '</g>' +
-        '<g class="tapa">' +
-          '<path d="M56 76c10-28 78-28 88 0z" fill="var(--azul)" class="tr"/>' +
-          '<circle cx="100" cy="46" r="9" fill="var(--crema)" class="tr"/>' +
-        '</g>',
-    },
+    { id: 'zapatilla', nombre: 'Una zapatilla', para: 'para runners' },
+    { id: 'casco', nombre: 'Un casco', para: 'para ciclistas' },
+    { id: 'patin', nombre: 'Un patín', para: 'para quienes patinan' },
+    { id: 'olla', nombre: 'Una olla', para: 'para quienes cocinan' },
+    { id: 'botella', nombre: 'Una caramañola', para: 'para cualquier aventura' },
   ];
+  const imgEnvase = (id) => `assets/capsulas/${id}.png`;
 
   function envase(id) {
     const e = ENVASES.find((x) => x.id === id) || ENVASES[0];
     const div = document.createElement('div');
     div.className = 'envase envase--' + e.id;
-    div.innerHTML = '<svg viewBox="0 0 200 220" aria-hidden="true">' + e.svg + '</svg>';
+    div.innerHTML = '<span class="envase__aura"></span><img alt="" draggable="false" width="600" height="600">';
+    div.querySelector('img').src = imgEnvase(e.id);
     return div;
+  }
+
+  // Objetos 3D que flotan por la pantalla (como en la intro de Spotify).
+  // items: [{ id, x, y, s, r }]
+  function flotantes(cont, items) {
+    if (!cont) return;
+    cont.textContent = '';
+    items.forEach((it, i) => {
+      const img = document.createElement('img');
+      img.className = 'flotante';
+      img.alt = '';
+      img.src = imgEnvase(it.id);
+      img.style.setProperty('--x', it.x);
+      img.style.setProperty('--y', it.y);
+      img.style.setProperty('--s', it.s + 'px');
+      img.style.setProperty('--r', (it.r || 0) + 'deg');
+      img.style.setProperty('--d', (5 + (i % 3) * 1.4) + 's');
+      img.style.setProperty('--i', i);
+      cont.append(img);
+    });
+  }
+
+  // Cielo de estrellitas titilando, distinto en cada pantalla.
+  function cielo(cont, semilla = 1, n = 26) {
+    if (!cont) return;
+    let x = semilla * 7919;
+    const rnd = () => ((x = (x * 9301 + 49297) % 233280) / 233280);
+    cont.textContent = '';
+    for (let i = 0; i < n; i++) {
+      const e = document.createElement('i');
+      e.style.left = (rnd() * 100).toFixed(1) + '%';
+      e.style.top = (rnd() * 100).toFixed(1) + '%';
+      e.style.setProperty('--t', (1.5 + rnd() * 3).toFixed(1) + 'px');
+      e.style.setProperty('--d', (2 + rnd() * 3).toFixed(1) + 's');
+      e.style.animationDelay = (-rnd() * 4).toFixed(1) + 's';
+      cont.append(e);
+    }
+  }
+
+  // Lluvia de puntos y flores (festejo del sellado).
+  function confeti(cont, n = 34) {
+    if (!cont) return;
+    cont.textContent = '';
+    const tipos = ['punto', 'punto-o', 'flor', 'aro', 'punto'];
+    const colores = ['azul', 'crema', 'azul', 'crema', 'oscuro'];
+    for (let i = 0; i < n; i++) {
+      const it = { t: tipos[i % tipos.length], c: colores[(i * 3) % colores.length] };
+      const el = document.createElement('span');
+      el.className = 'confeti__pieza';
+      el.style.left = ((i * 37) % 100) + '%';
+      el.style.setProperty('--s', (8 + (i * 7) % 18) + 'px');
+      el.style.setProperty('--d', (2.4 + (i % 5) * .5) + 's');
+      el.style.setProperty('--dl', (-(i % 9) * .35) + 's');
+      el.style.setProperty('--gx', ((i % 2 ? 1 : -1) * (10 + (i * 13) % 40)) + 'px');
+      el.innerHTML = '<svg viewBox="0 0 100 100">' + forma(it) + '</svg>';
+      cont.append(el);
+    }
   }
 
   // ---------- la notita (misma construcción que dedicatorias post.) ----------
@@ -210,5 +200,5 @@
     });
   }
 
-  window.Piezas = { COLORES, ENVASES, envase, crearNota, pintarNota, escalarNota, decorar, mezcla, limpiar };
+  window.Piezas = { COLORES, ENVASES, envase, imgEnvase, flotantes, cielo, confeti, crearNota, pintarNota, escalarNota, decorar, mezcla, limpiar };
 })();
