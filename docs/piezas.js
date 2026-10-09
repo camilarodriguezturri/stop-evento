@@ -1,46 +1,138 @@
-// Piezas compartidas: las cápsulas (objetos 3D), la notita festoneada, las misceláneas y los fondos animados.
+// Piezas compartidas: las cápsulas de vidrio, los stickers, la notita festoneada, las misceláneas y los fondos animados.
 (() => {
   'use strict';
 
   const COLORES = { azul: '#7aa1ff', rosa: '#f79ee1' };
 
-  // ---------- cápsulas: objetos 3D de runners, ciclistas, patinadores y cocineros ----------
-  const ENVASES = [
-    { id: 'zapatilla', nombre: 'Una zapatilla', para: 'para runners' },
-    { id: 'casco', nombre: 'Un casco', para: 'para ciclistas' },
-    { id: 'patin', nombre: 'Un patín', para: 'para quienes patinan' },
-    { id: 'olla', nombre: 'Una olla', para: 'para quienes cocinan' },
-    { id: 'botella', nombre: 'Una caramañola', para: 'para cualquier aventura' },
+  // ---------- cápsulas de vidrio que se llenan de stickers ----------
+  // Cada cápsula son dos imágenes alineadas (fondo y vidrio de adelante); los stickers van en el medio.
+  // zona = [x0, y0, x1, y1] en % de la caja: dónde se apilan. mascara = recortar al interior.
+  const CAPSULAS = [
+    { id: 'trofeo', nombre: 'Un trofeo', para: 'para tus logros', zona: [24, 8, 76, 50], mascara: true },
+    { id: 'sobre', nombre: 'Un sobre', para: 'para tus mensajes', zona: [22, 16, 80, 66], mascara: false },
+    { id: 'botella', nombre: 'Una botella de agua', para: 'para cada entrenamiento', zona: [30, 24, 74, 90], mascara: true },
   ];
-  const imgEnvase = (id) => `assets/capsulas/${id}.png`;
+  const ENVASES = CAPSULAS; // compatibilidad
+  const imgCapa = (id, capa) => `assets/capsulas/${id}-${capa}.png`;
 
   function envase(id) {
-    const e = ENVASES.find((x) => x.id === id) || ENVASES[0];
+    const c = CAPSULAS.find((x) => x.id === id) || CAPSULAS[0];
     const div = document.createElement('div');
-    div.className = 'envase envase--' + e.id;
-    div.innerHTML = '<span class="envase__aura"></span><img alt="" draggable="false" width="600" height="600">';
-    div.querySelector('img').src = imgEnvase(e.id);
+    div.className = 'envase capsula capsula--' + c.id;
+    div.dataset.id = c.id;
+    div.innerHTML =
+      '<img class="capsula__atras" alt="" draggable="false" width="600" height="600">' +
+      '<div class="capsula__relleno"></div>' +
+      '<img class="capsula__frente" alt="" draggable="false" width="600" height="600">';
+    div.querySelector('.capsula__atras').src = imgCapa(c.id, 'atras');
+    div.querySelector('.capsula__frente').src = imgCapa(c.id, 'frente');
+    if (c.mascara) div.querySelector('.capsula__relleno').style.setProperty('--mascara', `url(${imgCapa(c.id, 'atras')})`);
     return div;
   }
 
-  // Objetos 3D que flotan por la pantalla (como en la intro de Spotify).
-  // items: [{ id, x, y, s, r }]
-  function flotantes(cont, items) {
+  // ---------- stickers estilo post ----------
+  const TIPOS_ST = ['globo', 'pastilla', 'flor', 'circulo'];
+  const COLORES_ST = ['azul', 'crema', 'oscuro', 'rosa'];
+  function sticker({ txt, tipo = 'pastilla', color = 'azul' }) {
+    const el = document.createElement('span');
+    el.className = `st st--${tipo} st--${color}`;
+    if (tipo === 'flor') el.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="${FLOR[11]}"/></svg>`;
+    const t = document.createElement('span');
+    t.className = 'st__txt';
+    t.textContent = txt;
+    el.append(t);
+    return el;
+  }
+
+  let semillaSt = 7;
+  const rnd = () => ((semillaSt = (semillaSt * 9301 + 49297) % 233280) / 233280);
+
+  // Apila los stickers de abajo hacia arriba dentro de la zona de la cápsula.
+  // animar: los nuevos caen desde arriba. desde: índice a partir del cual animar.
+  function llenar(cap, items, { animar = true, desde = 0, demora = 0 } = {}) {
+    const c = CAPSULAS.find((x) => x.id === cap.dataset.id);
+    const rel = cap.querySelector('.capsula__relleno');
+    const [x0, y0, x1, y1] = c.zona;
+    const cols = 2;
+    const altoFila = Math.min(12, (y1 - y0) / Math.max(3, Math.ceil(items.length / cols)));
+    [...rel.children].slice(desde).forEach((n) => n.remove());
+    semillaSt = 7 + desde * 13;
+    items.slice(desde).forEach((it, k) => {
+      const i = desde + k;
+      const fila = Math.floor(i / cols), col = i % cols;
+      const ancho = (x1 - x0) / cols;
+      const x = x0 + ancho * (col + .5) + (rnd() - .5) * ancho * .5 + (fila % 2 ? ancho * .18 : -ancho * .1);
+      const y = y1 - altoFila * (fila + .55) + (rnd() - .5) * 3;
+      const r = Math.round((rnd() - .5) * 50);
+      const el = sticker(it);
+      el.style.setProperty('--x', x.toFixed(1) + '%');
+      el.style.setProperty('--y', Math.max(y0, y).toFixed(1) + '%');
+      el.style.setProperty('--r', r + 'deg');
+      rel.append(el);
+      if (animar && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const alto = cap.clientHeight || 300;
+        el.animate([
+          { transform: `translate(-50%, -50%) translateY(${-alto * .9}px) rotate(${r - 120}deg)`, opacity: 0 },
+          { transform: `translate(-50%, -50%) translateY(${-alto * .5}px) rotate(${r - 60}deg)`, opacity: 1, offset: .25 },
+          { transform: `translate(-50%, -50%) translateY(8px) rotate(${r + 8}deg)`, offset: .78 },
+          { transform: `translate(-50%, -50%) rotate(${r}deg)` },
+        ], { duration: 850, delay: demora + k * 160, easing: 'cubic-bezier(.45,0,.4,1)', fill: 'backwards' });
+      }
+    });
+  }
+
+  // Hace saltar los stickers fuera de la cápsula (apertura).
+  function vaciar(cap) {
+    const rel = cap.querySelector('.capsula__relleno');
+    rel.style.setProperty('--mascara', 'none');
+    [...rel.children].forEach((el, i) => {
+      const r = parseFloat(el.style.getPropertyValue('--r')) || 0;
+      const dx = (i % 2 ? 1 : -1) * (60 + (i * 37) % 120);
+      el.animate([
+        { transform: `translate(-50%, -50%) rotate(${r}deg)` },
+        { transform: `translate(-50%, -50%) translate(${dx * .4}px, -160px) rotate(${r + 90}deg) scale(1.3)`, offset: .45 },
+        { transform: `translate(-50%, -50%) translate(${dx}px, -60px) rotate(${r + 200}deg) scale(1.5)`, opacity: 0 },
+      ], { duration: 1100, delay: i * 60, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'forwards' });
+    });
+  }
+
+  // Collage de stickers motivacionales superpuestos (pantallas de carga y explicación).
+  const FRASES = [
+    { txt: '¡vos podés!', tipo: 'flor', color: 'azul' },
+    { txt: 'un paso a la vez', tipo: 'globo', color: 'crema' },
+    { txt: 'stop.', tipo: 'circulo', color: 'rosa' },
+    { txt: 'constancia', tipo: 'pastilla', color: 'azul' },
+    { txt: 'respirá y seguí', tipo: 'globo', color: 'rosa' },
+    { txt: '¡dale!', tipo: 'flor', color: 'rosa' },
+    { txt: 'tu mejor versión', tipo: 'pastilla', color: 'crema' },
+    { txt: 'nos vemos el 27/10', tipo: 'pastilla', color: 'azul' },
+    { txt: '+1', tipo: 'circulo', color: 'crema' },
+    { txt: 'a tu ritmo', tipo: 'pastilla', color: 'rosa' },
+    { txt: 'ya arrancaste', tipo: 'globo', color: 'oscuro' },
+    { txt: '¡genial!', tipo: 'pastilla', color: 'azul' },
+  ];
+  const POS_COLLAGE = [[50, 46, -8], [34, 28, 12], [68, 26, -14], [34, 64, -10], [66, 66, 9], [52, 14, 6], [50, 82, -4], [26, 46, -20], [74, 46, 16], [42, 38, 18], [60, 54, -16], [48, 62, 4]];
+  // nuevosDesde: los anteriores ya están y no se vuelven a animar.
+  function collage(cont, { n = 9, desde = 0, intervalo = 170, nuevosDesde = 0 } = {}) {
     if (!cont) return;
     cont.textContent = '';
-    items.forEach((it, i) => {
-      const img = document.createElement('img');
-      img.className = 'flotante';
-      img.alt = '';
-      img.src = imgEnvase(it.id);
-      img.style.setProperty('--x', it.x);
-      img.style.setProperty('--y', it.y);
-      img.style.setProperty('--s', it.s + 'px');
-      img.style.setProperty('--r', (it.r || 0) + 'deg');
-      img.style.setProperty('--d', (5 + (i % 3) * 1.4) + 's');
-      img.style.setProperty('--i', i);
-      cont.append(img);
-    });
+    const red = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    for (let i = 0; i < n; i++) {
+      const f = FRASES[(desde + i) % FRASES.length];
+      const [x, y, r] = POS_COLLAGE[i % POS_COLLAGE.length];
+      const el = sticker(f);
+      el.classList.add('st--grande');
+      el.style.setProperty('--x', x + '%');
+      el.style.setProperty('--y', y + '%');
+      el.style.setProperty('--r', r + 'deg');
+      el.style.setProperty('--i', i);
+      cont.append(el);
+      if (!red && i >= nuevosDesde) el.animate([
+        { transform: `translate(-50%, -50%) rotate(${r - 30}deg) scale(0)` },
+        { transform: `translate(-50%, -50%) rotate(${r + 6}deg) scale(1.15)`, offset: .7 },
+        { transform: `translate(-50%, -50%) rotate(${r}deg) scale(1)` },
+      ], { duration: 520, delay: (i - nuevosDesde) * intervalo, easing: 'cubic-bezier(.3,1.4,.5,1)', fill: 'backwards' });
+    }
   }
 
   // Cielo de estrellitas titilando, distinto en cada pantalla.
@@ -200,5 +292,5 @@
     });
   }
 
-  window.Piezas = { COLORES, ENVASES, envase, imgEnvase, flotantes, cielo, confeti, crearNota, pintarNota, escalarNota, decorar, mezcla, limpiar };
+  window.Piezas = { COLORES, CAPSULAS, ENVASES, envase, sticker, llenar, vaciar, collage, cielo, confeti, crearNota, pintarNota, escalarNota, decorar, mezcla, limpiar };
 })();

@@ -8,8 +8,9 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const REDUCIDO = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const DEMO = CFG.DEMO || new URLSearchParams(location.search).has('demo');
-  const KEY = 'stop-capsula-v2';
+  const KEY = 'stop-capsula-v3';
   const DIA = 864e5;
+  const MAX = 6; // objetivos por cápsula
 
   // ---------- datos ----------
   const leer = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
@@ -25,8 +26,36 @@
     new Date(iso).toLocaleDateString('es-AR', opc);
 
   let borrador = nuevoBorrador();
+
+  // Lo que entra a la cápsula: un sticker por objetivo y otro con la meta; la nota y el logo al final.
+  const ESTILOS = [['globo', 'crema'], ['pastilla', 'oscuro'], ['pastilla', 'azul'], ['globo', 'rosa'], ['pastilla', 'crema'], ['globo', 'azul']];
+  function stickersDe(b, { nota = false } = {}) {
+    const lista = [];
+    b.objetivos.forEach((o, i) => {
+      const def = objetivo(o.id);
+      const [tipo, color] = ESTILOS[i % ESTILOS.length];
+      lista.push({ txt: def.nombre, tipo, color });
+      lista.push({ txt: `${fmt(o.meta)} ${def.corto}`, tipo: i % 2 ? 'circulo' : 'pastilla', color: i % 2 ? 'crema' : 'azul' });
+    });
+    if (nota) lista.push({ txt: 'nota', tipo: 'globo', color: 'rosa' }, { txt: 'stop.', tipo: 'flor', color: 'azul' });
+    return lista;
+  }
+  const MUESTRA = [
+    { txt: 'correr', tipo: 'globo', color: 'crema' }, { txt: '10 km', tipo: 'pastilla', color: 'azul' },
+    { txt: '¡dale!', tipo: 'flor', color: 'oscuro' }, { txt: 'pedalear', tipo: 'pastilla', color: 'crema' },
+    { txt: '4 días', tipo: 'globo', color: 'azul' }, { txt: 'stop.', tipo: 'circulo', color: 'rosa' },
+    { txt: 'patinar', tipo: 'pastilla', color: 'oscuro' },
+  ];
+  // Cápsula llena con lo que eligió (o la muestra) dentro de un contenedor.
+  function capsulaLlena(slot, id, items, opc = { animar: false }) {
+    slot.textContent = '';
+    const cap = P.envase(id);
+    slot.append(cap);
+    requestAnimationFrame(() => P.llenar(cap, items, opc));
+    return cap;
+  }
   function nuevoBorrador(objetivos = []) {
-    return { envase: 'zapatilla', objetivos, para: 'mi yo del futuro', mensaje: '', color: 'azul' };
+    return { envase: 'trofeo', objetivos, para: 'mi yo del futuro', mensaje: '', color: 'azul' };
   }
 
   function estadoCapsula() {
@@ -81,6 +110,24 @@
 
   const al = {}; // hooks al entrar a cada pantalla
 
+  // Pantalla de carga con stickers motivacionales; se puede omitir.
+  function cargar(texto, ms = 2800) {
+    const carga = $('#carga');
+    $('#carga-texto').textContent = texto;
+    P.collage($('#collage-carga'), { n: 9, desde: Math.floor(Math.random() * 12), intervalo: Math.min(220, ms / 12) });
+    carga.hidden = false;
+    aplicarTema('negro');
+    const barra = $('.carga__barra i', carga);
+    const anim = barra.animate({ transform: ['scaleX(0)', 'scaleX(1)'] }, { duration: ms, easing: 'linear', fill: 'forwards' });
+    if (!REDUCIDO) carga.animate({ opacity: [0, 1] }, { duration: 200 });
+    $('#carga-omitir').focus({ preventScroll: true });
+    return new Promise((listo) => {
+      const fin = () => { clearTimeout(t); $('#carga-omitir').onclick = null; anim.cancel(); carga.hidden = true; listo(); };
+      const t = setTimeout(fin, ms);
+      $('#carga-omitir').onclick = fin;
+    });
+  }
+
   function sacudir(el) {
     el.classList.remove('sacudir');
     void el.offsetWidth;
@@ -90,15 +137,23 @@
 
   // ---------- misceláneas, estrellitas y objetos flotantes ----------
   $$('.cielo').forEach((c, i) => P.cielo(c, i + 1));
-  P.flotantes($('#flot-inicio'), [
-    { id: 'zapatilla', x: '-4%', y: '2%', s: 118, r: -18 },
-    { id: 'casco', x: '70%', y: '-2%', s: 112, r: 14 },
-    { id: 'olla', x: '74%', y: '62%', s: 104, r: -8 },
-    { id: 'patin', x: '-6%', y: '64%', s: 108, r: 12 },
-    { id: 'botella', x: '84%', y: '34%', s: 58, r: 24 },
-  ]);
+  [
+    { id: 'trofeo', x: '-6%', y: '0%', s: 150, r: -14, items: MUESTRA.slice(0, 5) },
+    { id: 'botella', x: '72%', y: '-4%', s: 140, r: 16, items: MUESTRA.slice(2, 7) },
+    { id: 'sobre', x: '64%', y: '58%', s: 150, r: -8, items: MUESTRA.slice(1, 6) },
+  ].forEach((f, i) => {
+    const cap = P.envase(f.id);
+    cap.style.setProperty('--x', f.x);
+    cap.style.setProperty('--y', f.y);
+    cap.style.setProperty('--s', f.s + 'px');
+    cap.style.setProperty('--r', f.r + 'deg');
+    cap.style.setProperty('--d', (5 + i * 1.3) + 's');
+    cap.style.setProperty('--i', i);
+    $('#flot-inicio').append(cap);
+    requestAnimationFrame(() => P.llenar(cap, f.items, { animar: true, demora: 500 + i * 300 }));
+  });
   P.decorar($('#deco-inicio'), [
-    { t: 'flor', x: '34%', y: '2%', s: 34, c: 'rosa' },
+    { t: 'flor', x: '40%', y: '0%', s: 34, c: 'rosa' },
     { t: 'punto', x: '28%', y: '30%', s: 14, c: 'crema' },
     { t: 'aro', x: '88%', y: '40%', s: 24 },
     { t: 'punto-o', x: '58%', y: '10%', s: 18, c: 'rosa' },
@@ -124,7 +179,7 @@
     const est = estadoCapsula();
     const c = datos.capsula;
     $$('.estado', pantallas.inicio).forEach((el) => { el.hidden = el.dataset.estado !== est; });
-    pantallas.inicio.dataset.tema = { vacio: 'azul', sellada: 'negro', lista: 'rosa', abierta: 'crema' }[est];
+    pantallas.inicio.dataset.tema = { vacio: 'azul', sellada: 'negro', lista: 'azul', abierta: 'crema' }[est];
     if (actual === pantallas.inicio) aplicarTema(pantallas.inicio.dataset.tema);
     clearInterval(reloj);
     btnInicio.hidden = false;
@@ -134,7 +189,7 @@
     if (est === 'vacio') {
       $('.btn__texto', btnInicio).textContent = 'Armar mi cápsula';
     } else if (est === 'sellada') {
-      ponerEnvase($('#envase-espera'), c.envase);
+      capsulaLlena($('#envase-espera'), c.envase, stickersDe(c, { nota: true }));
       $('#espera-evento').textContent = `${c.evento} · ${fecha(c.abreEn, { day: 'numeric', month: 'long' })}`;
       $('#espera-fecha').textContent = 'El ' + fecha(c.abreEn, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       btnInicio.hidden = true;
@@ -144,7 +199,7 @@
       tic();
       reloj = setInterval(tic, 1000);
     } else if (est === 'lista') {
-      ponerEnvase($('#envase-lista'), c.envase);
+      capsulaLlena($('#envase-lista'), c.envase, stickersDe(c, { nota: true }));
       $('#lista-texto').textContent =
         `La sellaste el ${fecha(c.selladaEn, { day: 'numeric', month: 'long' })} en ${punto(c.eventoOrigen)} Ahora vas a ver cuánto creciste.`;
       $('.btn__texto', btnInicio).textContent = 'Abrir mi cápsula';
@@ -192,7 +247,7 @@
 
   btnInicio.addEventListener('click', () => {
     const est = estadoCapsula();
-    if (est === 'lista') abrirHistoria();
+    if (est === 'lista') cargar('Abriendo tu cápsula…').then(abrirHistoria);
     else if (est === 'abierta') {
       const c = datos.capsula;
       datos.historial.push(c);
@@ -211,7 +266,7 @@
     } else {
       borrador = nuevoBorrador();
       prepararPasos();
-      ir('envase');
+      ir('intro');
     }
   });
   btnInicio2.addEventListener('click', () => {
@@ -234,6 +289,41 @@
   });
   al.inicio = pintarInicio;
 
+  // ---------- cómo funciona (se puede omitir) ----------
+  const INTRO = [
+    { titulo: 'Guardá tus objetivos en una cápsula', texto: 'Elegís dónde guardarlos y sumás todo lo que querés lograr: correr, pedalear, patinar, descansar…' },
+    { titulo: 'Sellala hasta stop.', texto: 'Te dejás una nota y la cerrás. Nadie la puede abrir hasta el evento.' },
+    { titulo: 'El 27/10 se abre', texto: 'En stop. la abrís, cargás cómo estás y te mostramos cuánto creciste.' },
+  ];
+  let introIdx = 0, introTimer = 0, introAnim = null;
+  function pintarIntro(i) {
+    introIdx = i;
+    clearTimeout(introTimer);
+    introAnim?.cancel();
+    const d = INTRO[i];
+    $('#t-intro').textContent = d.titulo;
+    $('#intro-texto').textContent = d.texto;
+    $('#intro-paso').textContent = `${i + 1} de ${INTRO.length}`;
+    $('.btn__texto', $('#intro-sig')).textContent = i === INTRO.length - 1 ? 'Empezar' : 'Siguiente';
+    // La pila de stickers crece en cada paso.
+    P.collage($('#collage-intro'), { n: 4 + i * 4, nuevosDesde: i ? i * 4 : 0 });
+    [...$('#barras-intro').children].forEach((b, k) => {
+      if (!b.firstChild) b.append(document.createElement('b'));
+      b.classList.toggle('hecha', k < i);
+    });
+    if (!REDUCIDO) {
+      $$('.intro__textos > *', pantallas.intro).forEach((el, k) => el.animate(
+        { opacity: [0, 1], transform: ['translateY(12px)', 'none'] }, { duration: 400, delay: k * 60, fill: 'backwards' }));
+      introAnim = $('#barras-intro').children[i].firstChild.animate({ transform: ['scaleX(0)', 'scaleX(1)'] }, { duration: 5000, easing: 'linear', fill: 'forwards' });
+      if (i < INTRO.length - 1) introTimer = setTimeout(() => pintarIntro(i + 1), 5000);
+    }
+  }
+  al.intro = () => requestAnimationFrame(() => pintarIntro(0));
+  const salirIntro = () => { clearTimeout(introTimer); introAnim?.cancel(); ir('envase'); };
+  $('#intro-sig').addEventListener('click', () => (introIdx < INTRO.length - 1 ? pintarIntro(introIdx + 1) : salirIntro()));
+  $('#intro-omitir').addEventListener('click', salirIntro);
+  $('[data-volver]', pantallas.intro).addEventListener('click', () => { clearTimeout(introTimer); introAnim?.cancel(); });
+
   // ---------- paso 1: envase ----------
   const carrusel = $('#carrusel');
   const puntos = $('#puntos');
@@ -246,7 +336,9 @@
     b.innerHTML = '<span class="opcion__escena"><span class="deco"></span></span><span class="opcion__nombre"></span><span class="opcion__para"></span>';
     $('.opcion__nombre', b).textContent = e.nombre;
     $('.opcion__para', b).textContent = e.para;
-    $('.opcion__escena', b).append(P.envase(e.id));
+    const cap = P.envase(e.id);
+    $('.opcion__escena', b).append(cap);
+    requestAnimationFrame(() => P.llenar(cap, MUESTRA, { animar: false }));
     P.decorar($('.deco', b), P.mezcla(11 + i, 8));
     b.addEventListener('click', () => elegirEnvase(e.id, true));
     carrusel.append(b);
@@ -264,6 +356,7 @@
       b.setAttribute('aria-checked', on);
       b.tabIndex = on ? 0 : -1;
       puntos.children[i].classList.toggle('on', on);
+      if (on && mover !== 'quieto') P.llenar($('.envase', b), MUESTRA, { animar: true });
       if (on && mover) carrusel.scrollTo({ left: i * carrusel.clientWidth, behavior: REDUCIDO ? 'auto' : 'smooth' });
     });
   }
@@ -286,6 +379,7 @@
     $(`.opcion[data-id="${n}"]`, carrusel).focus({ preventScroll: true });
   });
   al.envase = () => requestAnimationFrame(() => elegirEnvase(borrador.envase, true));
+  pantallas.envase.dataset.volverA = 'inicio';
 
   // ---------- paso 2: objetivos ----------
   const chips = $('#chips');
@@ -301,7 +395,7 @@
     b.addEventListener('click', () => {
       const i = borrador.objetivos.findIndex((x) => x.id === o.id);
       if (i >= 0) borrador.objetivos.splice(i, 1);
-      else if (borrador.objetivos.length < 3) borrador.objetivos.push({ id: o.id, hoy: o.hoy, meta: o.meta });
+      else if (borrador.objetivos.length < MAX) borrador.objetivos.push({ id: o.id, hoy: o.hoy, meta: o.meta });
       else { sacudir(chips); return; }
       pintarObjetivos();
       pintarPregunta(true);
@@ -315,17 +409,18 @@
   const libres = () => CFG.OBJETIVOS.filter((o) => !borrador.objetivos.some((x) => x.id === o.id));
   function pintarPregunta(animar = false) {
     const lista = libres();
-    const lleno = borrador.objetivos.length >= 3 || !lista.length;
+    const lleno = borrador.objetivos.length >= MAX || !lista.length;
     const o = lista[preguntaIdx % Math.max(1, lista.length)];
-    pregunta.textContent = lleno ? '¡Listo! Ya sumaste tus 3 objetivos.' : o.pregunta;
+    pregunta.textContent = lleno ? `¡Tu cápsula está llena! Sumaste ${borrador.objetivos.length} objetivos.` : o.pregunta;
     pregunta.dataset.id = lleno ? '' : o.id;
     $('#btn-sumar').setAttribute('aria-disabled', lleno);
     $('#btn-pregunta').setAttribute('aria-disabled', lleno);
+    $('#btn-aleatorio').setAttribute('aria-disabled', lleno);
     if (animar && !REDUCIDO) { pregunta.classList.remove('cambia'); void pregunta.offsetWidth; pregunta.classList.add('cambia'); }
   }
   function sumarObjetivo(id) {
     const o = objetivo(id);
-    if (!o || borrador.objetivos.length >= 3 || borrador.objetivos.some((x) => x.id === id)) return false;
+    if (!o || borrador.objetivos.length >= MAX || borrador.objetivos.some((x) => x.id === id)) return false;
     borrador.objetivos.push({ id: o.id, hoy: o.hoy, meta: o.meta });
     return true;
   }
@@ -335,15 +430,13 @@
     pintarObjetivos();
     pintarPregunta(true);
   });
-  $('#btn-aleatorio').addEventListener('click', () => {
-    const mezcla = [...CFG.OBJETIVOS];
-    for (let i = mezcla.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [mezcla[i], mezcla[j]] = [mezcla[j], mezcla[i]];
-    }
-    mezcla.length = 3;
-    borrador.objetivos = [];
-    mezcla.forEach((o) => sumarObjetivo(o.id));
+  // Aleatorio: suma una pregunta al azar cada vez (se pueden guardar varias).
+  $('#btn-aleatorio').addEventListener('click', (e) => {
+    const lista = libres();
+    if (borrador.objetivos.length >= MAX || !lista.length) { sacudir(e.currentTarget); return; }
+    const o = lista[Math.floor(Math.random() * lista.length)];
+    pregunta.textContent = o.pregunta;
+    sumarObjetivo(o.id);
     pintarObjetivos();
     pintarPregunta(true);
   });
@@ -386,7 +479,7 @@
     $$('.chip', chips).forEach((b) => {
       const on = borrador.objetivos.some((x) => x.id === b.dataset.id);
       b.setAttribute('aria-pressed', on);
-      b.setAttribute('aria-disabled', !on && borrador.objetivos.length >= 3);
+      b.setAttribute('aria-disabled', !on && borrador.objetivos.length >= MAX);
     });
     const ya = new Set($$('.meta', metas).map((m) => m.dataset.id));
     metas.textContent = '';
@@ -402,7 +495,31 @@
     });
     $('[data-siguiente]', pantallas.objetivos).setAttribute('aria-disabled', !borrador.objetivos.length);
     pintarPregunta();
+    pintarLlenado();
   }
+
+  // La cápsula del paso 2 recibe un sticker por cada objetivo que se suma.
+  let capObj = null, enCap = 0;
+  function pintarLlenado() {
+    const slot = $('#cap-objetivos');
+    if (!capObj || capObj.dataset.id !== borrador.envase) {
+      slot.textContent = '';
+      capObj = P.envase(borrador.envase);
+      slot.append(capObj);
+      enCap = 0;
+    }
+    const items = stickersDe(borrador);
+    const crece = items.length > enCap;
+    const opc = crece ? { animar: true, desde: enCap } : { animar: false };
+    const cap = capObj;
+    requestAnimationFrame(() => P.llenar(cap, items, opc));
+    enCap = items.length;
+    const n = borrador.objetivos.length;
+    const txt = $('#cap-contador');
+    txt.textContent = n ? `${n} ${n === 1 ? 'objetivo adentro' : 'objetivos adentro'}${n >= MAX ? ' · ¡llena!' : ''}` : 'Tu cápsula está vacía. Sumá tu primer objetivo.';
+    if (crece && !REDUCIDO) { txt.classList.remove('cambia'); void txt.offsetWidth; txt.classList.add('cambia'); }
+  }
+  al.objetivos = () => { capObj = null; requestAnimationFrame(pintarLlenado); };
 
   // ---------- paso 3: nota ----------
   const inPara = $('#in-para');
@@ -471,7 +588,7 @@
   let t0 = 0, raf = 0, sellando = false;
 
   al.sellar = () => {
-    ponerEnvase($('#envase-sellar'), borrador.envase);
+    capsulaLlena($('#envase-sellar'), borrador.envase, stickersDe(borrador), { animar: true, demora: 250 });
     P.pintarNota(notaSellar, borrador);
     notaSellar.style.cssText = '';
     $('#slot-sellar').style.cssText = '';
@@ -544,7 +661,9 @@
         [{ transform: 'none' }, { transform: 'translateY(-20px) rotate(-4deg)', offset: .3 }, { transform: `translateY(${dy}px) scale(.35)`, opacity: 0 }],
         { duration: 700, easing: 'cubic-bezier(.5,0,.6,1)', fill: 'forwards' },
       ).finished;
-      $('#destello').animate({ opacity: [0, 1, 0] }, { duration: 650, easing: 'ease-out' });
+      P.llenar(env, stickersDe(borrador, { nota: true }), { animar: true, desde: stickersDe(borrador).length });
+      await new Promise((r) => setTimeout(r, 900));
+      $('#destello').animate({ opacity: [0, 1, 0], transform: ['scale(.2)', 'scale(6)', 'scale(8)'] }, { duration: 650, easing: 'ease-out' });
       await env.animate(
         { transform: ['scale(1)', 'scale(1.18) rotate(-6deg)', 'scale(.94) rotate(4deg)', 'scale(1)'] },
         { duration: 650, easing: 'cubic-bezier(.3,1.5,.5,1)' },
@@ -556,13 +675,14 @@
       await new Promise((r) => setTimeout(r, 650));
     }
     pila.length = 0;
+    await cargar('Mandando tu cápsula al 27/10…');
     ir('sellada');
   }
 
   // ---------- sellada ----------
   al.sellada = () => {
     const c = datos.capsula;
-    ponerEnvase($('#envase-exito'), c.envase);
+    capsulaLlena($('#envase-exito'), c.envase, stickersDe(c, { nota: true }), { animar: true, demora: 600 });
     $('#tarjeta-texto').textContent = `Se abre el ${fecha(c.abreEn, { day: 'numeric', month: 'long' })} en ${c.evento}`;
     P.confeti($('#confeti'));
     if (!REDUCIDO) {
@@ -645,10 +765,11 @@
         '<p class="slide__texto" data-abriendo>Abriendo…</p>',
       alEntrar: (el) => {
         const slot = $('[data-envase]', el);
-        ponerEnvase(slot, c.envase);
+        const cap = capsulaLlena(slot, c.envase, stickersDe({ objetivos: c.objetivos }, { nota: true }));
         setTimeout(() => {
           slot.classList.remove('tiembla');
-          $('.envase', slot).classList.add('abierta');
+          cap.classList.add('abierta');
+          P.vaciar(cap);
           $('[data-abriendo]', el).textContent = '¡Se abrió!';
         }, REDUCIDO ? 0 : 2200);
       },

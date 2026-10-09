@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#7aa1ff">
   <meta name="description" content="Guardá tus objetivos y una nota para vos. Tu cápsula se abre el 27 de octubre en stop. y te muestra cuánto creciste.">
   <title>Cápsula del tiempo · stop.</title>
-  <link rel="icon" href="assets/capsulas/zapatilla.png">
+  <link rel="icon" href="assets/capsulas/trofeo-frente.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=Reddit+Sans:wght@400;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
@@ -108,6 +108,30 @@
       </footer>
     </section>
 
+    <!-- ============ CÓMO FUNCIONA (explicación, se puede omitir) ============ -->
+    <section class="pantalla pantalla--intro" id="p-intro" data-tema="negro" aria-labelledby="t-intro" hidden>
+      <div class="cielo" aria-hidden="true"></div>
+      <header class="header" data-anim>
+        <button class="icon-btn" data-volver type="button" aria-label="Volver">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12H3M10 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="barras-intro" id="barras-intro" aria-hidden="true"><i></i><i></i><i></i></div>
+        <button class="link link--omitir" id="intro-omitir" type="button">Omitir</button>
+      </header>
+      <div class="collage" id="collage-intro" aria-hidden="true"></div>
+      <div class="intro__textos" aria-live="polite">
+        <span class="paso" id="intro-paso">1 de 3</span>
+        <h1 class="intro__titulo" id="t-intro" tabindex="-1"></h1>
+        <p class="bajada bajada--centro" id="intro-texto"></p>
+      </div>
+      <footer class="pie">
+        <button class="btn btn--primario btn--ancho" id="intro-sig" type="button">
+          <span class="btn__texto">Siguiente</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>
+        </button>
+      </footer>
+    </section>
+
     <!-- ============ PASO 1 · CÁPSULA ============ -->
     <section class="pantalla" id="p-envase" data-tema="negro" aria-labelledby="t-envase" hidden>
       <div class="cielo" aria-hidden="true"></div>
@@ -122,7 +146,7 @@
         <span class="header__lado" aria-hidden="true"></span>
       </header>
 
-      <p class="pregunta" data-anim>¿En qué vas a guardar tus objetivos?</p>
+      <p class="pregunta" data-anim>¿Dónde vas a guardar tus objetivos?</p>
 
       <div class="carrusel" id="carrusel" role="radiogroup" aria-label="Tipo de cápsula" data-anim></div>
       <div class="puntos" id="puntos"></div>
@@ -137,7 +161,7 @@
     </section>
 
     <!-- ============ PASO 2 · OBJETIVOS ============ -->
-    <section class="pantalla" id="p-objetivos" data-tema="rosa" aria-labelledby="t-objetivos" hidden>
+    <section class="pantalla" id="p-objetivos" data-tema="azul" aria-labelledby="t-objetivos" hidden>
       <div class="cielo" aria-hidden="true"></div>
       <header class="header" data-anim>
         <button class="icon-btn" data-volver type="button" aria-label="Volver">
@@ -151,6 +175,10 @@
       </header>
 
       <div class="contenido">
+        <div class="llenando" data-anim>
+          <div class="llenando__cap" id="cap-objetivos" aria-hidden="true"></div>
+          <p class="llenando__txt" id="cap-contador" aria-live="polite">Tu cápsula está vacía</p>
+        </div>
         <div class="pregunta-card" data-anim>
           <p class="pregunta-card__texto" id="pregunta" aria-live="polite"></p>
           <div class="pregunta-card__acciones">
@@ -168,7 +196,7 @@
             </button>
           </div>
         </div>
-        <p class="ayuda" data-anim>Elegí hasta 3. Contá dónde estás hoy y a dónde querés llegar.</p>
+        <p class="ayuda" data-anim>Sumá todas las que quieras (hasta 6). Cada una entra a tu cápsula.</p>
         <div class="chips" id="chips" role="group" aria-label="Objetivos" data-anim></div>
         <div class="metas" id="metas" aria-live="polite"></div>
       </div>
@@ -267,10 +295,8 @@
       <div class="escena escena--sellar">
         <div class="deco" id="deco-sellar" aria-hidden="true"></div>
         <div class="nota-slot nota-slot--sellar" id="slot-sellar"></div>
-        <div class="podio-wrap">
-          <div class="envase-slot envase-slot--grande" id="envase-sellar"></div>
-          <img class="podio" src="assets/capsulas/podio.png" alt="" width="600" height="600">
-        </div>
+        <div class="halo" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M50 4l8 9 12-3 3 12 12 3-3 12 9 8-9 8 3 12-12 3-3 12-12-3-8 9-8-9-12 3-3-12-12-3 3-12-9-8 9-8-3-12 12-3 3-12 12 3z"/></svg></div>
+        <div class="envase-slot envase-slot--grande" id="envase-sellar"></div>
         <span class="sello" id="sello" aria-hidden="true">s.</span>
         <div class="destello-sello" id="destello" aria-hidden="true"></div>
       </div>
@@ -327,6 +353,15 @@
     <button class="historia__zona historia__zona--atras" id="zona-atras" type="button" aria-label="Anterior"></button>
     <button class="historia__zona historia__zona--adelante" id="zona-adelante" type="button" aria-label="Siguiente"></button>
     <p class="historia__ayuda" id="historia-ayuda">Tocá para seguir</p>
+  </div>
+
+  <!-- ============ CARGA (stickers motivacionales, se puede omitir) ============ -->
+  <div class="carga" id="carga" data-tema="negro" role="status" aria-live="polite" hidden>
+    <div class="cielo" aria-hidden="true"></div>
+    <button class="link link--omitir carga__omitir" id="carga-omitir" type="button">Omitir</button>
+    <div class="collage" id="collage-carga" aria-hidden="true"></div>
+    <p class="carga__texto" id="carga-texto"></p>
+    <div class="carga__barra" aria-hidden="true"><i></i></div>
   </div>
 
   <dialog class="sheet" id="dlg-borrar" aria-labelledby="dlg-titulo">

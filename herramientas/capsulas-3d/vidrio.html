@@ -1,0 +1,99 @@
+<!doctype html><html><head><style>html,body{margin:0;background:transparent}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+// Cápsulas de vidrio rosa (estilo de referencia): dos capas alineadas.
+// ?obj=trofeo|sobre|botella  &capa=atras|frente
+import * as THREE from 'three';
+const P = new URLSearchParams(location.search);
+const OBJ = P.get('obj') || 'trofeo', CAPA = P.get('capa') || 'frente';
+const SIZE = 900;
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(SIZE, SIZE); renderer.setClearColor(0, 0);
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+
+const VERT = `varying vec3 vN; varying vec3 vV;
+void main(){ vec4 mv = modelViewMatrix * vec4(position,1.); vN = normalize(normalMatrix*normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix*mv; }`;
+const FRAG = `uniform vec3 base; uniform vec3 rim; uniform float a0; uniform float a1; uniform float spec; uniform float pw;
+varying vec3 vN; varying vec3 vV;
+void main(){
+  vec3 n = normalize(vN); if(!gl_FrontFacing) n = -n;
+  float f = pow(1. - abs(dot(n, vV)), pw);
+  vec3 L1 = normalize(vec3(-.5,.75,.6)); vec3 L2 = normalize(vec3(.7,.3,.5));
+  float s = pow(max(dot(n, normalize(L1+vV)),0.), 70.) + .55*pow(max(dot(n, normalize(L2+vV)),0.), 120.);
+  vec3 c = mix(base, rim, f) + s*spec;
+  float a = clamp(mix(a0, a1, f) + s*spec, 0., 1.);
+  gl_FragColor = vec4(c, a);
+}`;
+const vidrio = (o) => new THREE.ShaderMaterial({
+  vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: o.depthWrite ?? false, side: o.side ?? THREE.FrontSide,
+  uniforms: { base: { value: new THREE.Color(o.base) }, rim: { value: new THREE.Color(o.rim) }, a0: { value: o.a0 }, a1: { value: o.a1 }, spec: { value: o.spec ?? .9 }, pw: { value: o.pw ?? 2.0 } },
+});
+const FRENTE = { base: 0xfab8ec, rim: 0xd560bd, a0: .07, a1: .9 };
+const ATRAS = { base: 0xf2a0e0, rim: 0xc45aae, a0: .5, a1: .9, spec: .25, side: THREE.BackSide };
+const SOLIDO = { base: 0xf79ee1, rim: 0xa8429a, a0: 1, a1: 1, spec: .8, depthWrite: true };
+const mat = (tipo) => vidrio(tipo);
+
+const g = new THREE.Group(); scene.add(g);
+const add = (geo, m, p = [0,0,0], r = [0,0,0], s = [1,1,1]) => { const x = new THREE.Mesh(geo, m); x.position.set(...p); x.rotation.set(...r); x.scale.set(...s); g.add(x); return x; };
+const spl = (pts, n = 60) => new THREE.SplineCurve(pts.map(([x,y]) => new THREE.Vector2(x,y))).getPoints(n);
+const lathe = (pts, seg = 96) => new THREE.LatheGeometry(pts, seg);
+const frente = CAPA === 'frente';
+
+function trofeo() {
+  const copa = lathe(spl([[0.05,1.55],[0.4,1.62],[0.85,1.95],[1.18,2.55],[1.33,3.2],[1.38,3.8]]));
+  if (frente) {
+    add(copa, mat(FRENTE));
+    add(new THREE.TorusGeometry(1.38, .045, 16, 120), mat({ ...FRENTE, a0: .7 }), [0, 3.8, 0], [Math.PI/2, 0, 0]);
+    add(lathe(spl([[0.36,1.6],[0.2,1.45],[0.13,1.0],[0.18,.55],[0.32,.42]])), mat({ ...FRENTE, a0: .5 }));
+    add(lathe(spl([[0.32,.42],[0.8,.32],[1.0,.18],[1.0,0.02],[0.0,0.0]])), mat({ ...FRENTE, a0: .45 }));
+    for (const sx of [-1, 1]) { const c = new THREE.CatmullRomCurve3([[1.3,3.55],[1.85,3.6],[2.1,3.2],[1.85,2.55],[1.2,2.3]].map(([x,y]) => new THREE.Vector3(sx*x, y, 0))); add(new THREE.TubeGeometry(c, 60, .1, 20), mat({ ...FRENTE, a0: .45 })); }
+  } else {
+    add(copa, mat(ATRAS));
+  }
+  g.rotation.set(.32, 0, -.06);
+}
+
+function sobre() {
+  const panel = (w, h, d, bev) => { const s = new THREE.Shape(); const r = .12; s.moveTo(-w/2+r,-h/2); s.lineTo(w/2-r,-h/2); s.quadraticCurveTo(w/2,-h/2,w/2,-h/2+r); s.lineTo(w/2,h/2-r); s.quadraticCurveTo(w/2,h/2,w/2-r,h/2); s.lineTo(-w/2+r,h/2); s.quadraticCurveTo(-w/2,h/2,-w/2,h/2-r); s.lineTo(-w/2,-h/2+r); s.quadraticCurveTo(-w/2,-h/2,-w/2+r,-h/2); return new THREE.ExtrudeGeometry(s, { depth: d, bevelEnabled: true, bevelThickness: bev, bevelSize: bev, bevelSegments: 6 }); };
+  const W = 3.4, H = 2.3;
+  if (!frente) {
+    add(panel(W, H, .03, .05), mat({ ...ATRAS, side: THREE.FrontSide, a0: .7 }), [0, 0, -.1]);
+    const fl = new THREE.Shape(); fl.moveTo(-W/2, H/2); fl.lineTo(W/2, H/2); fl.lineTo(.15, H/2 + 1.35); fl.quadraticCurveTo(0, H/2 + 1.45, -.15, H/2 + 1.35); fl.lineTo(-W/2, H/2);
+    add(new THREE.ExtrudeGeometry(fl, { depth: .03, bevelEnabled: true, bevelThickness: .05, bevelSize: .05, bevelSegments: 6 }), mat({ ...ATRAS, side: THREE.FrontSide, a0: .45, base: 0xf5a8e4 }), [0, 0, -.13]);
+  } else {
+    const bo = new THREE.Shape(); bo.moveTo(-W/2, -H/2); bo.lineTo(W/2, -H/2); bo.lineTo(W/2, H/2 - .15); bo.lineTo(.12, -.15); bo.quadraticCurveTo(0, -.24, -.12, -.15); bo.lineTo(-W/2, H/2 - .15); bo.lineTo(-W/2, -H/2);
+    add(new THREE.ExtrudeGeometry(bo, { depth: .03, bevelEnabled: true, bevelThickness: .06, bevelSize: .06, bevelSegments: 6 }), mat({ ...FRENTE, a0: .5, pw: 1.4 }), [0, 0, .08]);
+    // pliegues laterales
+    const pl = (sx) => { const s = new THREE.Shape(); s.moveTo(sx * W/2, -H/2); s.lineTo(sx * W/2, H/2 - .15); s.lineTo(sx * .25, -.35); s.lineTo(sx * W/2, -H/2); return s; };
+    for (const sx of [-1, 1]) add(new THREE.ExtrudeGeometry(pl(sx), { depth: .02, bevelEnabled: true, bevelThickness: .03, bevelSize: .03, bevelSegments: 4 }), mat({ ...FRENTE, a0: .18, pw: 1.4 }), [0, 0, .13]);
+  }
+  g.rotation.set(.1, .35, -.16);
+}
+
+function botella() {
+  const cuerpo = lathe(spl([[0.05,0],[0.85,0.02],[1.0,.2],[1.02,1.0],[.9,1.6],[.9,1.9],[1.02,2.4],[1.0,3.05],[.78,3.35],[.52,3.45]], 90));
+  if (frente) {
+    add(cuerpo, mat(FRENTE));
+    for (let i = 0; i < 3; i++) add(new THREE.TorusGeometry(.905, .02, 8, 96), mat({ ...FRENTE, a0: .8 }), [0, 1.66 + i * .1, 0], [Math.PI/2, 0, 0]);
+    add(new THREE.CylinderGeometry(.6, .6, .45, 64), mat(SOLIDO), [0, 3.66, 0]);
+    add(new THREE.CylinderGeometry(.24, .32, .45, 48), mat({ ...SOLIDO, base: 0x7aa1ff, rim: 0x3e5fc4 }), [0, 4.08, 0]);
+    add(new THREE.TorusGeometry(.3, .07, 16, 48), mat(SOLIDO), [.78, 3.66, 0]);
+  } else {
+    add(cuerpo, mat(ATRAS));
+  }
+  g.rotation.set(.18, 0, -.18);
+}
+
+({ trofeo, sobre, botella })[OBJ]();
+// encuadre fijo por objeto: se calcula con la capa de frente siempre, para alinear ambas capas
+const ref = new THREE.Group();
+const box = new THREE.Box3().setFromObject(g);
+const ENC = { trofeo: [0, 2.0, 0, 5.6], sobre: [0, .55, 0, 4.9], botella: [0, 2.05, 0, 5.2] }[OBJ];
+const cam = new THREE.PerspectiveCamera(26, 1, .1, 100);
+const dist = ENC[3] / (2 * Math.tan(THREE.MathUtils.degToRad(13)));
+cam.position.set(ENC[0], ENC[1], dist); cam.lookAt(ENC[0], ENC[1], ENC[2]);
+renderer.render(scene, cam);
+window.LISTO = true;
+</script></body></html>

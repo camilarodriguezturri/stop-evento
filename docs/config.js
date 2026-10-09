@@ -10,13 +10,12 @@ window.CAPSULA_CONFIG = {
   // Muestra el botón "Demo: simular que llegó el 27/10" (también con ?demo en el link).
   DEMO: true,
 
-  // Objetivos (hasta 3 por cápsula). "pregunta" aparece en la tarjeta del paso 2.
+  // Objetivos (hasta 6 por cápsula). "pregunta" aparece en la tarjeta del paso 2.
   // "mas: false" = bajar el número es crecer.
   OBJETIVOS: [
     { id: 'correr',   nombre: 'Correr',         unidad: 'km por salida',      corto: 'km',      min: 0, max: 42,  paso: 1,   hoy: 3,  meta: 10, pregunta: '¿Cuántos km querés correr de una?' },
     { id: 'pedalear', nombre: 'Pedalear',       unidad: 'km por salida',      corto: 'km',      min: 0, max: 150, paso: 5,   hoy: 10, meta: 30, pregunta: '¿Hasta dónde querés llegar en bici?' },
     { id: 'patinar',  nombre: 'Patinar',        unidad: 'min sin frenar',     corto: 'min',     min: 0, max: 120, paso: 5,   hoy: 10, meta: 30, pregunta: '¿Cuánto querés patinar sin frenar?' },
-    { id: 'cocinar',  nombre: 'Cocinar',        unidad: 'comidas caseras por semana', corto: 'comidas', min: 0, max: 14, paso: 1, hoy: 3, meta: 7, pregunta: '¿Cuántas veces por semana querés cocinarte algo rico?' },
     { id: 'entrenar', nombre: 'Moverme',        unidad: 'días por semana',    corto: 'días',    min: 0, max: 7,   paso: 1,   hoy: 2,  meta: 4,  pregunta: '¿Cuántos días por semana querés moverte?' },
     { id: 'pasos',    nombre: 'Caminar',        unidad: 'mil pasos por día',  corto: 'mil pasos', min: 0, max: 30, paso: 1,  hoy: 5,  meta: 10, pregunta: '¿Cuántos pasos querés sumar por día?' },
     { id: 'fuerza',   nombre: 'Fuerza',         unidad: 'kg en sentadilla',   corto: 'kg',      min: 0, max: 200, paso: 5,   hoy: 40, meta: 60, pregunta: '¿Cuántos kg querés levantar en sentadilla?' },
