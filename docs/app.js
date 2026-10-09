@@ -1,4 +1,4 @@
-// Cápsula del tiempo post.: sellar (4 pasos) → esperar al próximo evento → abrir y comparar.
+// Cápsula del tiempo de stop. (evento de post.): sellar (4 pasos) → esperar al próximo evento → abrir y comparar.
 (() => {
   'use strict';
 
@@ -8,7 +8,7 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const REDUCIDO = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const DEMO = CFG.DEMO || new URLSearchParams(location.search).has('demo');
-  const KEY = 'post-capsula-v1';
+  const KEY = 'stop-capsula-v1';
   const DIA = 864e5;
 
   // ---------- datos ----------
@@ -19,14 +19,14 @@
 
   const objetivo = (id) => CFG.OBJETIVOS.find((o) => o.id === id);
   const fmt = (n) => Number(n).toLocaleString('es-AR', { maximumFractionDigits: 1 });
-  // "el próximo evento post." + "." no debe quedar con dos puntos.
+  // "la próxima edición de stop." + "." no debe quedar con dos puntos.
   const punto = (s) => (/[.!?]$/.test(s) ? s : s + '.');
   const fecha = (iso, opc = { day: 'numeric', month: 'long', year: 'numeric' }) =>
     new Date(iso).toLocaleDateString('es-AR', opc);
 
   let borrador = nuevoBorrador();
   function nuevoBorrador(objetivos = []) {
-    return { envase: 'frasco', objetivos, para: 'mi yo del futuro', mensaje: '', color: 'azul' };
+    return { envase: 'locker', objetivos, para: 'mi yo del futuro', mensaje: '', color: 'azul' };
   }
 
   function estadoCapsula() {
@@ -82,46 +82,21 @@
 
   // ---------- misceláneas ----------
   P.decorar($('#deco-inicio'), [
-    { t: 'pildora', x: '4%', y: '6%', s: 64, r: -24 },
-    { t: 'reloj', x: '78%', y: '2%', s: 58, r: 12 },
-    { t: 'chispa', x: '84%', y: '58%', s: 44 },
-    { t: 'luna', x: '6%', y: '66%', s: 46, r: -10 },
-    { t: 'onda', x: '62%', y: '82%', s: 70, r: -8 },
-    { t: 'chispa', x: '30%', y: '86%', s: 22 },
+    { t: 'flor', x: '3%', y: '4%', s: 46, c: 'rosa' },
+    { t: 'punto', x: '30%', y: '2%', s: 14, c: 'azul' },
+    { t: 'aro', x: '84%', y: '6%', s: 26 },
+    { t: 'punto-o', x: '88%', y: '34%', s: 22, c: 'azul' },
+    { t: 'flor-hueca', x: '4%', y: '58%', s: 40 },
+    { t: 'punto', x: '18%', y: '86%', s: 20, c: 'rosa' },
+    { t: 'flor', x: '84%', y: '90%', s: 30, c: 'azul', p: 8 },
+    { t: 'punto', x: '58%', y: '92%', s: 10, c: 'crema' },
+    { t: 'aro', x: '44%', y: '84%', s: 16, c: 'azul' },
   ]);
-  const decoEspera = [
-    { t: 'reloj', x: '8%', y: '10%', s: 52, r: -14 },
-    { t: 'chispa', x: '80%', y: '8%', s: 34 },
-    { t: 'onda', x: '70%', y: '76%', s: 62 },
-    { t: 'pildora', x: '4%', y: '70%', s: 54, r: 30 },
-    { t: 'chispa', x: '22%', y: '42%', s: 18 },
-  ];
-  P.decorar($('#deco-espera'), decoEspera);
-  P.decorar($('#deco-lista'), [
-    { t: 'chispa', x: '10%', y: '12%', s: 40 },
-    { t: 'chispa', x: '80%', y: '18%', s: 30 },
-    { t: 'cerradura', x: '76%', y: '68%', s: 46 },
-    { t: 'arco', x: '6%', y: '70%', s: 60 },
-    { t: 'chispa', x: '60%', y: '2%', s: 20 },
-  ]);
-  P.decorar($('#deco-nota'), [
-    { t: 'chispa', x: '82%', y: '10%', s: 30 },
-    { t: 'luna', x: '6%', y: '64%', s: 34 },
-    { t: 'onda', x: '74%', y: '74%', s: 50 },
-  ]);
-  P.decorar($('#deco-sellar'), [
-    { t: 'chispa', x: '8%', y: '14%', s: 32 },
-    { t: 'reloj', x: '80%', y: '30%', s: 46 },
-    { t: 'pildora', x: '6%', y: '70%', s: 52, r: -30 },
-    { t: 'chispa', x: '84%', y: '80%', s: 22 },
-  ]);
-  P.decorar($('#deco-exito'), [
-    { t: 'chispa', x: '10%', y: '6%', s: 40 },
-    { t: 'luna', x: '80%', y: '10%', s: 44 },
-    { t: 'arco', x: '4%', y: '66%', s: 58 },
-    { t: 'candado', x: '78%', y: '64%', s: 46 },
-    { t: 'chispa', x: '64%', y: '0%', s: 20 },
-  ]);
+  P.decorar($('#deco-espera'), P.mezcla(3, 8));
+  P.decorar($('#deco-lista'), P.mezcla(5, 8));
+  P.decorar($('#deco-nota'), P.mezcla(2, 5, { y0: 10, y1: 80 }));
+  P.decorar($('#deco-sellar'), P.mezcla(7, 7));
+  P.decorar($('#deco-exito'), P.mezcla(1, 8));
 
   // ---------- inicio ----------
   const btnInicio = $('#btn-inicio');
@@ -168,7 +143,14 @@
     const falta = Math.max(0, new Date(c.abreEn).getTime() - Date.now());
     if (!falta) { pintarInicio(); return; }
     const u = { d: Math.floor(falta / DIA), h: Math.floor(falta / 36e5) % 24, m: Math.floor(falta / 6e4) % 60, s: Math.floor(falta / 1e3) % 60 };
-    $$('#cuenta b').forEach((b) => { b.textContent = String(u[b.dataset.u]).padStart(2, '0'); });
+    $$('#cuenta b').forEach((b) => {
+      const v = String(u[b.dataset.u]).padStart(2, '0');
+      if (b.textContent === v) return;
+      b.textContent = v;
+      b.classList.remove('cambia');
+      void b.offsetWidth;
+      b.classList.add('cambia');
+    });
   }
 
   function ponerEnvase(slot, id) {
@@ -237,12 +219,6 @@
   // ---------- paso 1: envase ----------
   const carrusel = $('#carrusel');
   const puntos = $('#puntos');
-  const decoOpciones = [
-    [{ t: 'chispa', x: '12%', y: '8%', s: 34 }, { t: 'onda', x: '70%', y: '76%', s: 60 }, { t: 'luna', x: '78%', y: '14%', s: 36 }],
-    [{ t: 'pildora', x: '8%', y: '64%', s: 54, r: 30 }, { t: 'chispa', x: '80%', y: '12%', s: 30 }, { t: 'reloj', x: '78%', y: '64%', s: 44 }],
-    [{ t: 'arco', x: '6%', y: '10%', s: 54 }, { t: 'chispa', x: '82%', y: '70%', s: 34 }, { t: 'cerradura', x: '80%', y: '8%', s: 34 }],
-    [{ t: 'chispa', x: '10%', y: '70%', s: 30 }, { t: 'luna', x: '8%', y: '10%', s: 40 }, { t: 'pildora', x: '74%', y: '72%', s: 50, r: -20 }],
-  ];
   P.ENVASES.forEach((e, i) => {
     const b = document.createElement('button');
     b.type = 'button';
@@ -252,7 +228,7 @@
     b.innerHTML = '<span class="opcion__nombre"></span><span class="opcion__escena"><span class="deco"></span></span>';
     $('.opcion__nombre', b).textContent = e.nombre;
     $('.opcion__escena', b).append(P.envase(e.id));
-    P.decorar($('.deco', b), decoOpciones[i]);
+    P.decorar($('.deco', b), P.mezcla(11 + i, 6));
     b.addEventListener('click', () => elegirEnvase(e.id, true));
     carrusel.append(b);
     puntos.append(document.createElement('i'));
@@ -588,7 +564,7 @@
 
     lista.push(slide({
       bg: 'var(--azul)',
-      deco: [{ t: 'chispa', x: '8%', y: '40%', s: 40 }, { t: 'reloj', x: '78%', y: '34%', s: 54 }, { t: 'onda', x: '66%', y: '80%', s: 70 }, { t: 'chispa', x: '14%', y: '76%', s: 24 }],
+      deco: P.mezcla(21, 7, { y0: 30, y1: 92 }),
       auto: 5200,
       html:
         `<p class="slide__kicker">cápsula del ${esc(fecha(c.selladaEn, { day: '2-digit', month: '2-digit', year: 'numeric' }))}</p>` +
@@ -605,7 +581,7 @@
     lista.push(slide({
       // Fondo opuesto al color de la nota para que se lea.
       bg: c.color === 'rosa' ? 'var(--azul)' : 'var(--rosa)',
-      deco: [{ t: 'luna', x: '80%', y: '30%', s: 44 }, { t: 'chispa', x: '6%', y: '36%', s: 30 }, { t: 'arco', x: '6%', y: '82%', s: 56 }],
+      deco: P.mezcla(22, 6, { y0: 28, y1: 92 }),
       auto: 8000,
       html:
         '<p class="slide__kicker">esto te escribiste</p>' +
@@ -631,7 +607,7 @@
     lista.push(slide({
       bg: 'var(--crema)',
       interactiva: true,
-      deco: [{ t: 'chispa', x: '84%', y: '92%', s: 26 }, { t: 'pildora', x: '4%', y: '90%', s: 40, r: -30 }],
+      deco: P.mezcla(23, 3, { y0: 90, y1: 98 }),
       html:
         '<p class="slide__kicker">antes de comparar</p>' +
         '<h2 class="slide__titulo">¿Dónde estás hoy?</h2>' +
@@ -684,9 +660,7 @@
       const flecha = '<svg class="compara__flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>';
       const llenoDesde = pos(Math.min(o.antes, o.ahora));
       const llenoHasta = pos(Math.max(o.antes, o.ahora));
-      const deco = i % 2
-        ? [{ t: 'chispa', x: '80%', y: '28%', s: 40 }, { t: 'onda', x: '4%', y: '82%', s: 64 }, { t: 'luna', x: '8%', y: '30%', s: 34 }]
-        : [{ t: 'chispa', x: '8%', y: '28%', s: 36 }, { t: 'arco', x: '76%', y: '80%', s: 60 }, { t: 'pildora', x: '76%', y: '30%', s: 46, r: 24 }];
+      const deco = P.mezcla(30 + i, 7, { y0: 26, y1: 94 });
       return slide({
         bg: i % 2 ? 'var(--rosa)' : 'var(--azul)',
         deco,
@@ -730,7 +704,7 @@
     const final = slide({
       bg: 'var(--crema)',
       interactiva: true,
-      deco: [{ t: 'chispa', x: '6%', y: '9%', s: 34 }, { t: 'chispa', x: '86%', y: '12%', s: 22 }, { t: 'luna', x: '8%', y: '84%', s: 34 }],
+      deco: P.mezcla(40, 4, { y0: 3, y1: 14 }),
       html:
         `<p class="sticker sticker--${crecio ? 'azul' : 'rosa'} sticker--grande" data-texto="${crecio ? '¡Creciste!' : '¡Seguimos!'}" style="margin-top:12px">${crecio ? '¡Creciste!' : '¡Seguimos!'}</p>` +
         `<h2 class="slide__titulo" style="font-size:22px">Avanzaste en ${crecio} de ${c.objetivos.length} ${c.objetivos.length === 1 ? 'objetivo' : 'objetivos'}` +

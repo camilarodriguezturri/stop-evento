@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#ede8db">
-  <meta name="description" content="Sellá una notita para tu yo del futuro con tus objetivos. Se desbloquea en el próximo evento post. y te muestra cuánto creciste.">
-  <title>Cápsula del tiempo · post.</title>
+  <meta name="description" content="Sellá una notita para tu yo del futuro con tus objetivos. Se desbloquea en la próxima edición de stop. y te muestra cuánto creciste.">
+  <title>Cápsula del tiempo · stop.</title>
   <link rel="icon" href="assets/logo-post.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,44 +16,14 @@
   <script src="app.js" defer></script>
 </head>
 <body>
-  <!-- Misceláneas: píldora, reloj de arena, chispa, luna, cerradura, onda, candado, arco. -->
+  <!-- Ícono del candado (botón de sellar y cápsula cerrada). Las misceláneas flotantes salen de piezas.js. -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
-      <symbol id="d-pildora" viewBox="0 0 100 100">
-        <path d="M50 35H28a15 15 0 0 0 0 30h22z" fill="var(--azul)"/>
-        <path d="M50 35h22a15 15 0 0 1 0 30H50z" fill="var(--rosa)"/>
-        <path d="M28 35h44a15 15 0 0 1 0 30H28a15 15 0 0 1 0-30zM50 35v30" class="tr"/>
-        <path d="M27 42h12" class="tr brillo"/>
-      </symbol>
-      <symbol id="d-reloj" viewBox="0 0 100 100">
-        <path d="M30 12h40c0 22-16 28-16 38s16 16 16 38H30c0-22 16-28 16-38S30 34 30 12z" fill="var(--crema)"/>
-        <path d="M37 80c4-9 9-13 13-15 4 2 9 6 13 15z" fill="var(--rosa)"/>
-        <path d="M38 26h24c-3 7-8 10-12 12-4-2-9-5-12-12z" fill="var(--rosa)"/>
-        <path d="M30 12h40c0 22-16 28-16 38s16 16 16 38H30c0-22 16-28 16-38S30 34 30 12zM22 10h56M22 90h56" class="tr"/>
-      </symbol>
-      <symbol id="d-chispa" viewBox="0 0 100 100">
-        <path d="M50 6c3 30 13 40 44 44-31 4-41 14-44 44-3-30-13-40-44-44 31-4 41-14 44-44z" fill="var(--azul)" class="tr"/>
-      </symbol>
-      <symbol id="d-luna" viewBox="0 0 100 100">
-        <path d="M62 10a40 40 0 1 0 28 62A34 34 0 0 1 62 10z" fill="var(--rosa)" class="tr"/>
-      </symbol>
-      <symbol id="d-cerradura" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="40" fill="var(--azul)" class="tr"/>
-        <path d="M50 30a10 10 0 0 1 6 18l4 20H40l4-20a10 10 0 0 1 6-18z" fill="var(--oscuro)"/>
-      </symbol>
-      <symbol id="d-onda" viewBox="0 0 100 100">
-        <path d="M6 58c11-22 21-22 22 0s11 22 22 0 11-22 22 0 11 22 22 0" class="tr" style="stroke-width:11;stroke:var(--oscuro)"/>
-        <path d="M6 58c11-22 21-22 22 0s11 22 22 0 11-22 22 0 11 22 22 0" class="tr" style="stroke-width:6;stroke:var(--rosa)"/>
-      </symbol>
       <symbol id="d-candado" viewBox="0 0 100 100">
         <path d="M32 46V34a18 18 0 0 1 36 0v12" class="tr" style="stroke-width:8"/>
         <rect x="20" y="44" width="60" height="46" rx="12" fill="var(--rosa)" class="tr"/>
         <circle cx="50" cy="64" r="6" fill="var(--oscuro)"/>
         <path d="M50 66v10" class="tr"/>
-      </symbol>
-      <symbol id="d-arco" viewBox="0 0 100 100">
-        <path d="M8 80a42 42 0 0 1 84 0H76a26 26 0 0 0-52 0z" fill="var(--azul)" class="tr"/>
-        <path d="M24 80a26 26 0 0 1 52 0H64a14 14 0 0 0-28 0z" fill="var(--rosa)" class="tr"/>
       </symbol>
     </defs>
   </svg>
@@ -64,7 +34,7 @@
     <section class="pantalla pantalla--inicio" id="p-inicio" aria-labelledby="t-inicio">
       <header class="top" data-anim>
         <span class="header__lado" aria-hidden="true"></span>
-        <img class="logo" src="assets/logo-post.png" alt="post." width="92" height="42">
+        <span class="marca" role="img" aria-label="stop."><span class="sticker sticker--rosa" data-texto="stop" aria-hidden="true">stop</span><span class="sticker sticker--rosa marca__punto" data-texto="." aria-hidden="true">.</span></span>
         <span class="header__lado" aria-hidden="true"></span>
       </header>
 
@@ -78,12 +48,12 @@
             <span class="sticker sticker--rosa" data-texto="tiempo">tiempo</span>
           </h1>
         </div>
-        <p class="bajada bajada--centro" data-anim>Escribile a tu yo del futuro, guardá tus objetivos de hoy y sellalo. Se abre en el próximo evento post. y te muestra cuánto creciste.</p>
+        <p class="bajada bajada--centro" data-anim>Escribile a tu yo del futuro, guardá tus objetivos de hoy y sellalo. Se abre en la próxima edición de stop. y te muestra cuánto creciste.</p>
         <ol class="pasos" data-anim>
           <li><b>1</b><span>Elegí tu cápsula</span></li>
           <li><b>2</b><span>Contá dónde estás hoy</span></li>
           <li><b>3</b><span>Dejate una nota</span></li>
-          <li><b>4</b><span>Sellala hasta el próximo evento</span></li>
+          <li><b>4</b><span>Sellala hasta el próximo stop.</span></li>
         </ol>
       </div>
 
@@ -131,6 +101,7 @@
           <button class="btn btn--secundario" id="btn-inicio-2" type="button" hidden></button>
         </div>
         <button class="link" id="btn-simular" type="button" hidden>Demo: simular que llegó el evento</button>
+        <p class="por">un evento de <img src="assets/logo-post.png" alt="post." width="52" height="24"></p>
       </footer>
     </section>
 
@@ -275,7 +246,7 @@
         <div class="deco" id="deco-sellar" aria-hidden="true"></div>
         <div class="nota-slot nota-slot--sellar" id="slot-sellar"></div>
         <div class="envase-slot envase-slot--grande" id="envase-sellar"></div>
-        <span class="sello" id="sello" aria-hidden="true">p.</span>
+        <span class="sello" id="sello" aria-hidden="true">s.</span>
       </div>
 
       <footer class="pie" data-anim>
@@ -292,7 +263,7 @@
     <section class="pantalla pantalla--exito" id="p-sellada" aria-labelledby="t-sellada" hidden>
       <header class="top" data-anim>
         <span class="header__lado" aria-hidden="true"></span>
-        <img class="logo" src="assets/logo-post.png" alt="post." width="92" height="42">
+        <span class="marca" role="img" aria-label="stop."><span class="sticker sticker--rosa" data-texto="stop" aria-hidden="true">stop</span><span class="sticker sticker--rosa marca__punto" data-texto="." aria-hidden="true">.</span></span>
         <button class="icon-btn" id="btn-cerrar" type="button" aria-label="Volver al inicio">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
         </button>

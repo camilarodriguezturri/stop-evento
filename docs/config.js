@@ -1,11 +1,11 @@
-// Configuración de la Cápsula del tiempo post.
+// Configuración de la Cápsula del tiempo de stop. (evento de post.)
 // Editá estos valores sin tocar app.js.
 window.CAPSULA_CONFIG = {
   // Evento donde se sella la cápsula (el de hoy).
-  EVENTO_ACTUAL: { nombre: 'Cubo post. · Obelisco', fecha: '2026-10-09T18:00:00-03:00' },
+  EVENTO_ACTUAL: { nombre: 'stop.', fecha: '2026-10-09T18:00:00-03:00' },
 
   // Evento donde se desbloquea. Cuando llega esta fecha, la cápsula se puede abrir.
-  PROXIMO_EVENTO: { nombre: 'el próximo evento post.', fecha: '2027-04-10T18:00:00-03:00' },
+  PROXIMO_EVENTO: { nombre: 'la próxima edición de stop.', fecha: '2027-04-10T18:00:00-03:00' },
 
   // Muestra el botón "Demo: simular que llegó el evento" (también con ?demo en el link).
   DEMO: true,

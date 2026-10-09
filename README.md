@@ -1,6 +1,6 @@
-# Cápsula del tiempo · post.
+# Cápsula del tiempo · stop.
 
-Extensión de la app SPOT! con la identidad de [Dedicatorias post.](https://estefigarrido.github.io/dedicatorias-post/)
+Para **stop.**, el evento de post. Extensión de la app SPOT! con la identidad de [Dedicatorias post.](https://estefigarrido.github.io/dedicatorias-post/)
 (Sora / Reddit Sans / JetBrains Mono, notita festoneada, botones pill), en versión clara:
 fondo `#EDE8DB`, azul `#7AA1FF` y rosa `#F79EE1`.
 
@@ -9,25 +9,29 @@ fondo `#EDE8DB`, azul `#7AA1FF` y rosa `#F79EE1`.
 
 ## La idea
 
-Como la *Playlist para el Futuro* de Spotify, pero con objetivos personales y atada a los eventos de la marca:
+Como la *Playlist para el Futuro* de Spotify, pero con objetivos personales y atada a cada edición de stop.:
 
-1. **En un evento post.** la persona arma su cápsula en 4 pasos:
-   1. **Elegí tu cápsula**: frasco, lata, sobre lacrado o cajita (carrusel).
+1. **En stop.** la persona arma su cápsula en 4 pasos:
+   1. **Elegí tu cápsula**: casillero del vestuario, caramañola, pelota que se abre o trofeo con tapa (carrusel animado).
    2. **Tus objetivos**: hasta 3 (correr, entrenar, fuerza, descansar, menos pantalla…) con *dónde estoy hoy* y *mi meta*.
    3. **Una nota para tu yo del futuro**: la notita festoneada de post. (`para:` + mensaje), en azul o rosa.
-   4. **Sellala**: mantener presionado; la nota cae adentro, se cierra la tapa y aparece el sello `p.`.
+   4. **Sellala**: mantener presionado; la nota cae adentro, se cierra la tapa y aparece el sello `s.`.
 2. **Mientras tanto** el inicio muestra la cápsula sellada con candado y la cuenta regresiva al próximo evento.
-3. **En el próximo evento** la cápsula se desbloquea y se abre como *stories*:
+3. **En la próxima edición de stop.** la cápsula se desbloquea y se abre como *stories*:
    hace N días la sellaste → tu nota del pasado → ¿dónde estás hoy? (actualizás los números) →
    una pantalla por objetivo (antes → hoy, % de crecimiento, cuánto falta para la meta) → resumen “¡Creciste!”.
 4. **Sellar una nueva** arranca la próxima cápsula desde los números de hoy (y sube la meta si ya la cumpliste),
    así cada evento compara contra la última vez.
 
-### Misceláneas nuevas
+### Identidad
 
-Reemplazan los aros, puntos y estrellas-flor del sistema anterior por formas del universo “tiempo”:
-píldora/cápsula bicolor, reloj de arena, chispa de 4 puntas, luna, cerradura, onda, candado y arco.
-Todas con contorno `#252525` y relleno azul/rosa/crema, flotando igual que antes (`docs/index.html`, `<symbol id="d-…">`).
+- **stop.** está escrito como el logo de post.: Sora regular con interletrado cerrado, letra llena y contorno grueso.
+  Los títulos tipo sticker usan tres capas del mismo texto (contorno oscuro, contorno de color y letra llena sin trazo)
+  para que nunca se vean los bordes internos de la tipografía.
+- **Misceláneas**: mezcla de los puntos de SPOT! (color con borde) y los de post. (puntos oscuros, aros y flores
+  festoneadas). Flotan, las flores giran, los puntos laten y los aros respiran (`piezas.js`, `forma()` y `mezcla()`).
+- Todo tiene animación: títulos que caen, pasos que entran, cápsulas con movimiento propio (dial del casillero,
+  burbujas en la caramañola, pelota que rebota, destello del trofeo), brillo en los botones, cuenta regresiva que gira.
 
 ## Configuración
 
