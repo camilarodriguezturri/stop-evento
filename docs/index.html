@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ede8db">
+  <meta name="description" content="Sellá una notita para tu yo del futuro con tus objetivos. Se desbloquea en el próximo evento post. y te muestra cuánto creciste.">
+  <title>Cápsula del tiempo · post.</title>
+  <link rel="icon" href="assets/logo-post.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=Reddit+Sans:wght@400;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
+  <script src="piezas.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <!-- Misceláneas: píldora, reloj de arena, chispa, luna, cerradura, onda, candado, arco. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="d-pildora" viewBox="0 0 100 100">
+        <path d="M50 35H28a15 15 0 0 0 0 30h22z" fill="var(--azul)"/>
+        <path d="M50 35h22a15 15 0 0 1 0 30H50z" fill="var(--rosa)"/>
+        <path d="M28 35h44a15 15 0 0 1 0 30H28a15 15 0 0 1 0-30zM50 35v30" class="tr"/>
+        <path d="M27 42h12" class="tr brillo"/>
+      </symbol>
+      <symbol id="d-reloj" viewBox="0 0 100 100">
+        <path d="M30 12h40c0 22-16 28-16 38s16 16 16 38H30c0-22 16-28 16-38S30 34 30 12z" fill="var(--crema)"/>
+        <path d="M37 80c4-9 9-13 13-15 4 2 9 6 13 15z" fill="var(--rosa)"/>
+        <path d="M38 26h24c-3 7-8 10-12 12-4-2-9-5-12-12z" fill="var(--rosa)"/>
+        <path d="M30 12h40c0 22-16 28-16 38s16 16 16 38H30c0-22 16-28 16-38S30 34 30 12zM22 10h56M22 90h56" class="tr"/>
+      </symbol>
+      <symbol id="d-chispa" viewBox="0 0 100 100">
+        <path d="M50 6c3 30 13 40 44 44-31 4-41 14-44 44-3-30-13-40-44-44 31-4 41-14 44-44z" fill="var(--azul)" class="tr"/>
+      </symbol>
+      <symbol id="d-luna" viewBox="0 0 100 100">
+        <path d="M62 10a40 40 0 1 0 28 62A34 34 0 0 1 62 10z" fill="var(--rosa)" class="tr"/>
+      </symbol>
+      <symbol id="d-cerradura" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="40" fill="var(--azul)" class="tr"/>
+        <path d="M50 30a10 10 0 0 1 6 18l4 20H40l4-20a10 10 0 0 1 6-18z" fill="var(--oscuro)"/>
+      </symbol>
+      <symbol id="d-onda" viewBox="0 0 100 100">
+        <path d="M6 58c11-22 21-22 22 0s11 22 22 0 11-22 22 0 11 22 22 0" class="tr" style="stroke-width:11;stroke:var(--oscuro)"/>
+        <path d="M6 58c11-22 21-22 22 0s11 22 22 0 11-22 22 0 11 22 22 0" class="tr" style="stroke-width:6;stroke:var(--rosa)"/>
+      </symbol>
+      <symbol id="d-candado" viewBox="0 0 100 100">
+        <path d="M32 46V34a18 18 0 0 1 36 0v12" class="tr" style="stroke-width:8"/>
+        <rect x="20" y="44" width="60" height="46" rx="12" fill="var(--rosa)" class="tr"/>
+        <circle cx="50" cy="64" r="6" fill="var(--oscuro)"/>
+        <path d="M50 66v10" class="tr"/>
+      </symbol>
+      <symbol id="d-arco" viewBox="0 0 100 100">
+        <path d="M8 80a42 42 0 0 1 84 0H76a26 26 0 0 0-52 0z" fill="var(--azul)" class="tr"/>
+        <path d="M24 80a26 26 0 0 1 52 0H64a14 14 0 0 0-28 0z" fill="var(--rosa)" class="tr"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <main class="app" id="app">
+
+    <!-- ============ INICIO ============ -->
+    <section class="pantalla pantalla--inicio" id="p-inicio" aria-labelledby="t-inicio">
+      <header class="top" data-anim>
+        <span class="header__lado" aria-hidden="true"></span>
+        <img class="logo" src="assets/logo-post.png" alt="post." width="92" height="42">
+        <span class="header__lado" aria-hidden="true"></span>
+      </header>
+
+      <!-- estado: sin cápsula -->
+      <div class="estado" data-estado="vacio">
+        <div class="hero">
+          <div class="deco" id="deco-inicio" aria-hidden="true"></div>
+          <h1 class="hero__titulo" id="t-inicio" tabindex="-1" data-anim>
+            <span class="sticker sticker--azul" data-texto="Cápsula">Cápsula</span>
+            <span class="hero__del">del</span>
+            <span class="sticker sticker--rosa" data-texto="tiempo">tiempo</span>
+          </h1>
+        </div>
+        <p class="bajada bajada--centro" data-anim>Escribile a tu yo del futuro, guardá tus objetivos de hoy y sellalo. Se abre en el próximo evento post. y te muestra cuánto creciste.</p>
+        <ol class="pasos" data-anim>
+          <li><b>1</b><span>Elegí tu cápsula</span></li>
+          <li><b>2</b><span>Contá dónde estás hoy</span></li>
+          <li><b>3</b><span>Dejate una nota</span></li>
+          <li><b>4</b><span>Sellala hasta el próximo evento</span></li>
+        </ol>
+      </div>
+
+      <!-- estado: sellada, esperando -->
+      <div class="estado" data-estado="sellada" hidden>
+        <p class="etiqueta" data-anim>tu cápsula está sellada</p>
+        <div class="escena escena--espera" data-anim>
+          <div class="deco" id="deco-espera" aria-hidden="true"></div>
+          <div class="envase-slot envase-slot--grande flota" id="envase-espera"></div>
+          <span class="candado-badge" aria-hidden="true"><svg viewBox="0 0 100 100"><use href="#d-candado"/></svg></span>
+        </div>
+        <p class="espera__evento" data-anim>Se abre en <strong id="espera-evento"></strong></p>
+        <div class="cuenta" id="cuenta" role="timer" aria-live="off" data-anim>
+          <div><b data-u="d">00</b><span>días</span></div>
+          <div><b data-u="h">00</b><span>horas</span></div>
+          <div><b data-u="m">00</b><span>min</span></div>
+          <div><b data-u="s">00</b><span>seg</span></div>
+        </div>
+        <p class="espera__fecha" id="espera-fecha" data-anim></p>
+      </div>
+
+      <!-- estado: lista para abrir -->
+      <div class="estado" data-estado="lista" hidden>
+        <p class="etiqueta etiqueta--vivo" data-anim>evento en vivo</p>
+        <div class="escena escena--espera" data-anim>
+          <div class="deco" id="deco-lista" aria-hidden="true"></div>
+          <div class="envase-slot envase-slot--grande tiembla" id="envase-lista"></div>
+        </div>
+        <h1 class="titulo-grande" data-anim>¡Tu cápsula se desbloqueó!</h1>
+        <p class="bajada bajada--centro" id="lista-texto" data-anim></p>
+      </div>
+
+      <!-- estado: ya abierta -->
+      <div class="estado" data-estado="abierta" hidden>
+        <p class="etiqueta" data-anim>última cápsula</p>
+        <div class="resumen-mini" id="resumen-mini" data-anim></div>
+      </div>
+
+      <footer class="pie" data-anim>
+        <div class="acciones">
+          <button class="btn btn--primario" id="btn-inicio" type="button">
+            <span class="btn__texto">Armar mi cápsula</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>
+          </button>
+          <button class="btn btn--secundario" id="btn-inicio-2" type="button" hidden></button>
+        </div>
+        <button class="link" id="btn-simular" type="button" hidden>Demo: simular que llegó el evento</button>
+      </footer>
+    </section>
+
+    <!-- ============ PASO 1 · ENVASE ============ -->
+    <section class="pantalla" id="p-envase" aria-labelledby="t-envase" hidden>
+      <header class="header" data-anim>
+        <button class="icon-btn" data-volver type="button" aria-label="Volver">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12H3M10 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="header__centro">
+          <span class="paso">paso 1:</span>
+          <h1 class="header__titulo" id="t-envase" tabindex="-1">Elegí tu cápsula</h1>
+        </div>
+        <span class="header__lado" aria-hidden="true"></span>
+      </header>
+
+      <p class="bajada bajada--centro" data-anim>¿En qué vas a guardar tu mensaje?</p>
+
+      <div class="carrusel" id="carrusel" role="radiogroup" aria-label="Tipo de cápsula" data-anim></div>
+      <div class="puntos" id="puntos" aria-hidden="true"></div>
+
+      <footer class="pie" data-anim>
+        <button class="btn btn--primario btn--ancho" data-siguiente type="button">
+          Siguiente
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>
+        </button>
+        <div class="progreso" aria-label="Paso 1 de 4"><i class="on"></i><i></i><i></i><i></i></div>
+      </footer>
+    </section>
+
+    <!-- ============ PASO 2 · OBJETIVOS ============ -->
+    <section class="pantalla" id="p-objetivos" aria-labelledby="t-objetivos" hidden>
+      <header class="header" data-anim>
+        <button class="icon-btn" data-volver type="button" aria-label="Volver">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12H3M10 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="header__centro">
+          <span class="paso">paso 2:</span>
+          <h1 class="header__titulo" id="t-objetivos" tabindex="-1">Tus objetivos</h1>
+        </div>
+        <span class="header__lado" aria-hidden="true"></span>
+      </header>
+
+      <div class="contenido">
+        <p class="bajada" data-anim>Elegí hasta 3 y contá dónde estás hoy y a dónde querés llegar. En el próximo evento comparamos.</p>
+        <div class="chips" id="chips" role="group" aria-label="Objetivos" data-anim></div>
+        <div class="metas" id="metas" aria-live="polite"></div>
+      </div>
+
+      <footer class="pie" data-anim>
+        <button class="btn btn--primario btn--ancho" data-siguiente type="button" aria-disabled="true">
+          Siguiente
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>
+        </button>
+        <div class="progreso" aria-label="Paso 2 de 4"><i></i><i class="on"></i><i></i><i></i></div>
+      </footer>
+    </section>
+
+    <!-- ============ PASO 3 · NOTA ============ -->
+    <section class="pantalla" id="p-nota" aria-labelledby="t-nota" hidden>
+      <header class="header" data-anim>
+        <button class="icon-btn" data-volver type="button" aria-label="Volver">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12H3M10 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="header__centro">
+          <span class="paso">paso 3:</span>
+          <h1 class="header__titulo" id="t-nota" tabindex="-1">Una nota para tu yo del futuro</h1>
+        </div>
+        <span class="header__lado" aria-hidden="true"></span>
+      </header>
+
+      <div class="contenido">
+        <div class="preview" data-anim>
+          <span class="preview__label">Vista previa</span>
+          <div class="deco" id="deco-nota" aria-hidden="true"></div>
+          <div class="nota-slot" id="slot-nota" role="img" aria-label="Vista previa de tu nota"></div>
+        </div>
+
+        <form id="form" novalidate autocomplete="off">
+          <div class="campo" data-anim>
+            <label class="campo__label" for="in-para">¿Para quién es?</label>
+            <div class="input">
+              <span class="input__prefijo" aria-hidden="true">para:</span>
+              <input id="in-para" name="para" type="text" maxlength="20" value="mi yo del futuro"
+                     autocapitalize="none" spellcheck="false" enterkeyhint="next">
+            </div>
+          </div>
+
+          <div class="campo" id="campo-msg" data-anim>
+            <label class="campo__label" for="in-msg">Tu mensaje</label>
+            <div class="comienzos" role="group" aria-labelledby="ayuda-comienzos">
+              <span class="comienzos__ayuda" id="ayuda-comienzos">Empezá con una frase o escribí lo tuyo</span>
+              <div class="comienzos__lista">
+                <button type="button" class="comienzo">Si estás leyendo esto</button>
+                <button type="button" class="comienzo">Hoy me prometo</button>
+                <button type="button" class="comienzo">No te olvides de</button>
+                <button type="button" class="comienzo">Ojalá ya estés</button>
+              </div>
+            </div>
+            <div class="textarea">
+              <textarea id="in-msg" name="mensaje" maxlength="150" rows="3" placeholder="Hola, yo del futuro…"
+                        enterkeyhint="done" aria-describedby="cont-msg"></textarea>
+              <span class="contador contador--in" id="cont-msg">0 / 150</span>
+            </div>
+          </div>
+
+          <fieldset class="campo colores" data-anim>
+            <legend class="campo__label">Color de la nota</legend>
+            <div class="colores__lista">
+              <label class="swatch"><input type="radio" name="color" value="azul" checked><span class="swatch__c" style="--c:#7aa1ff"></span><span class="sr">Azul</span></label>
+              <label class="swatch"><input type="radio" name="color" value="rosa"><span class="swatch__c" style="--c:#f79ee1"></span><span class="sr">Rosa</span></label>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+
+      <footer class="pie" data-anim>
+        <button class="btn btn--primario btn--ancho" data-siguiente type="button" aria-disabled="true">
+          Siguiente
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>
+        </button>
+        <div class="progreso" aria-label="Paso 3 de 4"><i></i><i></i><i class="on"></i><i></i></div>
+      </footer>
+    </section>
+
+    <!-- ============ PASO 4 · SELLAR ============ -->
+    <section class="pantalla" id="p-sellar" aria-labelledby="t-sellar" hidden>
+      <header class="header" data-anim>
+        <button class="icon-btn" data-volver type="button" aria-label="Volver">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12H3M10 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="header__centro">
+          <span class="paso">paso 4:</span>
+          <h1 class="header__titulo" id="t-sellar" tabindex="-1">Sellala y guardala</h1>
+        </div>
+        <span class="header__lado" aria-hidden="true"></span>
+      </header>
+
+      <p class="bajada bajada--centro" data-anim>Una vez sellada no se puede abrir hasta <strong id="sellar-evento"></strong></p>
+
+      <div class="escena escena--sellar">
+        <div class="deco" id="deco-sellar" aria-hidden="true"></div>
+        <div class="nota-slot nota-slot--sellar" id="slot-sellar"></div>
+        <div class="envase-slot envase-slot--grande" id="envase-sellar"></div>
+        <span class="sello" id="sello" aria-hidden="true">p.</span>
+      </div>
+
+      <footer class="pie" data-anim>
+        <button class="mantener" id="btn-sellar" type="button" aria-describedby="ayuda-sellar">
+          <svg class="mantener__aro" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="36"/><circle class="mantener__avance" cx="40" cy="40" r="36"/></svg>
+          <svg class="mantener__icono" viewBox="0 0 100 100" aria-hidden="true"><use href="#d-candado"/></svg>
+        </button>
+        <span class="ayuda-sellar" id="ayuda-sellar">Mantené presionado para sellar</span>
+        <div class="progreso" aria-label="Paso 4 de 4"><i></i><i></i><i></i><i class="on"></i></div>
+      </footer>
+    </section>
+
+    <!-- ============ SELLADA ============ -->
+    <section class="pantalla pantalla--exito" id="p-sellada" aria-labelledby="t-sellada" hidden>
+      <header class="top" data-anim>
+        <span class="header__lado" aria-hidden="true"></span>
+        <img class="logo" src="assets/logo-post.png" alt="post." width="92" height="42">
+        <button class="icon-btn" id="btn-cerrar" type="button" aria-label="Volver al inicio">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+        </button>
+      </header>
+      <h1 class="exito__titulo" id="t-sellada" tabindex="-1" data-anim>Tu cápsula viaja al futuro</h1>
+      <div class="escena escena--exito">
+        <div class="bandas" aria-hidden="true"><i></i><i></i></div>
+        <div class="deco" id="deco-exito" aria-hidden="true"></div>
+        <div class="envase-slot envase-slot--grande flota" id="envase-exito"></div>
+      </div>
+      <p class="sticker sticker--azul sticker--grande" data-texto="¡Sellada!">¡Sellada!</p>
+      <p class="exito__texto" id="exito-texto" data-anim></p>
+      <footer class="pie" data-anim>
+        <button class="btn btn--primario" id="btn-listo" type="button">
+          Listo
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>
+        </button>
+      </footer>
+    </section>
+  </main>
+
+  <!-- ============ HISTORIA (apertura, estilo stories) ============ -->
+  <div class="historia" id="historia" role="dialog" aria-modal="true" aria-label="Tu cápsula abierta" hidden>
+    <div class="historia__barras" id="barras"></div>
+    <button class="icon-btn historia__cerrar" id="historia-cerrar" type="button" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+    </button>
+    <div class="historia__slides" id="slides"></div>
+    <button class="historia__zona historia__zona--atras" id="zona-atras" type="button" aria-label="Anterior"></button>
+    <button class="historia__zona historia__zona--adelante" id="zona-adelante" type="button" aria-label="Siguiente"></button>
+  </div>
+
+  <dialog class="sheet" id="dlg-borrar" aria-labelledby="dlg-titulo">
+    <h2 id="dlg-titulo">¿Romper la cápsula?</h2>
+    <p>Se borra la que tenés sellada en este teléfono y empezás de nuevo.</p>
+    <div class="acciones">
+      <button class="btn btn--primario" id="dlg-seguir" type="button">Mejor no</button>
+      <button class="btn btn--secundario" id="dlg-confirmar" type="button">Romperla</button>
+    </div>
+  </dialog>
+</body>
+</html>
