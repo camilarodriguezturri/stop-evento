@@ -36,16 +36,24 @@
       const [tipo, color] = ESTILOS[i % ESTILOS.length];
       lista.push({ txt: def.nombre, tipo, color });
       lista.push({ txt: `${fmt(o.meta)} ${def.corto}`, tipo: i % 2 ? 'circulo' : 'pastilla', color: i % 2 ? 'crema' : 'azul' });
+      // Entre los stickers de texto se cuela una carita o una estrella.
+      if (i % 2 === 0) lista.push(CARITAS[(i / 2) % CARITAS.length]);
     });
     if (nota && b.cancion) lista.push({ txt: '♪ ' + b.cancion.titulo, tipo: 'pastilla', color: 'rosa' });
-    if (nota) lista.push({ txt: 'nota', tipo: 'globo', color: 'crema' }, { txt: 'stop.', tipo: 'flor', color: 'azul' });
+    if (nota) lista.push({ txt: 'nota', tipo: 'globo', color: 'crema' }, { tipo: 'estrella', color: 'rosa' }, { txt: 'stop.', tipo: 'flor', color: 'azul' });
     return lista;
   }
+  const CARITAS = [
+    { tipo: 'cara', cara: 'gafas', color: 'azul' },
+    { tipo: 'cara', cara: 'puntos', color: 'rosa' },
+    { tipo: 'cara', cara: 'canchera', color: 'crema' },
+    { tipo: 'cara', cara: 'dormida', color: 'azul' },
+  ];
   const MUESTRA = [
     { txt: 'correr', tipo: 'globo', color: 'crema' }, { txt: '10 km', tipo: 'pastilla', color: 'azul' },
-    { txt: '¡dale!', tipo: 'flor', color: 'oscuro' }, { txt: 'pedalear', tipo: 'pastilla', color: 'crema' },
-    { txt: '4 días', tipo: 'globo', color: 'azul' }, { txt: 'stop.', tipo: 'circulo', color: 'rosa' },
-    { txt: 'patinar', tipo: 'pastilla', color: 'oscuro' },
+    CARITAS[0], { txt: '¡dale!', tipo: 'flor', color: 'oscuro' }, { txt: 'pedalear', tipo: 'pastilla', color: 'crema' },
+    { tipo: 'estrella', color: 'rosa' }, { txt: '4 días', tipo: 'globo', color: 'azul' }, CARITAS[1],
+    { txt: 'stop.', tipo: 'circulo', color: 'rosa' }, { txt: 'patinar', tipo: 'pastilla', color: 'oscuro' },
   ];
   // Cápsula llena con lo que eligió (o la muestra) dentro de un contenedor.
   function capsulaLlena(slot, id, items, opc = { animar: false }) {

@@ -33,9 +33,33 @@
   // ---------- stickers estilo post ----------
   const TIPOS_ST = ['globo', 'pastilla', 'flor', 'circulo'];
   const COLORES_ST = ['azul', 'crema', 'oscuro', 'rosa'];
-  function sticker({ txt, tipo = 'pastilla', color = 'azul' }) {
+  // Caritas de línea (como los stickers de referencia) y estrella de 8 puntas.
+  const CARAS = {
+    gafas: '<path class="st__rasgo st__rasgo--lleno" d="M20 39h25l-4 13H24zM55 39h25l-4 13H59z"/><path class="st__rasgo" d="M45 42h10M52 54l-7 13h9M40 76q11 6 22-3"/>',
+    dormida: '<path class="st__rasgo" d="M27 38l13 7-13 7M73 38l-13 7 13 7M51 48l-8 17h10M38 78q7-6 14 0t14 0"/>',
+    canchera: '<path class="st__rasgo" d="M28 42q7-7 14 0M58 40q7-5 14 0M53 46v20h8M40 76q11 5 22-4"/>',
+    puntos: '<circle class="st__rasgo st__rasgo--lleno" cx="31" cy="50" r="4"/><circle class="st__rasgo st__rasgo--lleno" cx="69" cy="50" r="4"/><path class="st__rasgo" d="M56 34l-9 26h15"/>',
+  };
+  const ESTRELLA = (() => {
+    let d = '';
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2 - Math.PI / 2, r = i % 2 ? 19 : 47;
+      d += (i ? 'L' : 'M') + (50 + r * Math.cos(a)).toFixed(1) + ' ' + (50 + r * Math.sin(a)).toFixed(1);
+    }
+    return d + 'Z';
+  })();
+
+  function sticker({ txt, tipo = 'pastilla', color = 'azul', cara = 'gafas' }) {
     const el = document.createElement('span');
     el.className = `st st--${tipo} st--${color}`;
+    if (tipo === 'cara') {
+      el.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="st__disco" cx="50" cy="50" r="45"/>${CARAS[cara] || CARAS.gafas}</svg>`;
+      return el;
+    }
+    if (tipo === 'estrella') {
+      el.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><path class="st__disco" d="${ESTRELLA}"/></svg>`;
+      return el;
+    }
     if (tipo === 'flor') el.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="${FLOR[11]}"/></svg>`;
     const t = document.createElement('span');
     t.className = 'st__txt';
@@ -101,17 +125,22 @@
     { txt: '¡vos podés!', tipo: 'flor', color: 'azul' },
     { txt: 'un paso a la vez', tipo: 'globo', color: 'crema' },
     { txt: 'stop.', tipo: 'circulo', color: 'rosa' },
+    { tipo: 'cara', cara: 'gafas', color: 'azul' },
     { txt: 'constancia', tipo: 'pastilla', color: 'azul' },
     { txt: 'respirá y seguí', tipo: 'globo', color: 'rosa' },
     { txt: '¡dale!', tipo: 'flor', color: 'rosa' },
+    { tipo: 'estrella', color: 'rosa' },
     { txt: 'tu mejor versión', tipo: 'pastilla', color: 'crema' },
     { txt: 'nos vemos el 27/10', tipo: 'pastilla', color: 'azul' },
     { txt: '+1', tipo: 'circulo', color: 'crema' },
+    { tipo: 'cara', cara: 'puntos', color: 'rosa' },
     { txt: 'a tu ritmo', tipo: 'pastilla', color: 'rosa' },
     { txt: 'ya arrancaste', tipo: 'globo', color: 'oscuro' },
+    { tipo: 'cara', cara: 'canchera', color: 'crema' },
     { txt: '¡genial!', tipo: 'pastilla', color: 'azul' },
+    { tipo: 'cara', cara: 'dormida', color: 'azul' },
   ];
-  const POS_COLLAGE = [[50, 46, -8], [34, 28, 12], [68, 26, -14], [34, 64, -10], [66, 66, 9], [52, 14, 6], [50, 82, -4], [26, 46, -20], [74, 46, 16], [42, 38, 18], [60, 54, -16], [48, 62, 4]];
+  const POS_COLLAGE = [[50, 46, -8], [34, 28, 12], [68, 26, -14], [74, 62, 9], [34, 64, -10], [52, 14, 6], [22, 44, -16], [50, 82, -4], [78, 42, 16], [42, 38, 18], [60, 54, -16], [48, 62, 4], [24, 76, 10], [80, 80, -12], [64, 36, 8], [36, 50, -6]];
   // nuevosDesde: los anteriores ya están y no se vuelven a animar.
   function collage(cont, { n = 9, desde = 0, intervalo = 170, nuevosDesde = 0 } = {}) {
     if (!cont) return;
@@ -119,7 +148,10 @@
     const red = matchMedia('(prefers-reduced-motion: reduce)').matches;
     for (let i = 0; i < n; i++) {
       const f = FRASES[(desde + i) % FRASES.length];
-      const [x, y, r] = POS_COLLAGE[i % POS_COLLAGE.length];
+      const [x0, y, r] = POS_COLLAGE[i % POS_COLLAGE.length];
+      // Las frases largas van más al centro para que no se corten en el borde.
+      const largo = (f.txt || '').length;
+      const x = largo > 11 ? Math.min(62, Math.max(38, x0)) : largo > 7 ? Math.min(70, Math.max(30, x0)) : x0;
       const el = sticker(f);
       el.classList.add('st--grande');
       el.style.setProperty('--x', x + '%');
