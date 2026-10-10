@@ -156,6 +156,11 @@ img { max-width: 100%; }
 }
 .icon-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .icon-btn:hover { background: var(--t-15); }
+.icon-btn--sonido svg { width: 20px; height: 20px; }
+.icon-btn--sonido .s-base { fill: currentColor; stroke: currentColor; }
+.icon-btn--sonido .s-off, .icon-btn--sonido[aria-pressed="false"] .s-on { display: none; }
+.icon-btn--sonido[aria-pressed="false"] .s-off { display: block; }
+.icon-btn--sonido[aria-pressed="false"] { opacity: .6; }
 .icon-btn:active { transform: scale(.9); }
 
 .contenido { padding: 0 20px; }

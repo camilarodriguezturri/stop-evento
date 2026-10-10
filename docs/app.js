@@ -568,6 +568,97 @@
   });
   al.nota = () => requestAnimationFrame(pintarPreview);
 
+  // ---------- sonidos de la interfaz: sutiles, sintetizados (sin archivos) ----------
+  const KEY_SONIDO = 'stop-sonido';
+  let conSonido = true;
+  try { conSonido = localStorage.getItem(KEY_SONIDO) !== 'no'; } catch { /* sin storage */ }
+  let ctxAudio = null;
+  const ctx = () => {
+    if (!ctxAudio) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; ctxAudio = new AC(); }
+    if (ctxAudio.state === 'suspended') ctxAudio.resume();
+    return ctxAudio;
+  };
+  // Una nota corta con ataque y caída suaves.
+  function nota(frec, { dur = .09, vol = .05, tipo = 'sine', a = 0, hasta = 0 } = {}) {
+    const c = conSonido && ctx();
+    if (!c) return;
+    const t = c.currentTime + a;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = tipo;
+    o.frequency.setValueAtTime(frec, t);
+    if (hasta) o.frequency.exponentialRampToValueAtTime(hasta, t + dur);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + .008);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g).connect(c.destination);
+    o.start(t);
+    o.stop(t + dur + .02);
+  }
+  const SONIDOS = {
+    toque: () => nota(880, { dur: .06, vol: .035, hasta: 1100 }),
+    avanzar: () => { nota(660, { dur: .09, vol: .04 }); nota(990, { dur: .12, vol: .035, a: .06 }); },
+    volver: () => { nota(740, { dur: .08, vol: .035 }); nota(520, { dur: .1, vol: .03, a: .05 }); },
+    pop: () => nota(520, { dur: .07, vol: .045, hasta: 1040 }),
+    despop: () => nota(700, { dur: .07, vol: .035, hasta: 420 }),
+    tic: (arriba) => nota(arriba ? 1500 : 1150, { dur: .03, vol: .03, tipo: 'triangle' }),
+    no: () => { nota(190, { dur: .12, vol: .04, tipo: 'triangle' }); nota(170, { dur: .12, vol: .035, tipo: 'triangle', a: .09 }); },
+    sello: () => {
+      nota(110, { dur: .35, vol: .08, hasta: 60 });
+      [523, 659, 784, 1047].forEach((f, i) => nota(f, { dur: .5, vol: .035, a: .08 + i * .07 }));
+    },
+    logro: () => [784, 988, 1175, 1568, 1976].forEach((f, i) => nota(f, { dur: .25, vol: .03, tipo: 'triangle', a: i * .07 })),
+  };
+  const sonar = (nombre, ...args) => { try { SONIDOS[nombre]?.(...args); } catch { /* sin audio */ } };
+  // Tono que sube mientras mantenés presionado para sellar.
+  let tonoSello = null;
+  function empezarTonoSello(seg) {
+    const c = conSonido && ctx();
+    if (!c || tonoSello) return;
+    const o = c.createOscillator(), g = c.createGain(), t = c.currentTime;
+    o.type = 'sine';
+    o.frequency.setValueAtTime(220, t);
+    o.frequency.exponentialRampToValueAtTime(660, t + seg);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(.03, t + .08);
+    o.connect(g).connect(c.destination);
+    o.start(t);
+    tonoSello = { o, g };
+  }
+  function pararTonoSello() {
+    if (!tonoSello) return;
+    const { o, g } = tonoSello, t = ctxAudio.currentTime;
+    g.gain.cancelScheduledValues(t);
+    g.gain.setValueAtTime(g.gain.value, t);
+    g.gain.exponentialRampToValueAtTime(.0001, t + .12);
+    o.stop(t + .15);
+    tonoSello = null;
+  }
+
+  // Un solo lugar decide qué suena según lo que se tocó.
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('button, a, label.swatch');
+    if (!el || el.id === 'btn-sellar' || el.id === 'btn-sonido') return;
+    if (el.getAttribute('aria-disabled') === 'true') return sonar('no');
+    if (el.matches('.stepper button')) return sonar('tic', el.dataset.d > 0);
+    if (el.matches('.chip, .grupo')) { queueMicrotask(() => sonar(el.getAttribute('aria-pressed') === 'true' ? 'pop' : 'despop')); return; }
+    if (el.matches('.comienzo, .cancion, label.swatch, .puntos button, .opcion')) return sonar('pop');
+    if (el.matches('[data-volver], .historia__zona--atras, #historia-cerrar, #btn-cerrar')) return sonar('volver');
+    if (el.matches('.btn--primario, [data-siguiente], .historia__zona--adelante')) return sonar('avanzar');
+    sonar('toque');
+  });
+  const btnSonido = $('#btn-sonido');
+  const pintarSonido = () => {
+    btnSonido.setAttribute('aria-pressed', conSonido);
+    btnSonido.setAttribute('aria-label', conSonido ? 'Sonidos activados' : 'Sonidos desactivados');
+  };
+  btnSonido.addEventListener('click', () => {
+    conSonido = !conSonido;
+    try { localStorage.setItem(KEY_SONIDO, conSonido ? 'si' : 'no'); } catch { /* sin storage */ }
+    pintarSonido();
+    if (conSonido) sonar('pop');
+  });
+  pintarSonido();
+
   // ---------- música: vista previa real de 30 s (iTunes, y Deezer si no está) ----------
   const previas = new Map();
   const claveDe = (c) => c.titulo + '|' + c.artista;
@@ -828,9 +919,11 @@
       else sellar();
     };
     raf = requestAnimationFrame(paso);
+    empezarTonoSello(DURA / 1000);
     navigator.vibrate?.(10);
   }
   function soltar() {
+    pararTonoSello();
     if (sellando) return;
     btnSellar.classList.remove('presionando');
     cancelAnimationFrame(raf);
@@ -853,6 +946,8 @@
 
   async function sellar() {
     sellando = true;
+    pararTonoSello();
+    sonar('sello');
     btnSellar.classList.remove('presionando');
     navigator.vibrate?.([20, 40, 30]);
     $('#ayuda-sellar').textContent = 'Sellando…';
@@ -1211,6 +1306,7 @@
       alEntrar: (el) => {
         datos.logros ||= {};
         datos.logros.viajeEnElTiempo ||= new Date().toISOString();
+        setTimeout(() => sonar('logro'), REDUCIDO ? 0 : 350);
         guardar();
         $('[data-nueva]', el).onclick = () => { cerrarHistoria(); btnInicio.click(); };
         $('[data-cerrar]', el).onclick = cerrarHistoria;
