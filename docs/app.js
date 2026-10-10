@@ -705,7 +705,7 @@
     P.pintarNota(notaSellar, borrador);
     notaSellar.style.cssText = '';
     $('#slot-sellar').style.cssText = '';
-    requestAnimationFrame(() => P.escalarNota(notaSellar, 170, 150));
+    requestAnimationFrame(() => P.escalarNota(notaSellar, 220, 190));
     [$('#sello'), $('#destello'), $('#envase-sellar')].forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
     avance.style.strokeDashoffset = LARGO;
     sellando = false;

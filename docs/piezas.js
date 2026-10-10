@@ -33,32 +33,25 @@
   // ---------- stickers estilo post ----------
   const TIPOS_ST = ['globo', 'pastilla', 'flor', 'circulo'];
   const COLORES_ST = ['azul', 'crema', 'oscuro', 'rosa'];
-  // Caritas de línea (como los stickers de referencia) y estrella de 8 puntas.
-  const CARAS = {
-    gafas: '<path class="st__rasgo st__rasgo--lleno" d="M20 39h25l-4 13H24zM55 39h25l-4 13H59z"/><path class="st__rasgo" d="M45 42h10M52 54l-7 13h9M40 76q11 6 22-3"/>',
-    dormida: '<path class="st__rasgo" d="M27 38l13 7-13 7M73 38l-13 7 13 7M51 48l-8 17h10M38 78q7-6 14 0t14 0"/>',
-    canchera: '<path class="st__rasgo" d="M28 42q7-7 14 0M58 40q7-5 14 0M53 46v20h8M40 76q11 5 22-4"/>',
-    sonadora: '<path class="st__rasgo" d="M26 42q7 8 15 0M28 35l2 4M34 33v4M40 35l-2 4M59 44q7-9 15 0M50 38l-7 27h11M44 77q6 4 11-2"/>',
-    puntos: '<circle class="st__rasgo st__rasgo--lleno" cx="31" cy="50" r="4"/><circle class="st__rasgo st__rasgo--lleno" cx="69" cy="50" r="4"/><path class="st__rasgo" d="M56 34l-9 26h15"/>',
+  // Caritas y estrella: son las imágenes de referencia tal cual, solo recoloreadas a la paleta.
+  const EMOTES = {
+    gafas: ['azul', 'rosa'], canchera: ['rosa', 'azul'], estrella: ['rosa', 'azul'],
+    dormida: ['azul', 'rosa', 'crema'], puntos: ['rosa', 'azul', 'crema'], sonadora: ['azul', 'rosa', 'crema'],
   };
-  const ESTRELLA = (() => {
-    let d = '';
-    for (let i = 0; i < 16; i++) {
-      const a = (i / 16) * Math.PI * 2 - Math.PI / 2, r = i % 2 ? 19 : 47;
-      d += (i ? 'L' : 'M') + (50 + r * Math.cos(a)).toFixed(1) + ' ' + (50 + r * Math.sin(a)).toFixed(1);
-    }
-    return d + 'Z';
-  })();
+  const imgEmote = (nombre, color) => {
+    const colores = EMOTES[nombre] || EMOTES.gafas;
+    return `assets/stickers/${EMOTES[nombre] ? nombre : 'gafas'}-${colores.includes(color) ? color : colores[0]}.png`;
+  };
 
   function sticker({ txt, tipo = 'pastilla', color = 'azul', cara = 'gafas' }) {
     const el = document.createElement('span');
     el.className = `st st--${tipo} st--${color}`;
-    if (tipo === 'cara') {
-      el.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="st__disco" cx="50" cy="50" r="45"/>${CARAS[cara] || CARAS.gafas}</svg>`;
-      return el;
-    }
-    if (tipo === 'estrella') {
-      el.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><path class="st__disco" d="${ESTRELLA}"/></svg>`;
+    if (tipo === 'cara' || tipo === 'estrella') {
+      const img = document.createElement('img');
+      img.alt = '';
+      img.draggable = false;
+      img.src = imgEmote(tipo === 'estrella' ? 'estrella' : cara, color);
+      el.append(img);
       return el;
     }
     if (tipo === 'flor') el.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="${FLOR[11]}"/></svg>`;

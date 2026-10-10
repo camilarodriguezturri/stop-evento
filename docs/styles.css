@@ -306,8 +306,8 @@ img { max-width: 100%; }
 .hero__titulo > :nth-child(3) { animation-delay: .24s; }
 @keyframes caer { from { opacity: 0; transform: translateY(-50px) scale(.5) rotate(-12deg); } }
 .hero__titulo .sticker { font-size: 60px; }
-.hero__titulo .sticker--crema { margin-left: 70px; }
-.hero__del { font: 800 20px var(--f-mono); margin: 2px 0 0 -110px; }
+.hero__titulo .sticker--crema { margin-top: -6px; }
+.hero__del { position: relative; z-index: 1; font: 800 20px/1 var(--f-mono); margin: -4px 0 -8px; text-align: center; }
 
 .titulo-grande { margin: 12px 24px 0; text-align: center; font: 700 28px/1.15 var(--f-titulo); letter-spacing: -.02em; }
 
@@ -382,17 +382,12 @@ img { max-width: 100%; }
 .st--flor path { fill: var(--stbg); stroke: var(--borde); stroke-width: 4; stroke-linejoin: round; }
 .st--flor .st__txt { max-width: 3.6em; white-space: normal; text-align: center; font-size: .78em; line-height: 1.05; }
 .st--grande { --fs: clamp(15px, 4.6vw, 20px); }
-/* caritas de línea y estrella: sin texto, disco de color con borde */
+/* caritas y estrella: imágenes de referencia recoloreadas, sin texto */
 .st--cara, .st--estrella { background: none; box-shadow: none; padding: 0; width: 3.3em; height: 3.3em; border-radius: 0; }
-.st--cara svg, .st--estrella svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.st__disco { fill: var(--stbg); stroke: var(--crema); stroke-width: 6; stroke-linejoin: round; }
-.st--cara .st__disco { stroke: var(--oscuro); }
-.st__rasgo { fill: none; stroke: var(--oscuro); stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; }
-.st__rasgo--lleno { fill: var(--oscuro); stroke-width: 2; }
-.st--cara.st--oscuro .st__rasgo { stroke: var(--crema); } .st--cara.st--oscuro .st__rasgo--lleno { fill: var(--crema); }
-.st--estrella { width: 3em; height: 3em; }
-.st--estrella svg { animation: girar-lento 10s linear infinite; }
-.st--cara svg { animation: guino 4s ease-in-out infinite; transform-origin: 50% 50%; }
+.st--cara img, .st--estrella img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.st--estrella { width: 3.2em; height: 3.2em; }
+.st--estrella img { animation: girar-lento 10s linear infinite; }
+.st--cara img { animation: guino 4s ease-in-out infinite; }
 @keyframes guino { 0%, 86%, 100% { transform: rotate(0); } 90% { transform: rotate(-10deg) scale(1.06); } 95% { transform: rotate(8deg); } }
 .st--grande.st--cara, .st--grande.st--estrella { --fs: clamp(19px, 5.8vw, 25px); }
 
@@ -415,14 +410,15 @@ img { max-width: 100%; }
 .rayos {
   position: absolute; z-index: 0;
   left: 50%; top: 50%;
-  width: 290px; height: 290px;
+  width: 400px; height: 400px;
   translate: -50% -50%;
   border-radius: 50%;
-  border: 3px dashed var(--fg);
-  opacity: .5;
-  animation: girar-lento 16s linear infinite;
+  border: 2px dashed var(--fg);
+  opacity: .16;
+  filter: blur(.6px);
+  animation: girar-lento 28s linear infinite;
 }
-.rayos::after { content: ''; position: absolute; inset: 30px; border-radius: 50%; border: 3px dashed var(--fg); animation: girar-lento 10s linear infinite reverse; }
+.rayos::after { content: ''; position: absolute; inset: 80px; border-radius: 50%; border: 2px dashed var(--fg); animation: girar-lento 20s linear infinite reverse; }
 
 .candado-badge {
   position: absolute; z-index: 3;
@@ -609,12 +605,12 @@ form { margin: 0; }
 /* ---------- paso 4: sellar ---------- */
 .escena--sellar { flex: 1; min-height: 440px; display: grid; place-items: center; }
 .escena--sellar > .envase-slot, .escena--sellar > .silueta { grid-area: 1 / 1; }
-.escena--sellar .envase-slot { z-index: 2; margin-top: 90px; }
+.escena--sellar .envase-slot { z-index: 2; margin-top: 118px; }
 .silueta {
   z-index: 1;
   width: min(270px, 68vw);
   aspect-ratio: 1;
-  margin-top: 90px;
+  margin-top: 118px;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9'%3E%3Ccircle cx='4.5' cy='4.5' r='2.6' fill='%237aa1ff'/%3E%3C/svg%3E");
   -webkit-mask-image: var(--m1), var(--m2);
   mask-image: var(--m1), var(--m2);
@@ -626,7 +622,7 @@ form { margin: 0; }
   animation: silueta 4s ease-in-out infinite alternate;
 }
 @keyframes silueta { to { transform: translate(14px, 22px) scale(1.12) rotate(2deg); } }
-.nota-slot--sellar { position: absolute; z-index: 0; top: 74px; left: 50%; translate: -50% 0; animation: flotar-y 3s ease-in-out infinite alternate; }
+.nota-slot--sellar { position: absolute; z-index: 0; top: 4px; left: 50%; translate: -50% 0; animation: flotar-y 3s ease-in-out infinite alternate; }
 .nota-slot--sellar .nota { --rot: 5deg; }
 .sello {
   position: absolute; z-index: 4;
@@ -666,11 +662,11 @@ form { margin: 0; }
   --tr-w: 6;
 }
 .mantener.presionando { transform: scale(.92); }
-.mantener::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid var(--azul); animation: onda-sello 1.8s ease-out infinite; pointer-events: none; }
+.mantener::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--azul); filter: blur(.6px); animation: onda-sello 2.4s ease-out infinite; pointer-events: none; }
 .mantener.presionando::before { animation: none; opacity: 0; }
-@keyframes onda-sello { from { transform: scale(1); opacity: .9; } to { transform: scale(1.55); opacity: 0; } }
+@keyframes onda-sello { from { transform: scale(1); opacity: .45; } to { transform: scale(2); opacity: 0; } }
 .mantener__aro { position: absolute; inset: -7px; width: calc(100% + 14px); height: calc(100% + 14px); transform: rotate(-90deg); }
-.mantener__aro circle { fill: none; stroke: var(--t-15); stroke-width: 5; }
+.mantener__aro circle { fill: none; stroke: var(--t-06); stroke-width: 3; }
 .mantener__aro .mantener__avance { stroke: var(--rosa); stroke-linecap: round; stroke-dasharray: 226.2; stroke-dashoffset: 226.2; }
 .mantener__icono { width: 48px; height: 48px; margin: auto; animation: sacudon 2.6s ease-in-out infinite; }
 .ayuda-sellar { margin-top: -4px; font: 700 15px var(--f-texto); }
