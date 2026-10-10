@@ -9,7 +9,7 @@ notita festoneada, botones pill) y la estructura de la *Spotify Time Capsule*.
 
 ## Recorrido
 
-1. **Inicio** (azul): título sticker, cápsulas de vidrio flotando llenas de stickers y los 5 pasos.
+1. **Inicio** (azul): título sticker y cápsulas de vidrio flotando llenas de stickers.
 2. **Contexto** (negro, 3 pantallas, se puede **Omitir**): la cápsula sirve para medir tu progreso, seguir tu
    proceso y motivarte; se abre en cada evento de la marca; cada fecha es el punto de comparación.
    Una pila de stickers motivacionales crece en cada pantalla.
@@ -18,7 +18,7 @@ notita festoneada, botones pill) y la estructura de la *Spotify Time Capsule*.
    Cada objetivo cae como sticker adentro de la cápsula.
 5. **Paso 3 · Tu canción** (negro): buscás una canción motivadora (o escribís la tuya); entra como sticker.
 6. **Paso 4 · Escribite una nota** (crema): la notita festoneada. Se puede *Omitir*.
-7. **Paso 5 · Sellala** (negro): la cápsula llena con su silueta de puntos detrás; mantener presionado.
+7. **Paso 5 · Sellala** (negro): la cápsula llena con su silueta de puntos detrás y la nota asomando por detrás del vidrio; mantener presionado.
 8. **Carga** con stickers motivacionales (se puede omitir) → **¡Sellada!**: toda la pantalla en negro es la
    pieza para compartir en historias o share, o con tu grupo dentro de SPOT!.
 9. **Esperando** (negro): candado y cuenta regresiva al 27/10.

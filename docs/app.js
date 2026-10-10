@@ -48,10 +48,11 @@
     { tipo: 'cara', cara: 'puntos', color: 'rosa' },
     { tipo: 'cara', cara: 'canchera', color: 'crema' },
     { tipo: 'cara', cara: 'dormida', color: 'azul' },
+    { tipo: 'cara', cara: 'sonadora', color: 'azul' },
   ];
   const MUESTRA = [
     { txt: 'correr', tipo: 'globo', color: 'crema' }, { txt: '10 km', tipo: 'pastilla', color: 'azul' },
-    CARITAS[0], { txt: '¡dale!', tipo: 'flor', color: 'oscuro' }, { txt: 'pedalear', tipo: 'pastilla', color: 'crema' },
+    CARITAS[4], { txt: '¡dale!', tipo: 'flor', color: 'oscuro' }, { txt: 'pedalear', tipo: 'pastilla', color: 'crema' },
     { tipo: 'estrella', color: 'rosa' }, { txt: '4 días', tipo: 'globo', color: 'azul' }, CARITAS[1],
     { txt: 'stop.', tipo: 'circulo', color: 'rosa' }, { txt: 'patinar', tipo: 'pastilla', color: 'oscuro' },
   ];

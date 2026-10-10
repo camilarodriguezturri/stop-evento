@@ -38,6 +38,7 @@
     gafas: '<path class="st__rasgo st__rasgo--lleno" d="M20 39h25l-4 13H24zM55 39h25l-4 13H59z"/><path class="st__rasgo" d="M45 42h10M52 54l-7 13h9M40 76q11 6 22-3"/>',
     dormida: '<path class="st__rasgo" d="M27 38l13 7-13 7M73 38l-13 7 13 7M51 48l-8 17h10M38 78q7-6 14 0t14 0"/>',
     canchera: '<path class="st__rasgo" d="M28 42q7-7 14 0M58 40q7-5 14 0M53 46v20h8M40 76q11 5 22-4"/>',
+    sonadora: '<path class="st__rasgo" d="M26 42q7 8 15 0M28 35l2 4M34 33v4M40 35l-2 4M59 44q7-9 15 0M50 38l-7 27h11M44 77q6 4 11-2"/>',
     puntos: '<circle class="st__rasgo st__rasgo--lleno" cx="31" cy="50" r="4"/><circle class="st__rasgo st__rasgo--lleno" cx="69" cy="50" r="4"/><path class="st__rasgo" d="M56 34l-9 26h15"/>',
   };
   const ESTRELLA = (() => {
@@ -139,6 +140,7 @@
     { tipo: 'cara', cara: 'canchera', color: 'crema' },
     { txt: '¡genial!', tipo: 'pastilla', color: 'azul' },
     { tipo: 'cara', cara: 'dormida', color: 'azul' },
+    { tipo: 'cara', cara: 'sonadora', color: 'azul' },
   ];
   const POS_COLLAGE = [[50, 46, -8], [34, 28, 12], [68, 26, -14], [74, 62, 9], [34, 64, -10], [52, 14, 6], [22, 44, -16], [50, 82, -4], [78, 42, 16], [42, 38, 18], [60, 54, -16], [48, 62, 4], [24, 76, 10], [80, 80, -12], [64, 36, 8], [36, 50, -6]];
   // nuevosDesde: los anteriores ya están y no se vuelven a animar.
