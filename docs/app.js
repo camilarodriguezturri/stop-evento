@@ -585,6 +585,9 @@
   }
   function urlPrevia(c) {
     const clave = claveDe(c);
+    // Si la canción tiene audio propio en el sitio, suena ese (funciona en cualquier lado).
+    const propia = CFG.CANCIONES.find((x) => claveDe(x) === clave && x.audio);
+    if (propia) return Promise.resolve(propia.audio);
     if (!previas.has(clave)) previas.set(clave, (async () => {
       const term = encodeURIComponent(`${c.titulo} ${c.artista === 'Elegida por vos' ? '' : c.artista}`.trim());
       try {
@@ -937,7 +940,7 @@
 
   function listaResumen(c) {
     const cont = document.createElement('div');
-    cont.className = 'resumen';
+    cont.className = 'resumen' + (c.objetivos.length > 3 ? ' resumen--compacto' : '');
     c.objetivos.forEach((o) => {
       const r = comparar(o);
       const fila = document.createElement('div');

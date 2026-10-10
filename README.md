@@ -42,7 +42,8 @@ notita festoneada, botones pill) y la estructura de la *Spotify Time Capsule*.
 ## Música
 
 La canción elegida suena de verdad con la vista previa de 30 s de iTunes (y de Deezer si no está),
-pedida con JSONP desde el navegador: en el paso 3 cada canción tiene ▶ (suena unos 12 s) y al abrir la
+pedida con JSONP desde el navegador. Las canciones con `audio` en `config.js` ("Color esperanza", en
+`docs/assets/audio/`) suenan desde el propio sitio, en cualquier lado: en el paso 3 cada canción tiene ▶ (suena unos 12 s) y al abrir la
 cápsula suena en la pantalla de la canción y en el resumen. Necesita que la página esté publicada en un
 sitio normal (por ejemplo GitHub Pages); en entornos que bloquean audio externo muestra un aviso.
 

@@ -11,11 +11,12 @@ window.CAPSULA_CONFIG = {
   DEMO: true,
 
   // Canciones para elegir en el paso 3 (también se puede escribir otra).
+  // "audio": archivo propio que suena siempre; sin él se busca la vista previa de 30 s en iTunes/Deezer.
   CANCIONES: [
+    { titulo: 'Color esperanza', artista: 'Diego Torres', audio: 'assets/audio/color-esperanza.mp3' },
     { titulo: 'Eye of the Tiger', artista: 'Survivor' },
     { titulo: "Don't Stop Me Now", artista: 'Queen' },
     { titulo: 'Lose Yourself', artista: 'Eminem' },
-    { titulo: 'Color esperanza', artista: 'Diego Torres' },
     { titulo: 'Stronger', artista: 'Kanye West' },
     { titulo: "Can't Hold Us", artista: 'Macklemore & Ryan Lewis' },
     { titulo: 'Believer', artista: 'Imagine Dragons' },

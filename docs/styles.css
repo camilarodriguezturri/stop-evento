@@ -309,7 +309,7 @@ img { max-width: 100%; }
 @keyframes caer { from { opacity: 0; transform: translateY(-50px) scale(.5) rotate(-12deg); } }
 .hero__titulo .sticker { font-size: 60px; }
 .hero__titulo .sticker--crema { margin-top: 0; }
-.hero__del { position: relative; z-index: 4; margin: -10px 0 -12px; padding: 4px 12px 5px; border-radius: 20px; background: var(--crema); color: var(--oscuro); box-shadow: 0 0 0 2px var(--oscuro); font: 800 17px/1 var(--f-mono); text-align: center; rotate: 6deg; }
+.hero__del { position: relative; z-index: 4; margin: 26px 0 -12px; padding: 4px 12px 5px; border-radius: 20px; background: var(--crema); color: var(--oscuro); box-shadow: 0 0 0 2px var(--oscuro); font: 800 17px/1 var(--f-mono); text-align: center; rotate: 6deg; }
 
 .titulo-grande { margin: 12px 24px 0; text-align: center; font: 700 28px/1.15 var(--f-titulo); letter-spacing: -.02em; }
 
@@ -775,7 +775,8 @@ form { margin: 0; }
   text-align: center;
   background: var(--bg);
   color: var(--fg);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .slide .cielo, .slide .deco, .slide .flotantes { z-index: 0; }
 .slide > *:not(.deco):not(.cielo):not(.flotantes) { position: relative; z-index: 1; }
@@ -811,6 +812,11 @@ form { margin: 0; }
 .resumen__fila strong { font: 700 15px var(--f-texto); }
 .resumen__fila em { font: 800 15px var(--f-mono); font-style: normal; }
 .resumen__fila small { grid-column: 1 / -1; font-size: 13px; color: rgba(37, 37, 37, .7); }
+.resumen--compacto { grid-template-columns: 1fr 1fr; gap: 8px; }
+.resumen--compacto .resumen__fila { padding: 10px 12px; gap: 6px 8px; }
+.resumen--compacto .resumen__fila strong { font-size: 14px; }
+.resumen--compacto .resumen__fila em { font-size: 13px; }
+.resumen--compacto .resumen__fila small { display: none; }
 .mini-riel { grid-column: 1 / -1; height: 10px; border-radius: 5px; background: rgba(37, 37, 37, .12); overflow: hidden; }
 .mini-riel i { display: block; height: 100%; background: var(--azul); box-shadow: inset 0 0 0 2px var(--oscuro); border-radius: 5px; transform-origin: left; animation: crecer 1s var(--ease-out) .3s backwards; }
 @keyframes crecer { from { transform: scaleX(0); } }
