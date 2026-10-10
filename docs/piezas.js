@@ -9,7 +9,7 @@
   // zona = [x0, y0, x1, y1] en % de la caja: dónde se apilan. mascara = recortar al interior.
   const CAPSULAS = [
     { id: 'trofeo', nombre: 'Un trofeo', para: 'para tus logros', zona: [24, 8, 76, 50], mascara: true },
-    { id: 'sobre', nombre: 'Un sobre', para: 'para tus mensajes', zona: [22, 16, 80, 66], mascara: false },
+    { id: 'sobre', nombre: 'Un sobre', para: 'para tus mensajes', zona: [30, 30, 72, 62], mascara: false, max: 5 },
     { id: 'botella', nombre: 'Una botella de agua', para: 'para cada entrenamiento', zona: [30, 24, 74, 90], mascara: true },
   ];
   const ENVASES = CAPSULAS; // compatibilidad
@@ -71,6 +71,8 @@
     const c = CAPSULAS.find((x) => x.id === cap.dataset.id);
     const rel = cap.querySelector('.capsula__relleno');
     const [x0, y0, x1, y1] = c.zona;
+    // El sobre lleva pocos stickers, asomando del bolsillo; en las otras se apilan todos.
+    if (c.max) items = items.slice(0, c.max);
     const cols = 2;
     const altoFila = Math.min(12, (y1 - y0) / Math.max(3, Math.ceil(items.length / cols)));
     [...rel.children].slice(desde).forEach((n) => n.remove());
