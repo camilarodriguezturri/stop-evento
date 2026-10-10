@@ -168,6 +168,8 @@ img { max-width: 100%; }
 .pregunta { margin: 10px 28px 6px; text-align: center; font: 600 17px/1.3 var(--f-titulo); color: var(--t-70); }
 
 .etiqueta {
+  position: relative;
+  z-index: 3;
   margin: 20px auto 0;
   width: max-content;
   padding: 6px 12px;
@@ -306,8 +308,8 @@ img { max-width: 100%; }
 .hero__titulo > :nth-child(3) { animation-delay: .24s; }
 @keyframes caer { from { opacity: 0; transform: translateY(-50px) scale(.5) rotate(-12deg); } }
 .hero__titulo .sticker { font-size: 60px; }
-.hero__titulo .sticker--crema { margin-top: -6px; }
-.hero__del { position: relative; z-index: 1; font: 800 20px/1 var(--f-mono); margin: -4px 0 -8px; text-align: center; }
+.hero__titulo .sticker--crema { margin-top: 2px; }
+.hero__del { position: relative; z-index: 1; font: 800 20px/1 var(--f-mono); margin: 4px 0 2px; text-align: center; }
 
 .titulo-grande { margin: 12px 24px 0; text-align: center; font: 700 28px/1.15 var(--f-titulo); letter-spacing: -.02em; }
 
@@ -622,7 +624,7 @@ form { margin: 0; }
   animation: silueta 4s ease-in-out infinite alternate;
 }
 @keyframes silueta { to { transform: translate(14px, 22px) scale(1.12) rotate(2deg); } }
-.nota-slot--sellar { position: absolute; z-index: 0; top: 4px; left: 50%; translate: -50% 0; animation: flotar-y 3s ease-in-out infinite alternate; }
+.nota-slot--sellar { position: absolute; z-index: 0; top: 26px; left: 50%; translate: -50% 0; animation: flotar-y 3s ease-in-out infinite alternate; }
 .nota-slot--sellar .nota { --rot: 5deg; }
 .sello {
   position: absolute; z-index: 4;
@@ -852,6 +854,43 @@ form { margin: 0; }
 .slide__cancion { margin: 0 0 22px; display: flex; flex-direction: column; gap: 4px; }
 .slide__cancion strong { font: 700 24px/1.2 var(--f-titulo); }
 .slide__cancion span { color: var(--t-70); }
+
+/* ---------- botón de play (vista previa) ---------- */
+.canciones li { display: flex; align-items: center; gap: 6px; }
+.canciones li .cancion { flex: 1; min-width: 0; }
+.play {
+  flex: none;
+  position: relative;
+  display: grid; place-items: center;
+  width: 42px; height: 42px;
+  padding: 0;
+  border: 0; border-radius: 50%;
+  background: var(--crema);
+  color: var(--oscuro);
+  transition: transform .15s var(--ease-out), background-color .2s;
+}
+.play:active { transform: scale(.9); }
+.play svg { width: 18px; height: 18px; fill: currentColor; }
+.play .i-pausa, .play[data-estado="sonando"] .i-play { display: none; }
+.play[data-estado="sonando"] .i-pausa { display: block; }
+.play[data-estado="sonando"] { background: var(--rosa); }
+.play[data-estado="sonando"]::after { content: ''; position: absolute; inset: -5px; border-radius: 50%; border: 2px solid var(--rosa); animation: onda-sello 1.6s ease-out infinite; }
+.play__carga { display: none; position: absolute; inset: 6px; border-radius: 50%; border: 3px solid currentColor; border-right-color: transparent; animation: girar-lento .8s linear infinite; }
+.play[data-estado="cargando"] svg { display: none; }
+.play[data-estado="cargando"] .play__carga { display: block; }
+.play--grande { width: 52px; height: 52px; margin-left: auto; }
+.play--grande svg { width: 22px; height: 22px; }
+.disco-play { position: relative; display: grid; place-items: center; }
+.disco-play [data-play] { position: absolute; }
+.play--disco { width: 72px; height: 72px; box-shadow: 0 0 0 3px var(--oscuro); }
+.play--disco svg { width: 30px; height: 30px; }
+.play--chico { width: 36px; height: 36px; }
+.reproductor { display: flex; align-items: center; gap: 10px; margin: 14px auto 0; padding: 6px 16px 6px 6px; border-radius: 30px; background: var(--crema); color: var(--oscuro); box-shadow: 0 0 0 2px var(--oscuro); text-align: left; max-width: 100%; }
+.reproductor .play { background: var(--oscuro); color: var(--crema); }
+.reproductor .play[data-estado="sonando"] { background: var(--rosa); color: var(--oscuro); }
+.reproductor__txt { display: flex; flex-direction: column; min-width: 0; }
+.reproductor__txt small { font: 800 10px var(--f-mono); text-transform: uppercase; opacity: .7; }
+.reproductor__txt strong { font: 700 14px/1.2 var(--f-texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
 
 /* ---------- aviso ---------- */
 .toast {

@@ -34,13 +34,12 @@
     b.objetivos.forEach((o, i) => {
       const def = objetivo(o.id);
       const [tipo, color] = ESTILOS[i % ESTILOS.length];
+      // Un sticker por objetivo (la meta se ve al comparar) y una carita cada tres, para no saturar.
       lista.push({ txt: def.nombre, tipo, color });
-      lista.push({ txt: `${fmt(o.meta)} ${def.corto}`, tipo: i % 2 ? 'circulo' : 'pastilla', color: i % 2 ? 'crema' : 'azul' });
-      // Entre los stickers de texto se cuela una carita o una estrella.
-      if (i % 2 === 0) lista.push(CARITAS[(i / 2) % CARITAS.length]);
+      if (i % 3 === 0) lista.push(CARITAS[(i / 3) % CARITAS.length]);
     });
     if (nota && b.cancion) lista.push({ txt: '♪ ' + b.cancion.titulo, tipo: 'pastilla', color: 'rosa' });
-    if (nota) lista.push({ txt: 'nota', tipo: 'globo', color: 'crema' }, { tipo: 'estrella', color: 'rosa' }, { txt: 'stop.', tipo: 'flor', color: 'azul' });
+    if (nota) lista.push({ txt: 'nota', tipo: 'globo', color: 'crema' }, { tipo: 'estrella', color: 'rosa' });
     return lista;
   }
   const CARITAS = [
@@ -51,10 +50,8 @@
     { tipo: 'cara', cara: 'sonadora', color: 'azul' },
   ];
   const MUESTRA = [
-    { txt: 'correr', tipo: 'globo', color: 'crema' }, { txt: '10 km', tipo: 'pastilla', color: 'azul' },
-    CARITAS[4], { txt: '¡dale!', tipo: 'flor', color: 'oscuro' }, { txt: 'pedalear', tipo: 'pastilla', color: 'crema' },
-    { tipo: 'estrella', color: 'rosa' }, { txt: '4 días', tipo: 'globo', color: 'azul' }, CARITAS[1],
-    { txt: 'stop.', tipo: 'circulo', color: 'rosa' }, { txt: 'patinar', tipo: 'pastilla', color: 'oscuro' },
+    { txt: 'correr', tipo: 'globo', color: 'crema' }, CARITAS[4], { txt: '10 km', tipo: 'pastilla', color: 'azul' },
+    { tipo: 'estrella', color: 'rosa' }, { txt: 'pedalear', tipo: 'pastilla', color: 'oscuro' }, CARITAS[1],
   ];
   // Cápsula llena con lo que eligió (o la muestra) dentro de un contenedor.
   function capsulaLlena(slot, id, items, opc = { animar: false }) {
@@ -93,6 +90,7 @@
     if (desde === hacia) return;
     if (!atras) pila.push(desde.id.slice(2));
     actual = hacia;
+    parar();
     al[id]?.();
     aplicarTema(hacia.dataset.tema);
     hacia.hidden = false;
@@ -124,7 +122,7 @@
   function cargar(texto, ms = 2800) {
     const carga = $('#carga');
     $('#carga-texto').textContent = texto;
-    P.collage($('#collage-carga'), { n: 9, desde: Math.floor(Math.random() * 12), intervalo: Math.min(220, ms / 12) });
+    P.collage($('#collage-carga'), { n: 6, desde: Math.floor(Math.random() * 12), intervalo: Math.min(220, ms / 12) });
     carga.hidden = false;
     aplicarTema('negro');
     const barra = $('.carga__barra i', carga);
@@ -148,9 +146,9 @@
   // ---------- misceláneas, estrellitas y objetos flotantes ----------
   $$('.cielo').forEach((c, i) => P.cielo(c, i + 1));
   [
-    { id: 'trofeo', x: '-6%', y: '0%', s: 150, r: -14, items: MUESTRA.slice(0, 5) },
-    { id: 'botella', x: '72%', y: '-4%', s: 140, r: 16, items: MUESTRA.slice(2, 7) },
-    { id: 'sobre', x: '64%', y: '58%', s: 150, r: -8, items: MUESTRA.slice(1, 6) },
+    { id: 'trofeo', x: '-6%', y: '0%', s: 150, r: -14, items: MUESTRA.slice(0, 3) },
+    { id: 'botella', x: '72%', y: '-4%', s: 140, r: 16, items: MUESTRA.slice(3, 6) },
+    { id: 'sobre', x: '64%', y: '58%', s: 150, r: -8, items: MUESTRA.slice(1, 4) },
   ].forEach((f, i) => {
     const cap = P.envase(f.id);
     cap.style.setProperty('--x', f.x);
@@ -316,7 +314,7 @@
     $('#intro-paso').textContent = `${i + 1} de ${INTRO.length}`;
     $('.btn__texto', $('#intro-sig')).textContent = i === INTRO.length - 1 ? 'Empezar' : 'Siguiente';
     // La pila de stickers crece en cada paso.
-    P.collage($('#collage-intro'), { n: 4 + i * 4, nuevosDesde: i ? i * 4 : 0 });
+    P.collage($('#collage-intro'), { n: 3 + i * 2, nuevosDesde: i ? 1 + i * 2 : 0 });
     [...$('#barras-intro').children].forEach((b, k) => {
       if (!b.firstChild) b.append(document.createElement('b'));
       b.classList.toggle('hecha', k < i);
@@ -570,6 +568,104 @@
   });
   al.nota = () => requestAnimationFrame(pintarPreview);
 
+  // ---------- música: vista previa real de 30 s (iTunes, y Deezer si no está) ----------
+  const previas = new Map();
+  const claveDe = (c) => c.titulo + '|' + c.artista;
+  function jsonp(url, ms = 7000) {
+    return new Promise((ok, mal) => {
+      const cb = '__musica' + Math.random().toString(36).slice(2);
+      const sc = document.createElement('script');
+      const fin = (v, err) => { clearTimeout(t); delete window[cb]; sc.remove(); if (err) mal(err); else ok(v); };
+      const t = setTimeout(() => fin(null, new Error('tiempo')), ms);
+      window[cb] = (d) => fin(d);
+      sc.onerror = () => fin(null, new Error('red'));
+      sc.src = url + '&callback=' + cb;
+      document.head.append(sc);
+    });
+  }
+  function urlPrevia(c) {
+    const clave = claveDe(c);
+    if (!previas.has(clave)) previas.set(clave, (async () => {
+      const term = encodeURIComponent(`${c.titulo} ${c.artista === 'Elegida por vos' ? '' : c.artista}`.trim());
+      try {
+        const d = await jsonp(`https://itunes.apple.com/search?term=${term}&media=music&entity=song&limit=1`);
+        if (d?.results?.[0]?.previewUrl) return d.results[0].previewUrl;
+      } catch { /* sigue con Deezer */ }
+      try {
+        const d = await jsonp(`https://api.deezer.com/search?q=${term}&limit=1&output=jsonp`);
+        if (d?.data?.[0]?.preview) return d.data[0].preview;
+      } catch { /* sin vista previa */ }
+      previas.delete(clave);
+      return null;
+    })());
+    return previas.get(clave);
+  }
+
+  const audio = new Audio();
+  audio.preload = 'none';
+  // Un instante de silencio para "destrabar" el audio en el mismo toque (Safari en iPhone lo pide).
+  const SILENCIO = (() => {
+    const n = 800, b = new ArrayBuffer(44 + n * 2), v = new DataView(b);
+    const txt = (o, t) => [...t].forEach((ch, i) => v.setUint8(o + i, ch.charCodeAt(0)));
+    txt(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); txt(8, 'WAVEfmt '); v.setUint32(16, 16, true);
+    v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, 8000, true); v.setUint32(28, 16000, true);
+    v.setUint16(32, 2, true); v.setUint16(34, 16, true); txt(36, 'data'); v.setUint32(40, n * 2, true);
+    return URL.createObjectURL(new Blob([b], { type: 'audio/wav' }));
+  })();
+  let sonando = null, corte = 0;
+  function estadoMusica(nuevo) {
+    sonando = nuevo;
+    $$('[data-clave]').forEach((el) => {
+      const e = sonando && sonando.clave === el.dataset.clave ? sonando.estado : 'parado';
+      el.dataset.estado = e;
+      el.setAttribute('aria-label', e === 'parado' ? 'Escuchar' : 'Pausar');
+    });
+  }
+  function parar() {
+    clearTimeout(corte);
+    audio.pause();
+    if (sonando) estadoMusica(null);
+  }
+  function fundido() {
+    const v0 = audio.volume, t0 = performance.now();
+    const paso = (t) => {
+      const p = Math.min(1, (t - t0) / 900);
+      audio.volume = v0 * (1 - p);
+      if (p < 1 && sonando) requestAnimationFrame(paso); else parar();
+    };
+    requestAnimationFrame(paso);
+  }
+  // segundos: corta con un fundido (vista previa corta). Sin segundos suena los 30 s.
+  async function reproducir(c, { segundos = 0, conGesto = true } = {}) {
+    const clave = claveDe(c);
+    if (sonando && sonando.clave === clave) { parar(); return; }
+    parar();
+    if (conGesto) { audio.src = SILENCIO; audio.play().catch(() => {}); }
+    estadoMusica({ clave, estado: 'cargando' });
+    const url = await urlPrevia(c);
+    if (!sonando || sonando.clave !== clave) return;
+    if (!url) { estadoMusica(null); if (conGesto) avisar('No pudimos cargar la vista previa de esta canción.'); return; }
+    audio.src = url;
+    audio.volume = 1;
+    try { await audio.play(); } catch { estadoMusica(null); if (conGesto) avisar('Tocá play para escucharla.'); return; }
+    estadoMusica({ clave, estado: 'sonando' });
+    clearTimeout(corte);
+    if (segundos) corte = setTimeout(fundido, segundos * 1000);
+  }
+  audio.addEventListener('ended', () => estadoMusica(null));
+  const ICONO_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M8 5v14l11-7z"/><path class="i-pausa" d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+  function botonPlay(c, opc = {}) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'play' + (opc.clase ? ' ' + opc.clase : '');
+    b.dataset.clave = claveDe(c);
+    b.dataset.estado = sonando && sonando.clave === b.dataset.clave ? sonando.estado : 'parado';
+    b.setAttribute('aria-label', 'Escuchar');
+    b.innerHTML = ICONO_PLAY + '<span class="play__carga" aria-hidden="true"></span>';
+    b.addEventListener('click', (e) => { e.stopPropagation(); reproducir(c, opc); });
+    return b;
+  }
+
   // ---------- paso 3: canción ----------
   const listaCanciones = $('#canciones');
   const inCancion = $('#in-cancion');
@@ -589,6 +685,7 @@
       const b = $('button', li);
       b.setAttribute('aria-selected', !!mismaCancion(c, borrador.cancion));
       b.addEventListener('click', () => elegirCancion(c));
+      li.append(botonPlay(c, { segundos: 12 }));
       listaCanciones.append(li);
     });
     // Si no está en la lista, se puede guardar igual.
@@ -606,13 +703,16 @@
     cont.innerHTML = c
       ? `<span class="disco" aria-hidden="true"><span class="disco__etiqueta">${esc(iniciales(c.titulo))}</span></span><span class="disco-elegido__txt"><small>tu canción</small><strong>${esc(c.titulo)}</strong><span>${esc(c.artista)}</span></span>`
       : '<span class="disco disco--vacio" aria-hidden="true"></span><span class="disco-elegido__txt"><small>tu canción</small><strong>Todavía no elegiste</strong><span>Tocá una de la lista</span></span>';
+    if (c) cont.append(botonPlay(c, { segundos: 12, clase: 'play--grande' }));
     if (animar && !REDUCIDO) cont.animate({ transform: ['scale(.94)', 'scale(1.03)', 'none'] }, { duration: 420, easing: 'cubic-bezier(.3,1.5,.5,1)' });
     $('[data-siguiente]', pantallas.cancion).setAttribute('aria-disabled', !c);
   }
   function elegirCancion(c) {
+    const nueva = !mismaCancion(c, borrador.cancion);
     borrador.cancion = { titulo: c.titulo, artista: c.artista };
     pintarDisco(true);
     pintarCanciones();
+    if (nueva) reproducir(borrador.cancion, { segundos: 12 });
   }
   inCancion.addEventListener('input', pintarCanciones);
   $('#btn-cancion-azar').addEventListener('click', () => {
@@ -705,7 +805,7 @@
     P.pintarNota(notaSellar, borrador);
     notaSellar.style.cssText = '';
     $('#slot-sellar').style.cssText = '';
-    requestAnimationFrame(() => P.escalarNota(notaSellar, 220, 190));
+    requestAnimationFrame(() => P.escalarNota(notaSellar, 175, 150));
     [$('#sello'), $('#destello'), $('#envase-sellar')].forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
     avance.style.strokeDashoffset = LARGO;
     sellando = false;
@@ -935,13 +1035,18 @@
         html:
           '<p class="slide__kicker">tu canción de la cápsula</p>' +
           '<h2 class="slide__titulo">Subí el volumen</h2>' +
-          '<div class="slide__centro"><div class="disco disco--grande" aria-hidden="true"><span class="disco__etiqueta">' + esc(iniciales(c.cancion.titulo)) + '</span></div></div>' +
+          '<div class="slide__centro"><div class="disco-play"><div class="disco disco--grande" aria-hidden="true"><span class="disco__etiqueta">' + esc(iniciales(c.cancion.titulo)) + '</span></div><span data-play></span></div></div>' +
           `<p class="slide__cancion"><strong>${esc(c.cancion.titulo)}</strong><span>${esc(c.cancion.artista)}</span></p>` +
           '<div class="slide__pie">' +
             `<a class="btn btn--secundario" href="https://open.spotify.com/search/${encodeURIComponent(c.cancion.titulo + ' ' + c.cancion.artista)}" target="_blank" rel="noopener">Escuchar en Spotify</a>` +
             '<button class="btn btn--primario" type="button" data-seguir>Seguir<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg></button>' +
           '</div>',
-        alEntrar: (el) => { $('[data-seguir]', el).onclick = () => mostrar(idx + 1); },
+        alEntrar: (el) => {
+          $('[data-seguir]', el).onclick = () => mostrar(idx + 1);
+          const cont = $('[data-play]', el);
+          if (!cont.firstChild) cont.append(botonPlay(c.cancion, { clase: 'play--disco' }));
+          if (!sonando) reproducir(c.cancion, { conGesto: false });
+        },
       }));
     }
 
@@ -1053,6 +1158,7 @@
         `<p class="sticker sticker--${crecio ? 'azul' : 'rosa'} sticker--grande" data-texto="${crecio ? '¡Creciste!' : '¡Seguimos!'}" style="margin-top:12px">${crecio ? '¡Creciste!' : '¡Seguimos!'}</p>` +
         `<h2 class="slide__titulo" style="font-size:22px">Avanzaste en ${crecio} de ${c.objetivos.length} ${c.objetivos.length === 1 ? 'objetivo' : 'objetivos'}` +
         (metasOk ? ` y cumpliste ${metasOk} ${metasOk === 1 ? 'meta' : 'metas'}` : '') + '</h2>' +
+        (c.cancion ? '<div class="reproductor" data-reproductor></div>' : '') +
         '<div data-resumen style="width:100%"></div>' +
         '<div class="slide__pie" style="margin-top:auto;padding-top:20px">' +
           '<button class="btn btn--primario" type="button" data-logro>Ver mi logro<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg></button>' +
@@ -1062,6 +1168,17 @@
         const cont = $('[data-resumen]', el);
         cont.textContent = '';
         cont.append(listaResumen(c));
+        // En el resumen suena tu canción.
+        if (c.cancion) {
+          const rep = $('[data-reproductor]', el);
+          rep.textContent = '';
+          rep.append(botonPlay(c.cancion, { clase: 'play--chico' }));
+          const t = document.createElement('span');
+          t.className = 'reproductor__txt';
+          t.innerHTML = `<small>sonando</small><strong>${esc(c.cancion.titulo)}</strong>`;
+          rep.append(t);
+          if (!sonando) reproducir(c.cancion, { conGesto: false });
+        }
         $('[data-logro]', el).onclick = () => mostrar(idx + 1);
         if (!REDUCIDO) $('.sticker', el).animate(
           { transform: ['scale(.3) rotate(-14deg)', 'scale(1.1) rotate(-4deg)', 'scale(1) rotate(-4deg)'] },
@@ -1160,6 +1277,7 @@
   }
 
   function cerrarHistoria() {
+    parar();
     clearTimeout(timer);
     barraAnim?.cancel();
     historia.hidden = true;

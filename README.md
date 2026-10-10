@@ -39,6 +39,13 @@ notita festoneada, botones pill) y la estructura de la *Spotify Time Capsule*.
   los stickers van en el medio, así quedan *adentro* del vidrio. Se renderizan con three.js desde
   [`herramientas/capsulas-3d/vidrio.html`](herramientas/capsulas-3d/vidrio.html).
 
+## Música
+
+La canción elegida suena de verdad con la vista previa de 30 s de iTunes (y de Deezer si no está),
+pedida con JSONP desde el navegador: en el paso 3 cada canción tiene ▶ (suena unos 12 s) y al abrir la
+cápsula suena en la pantalla de la canción y en el resumen. Necesita que la página esté publicada en un
+sitio normal (por ejemplo GitHub Pages); en entornos que bloquean audio externo muestra un aviso.
+
 ## Configuración
 
 Todo en [`docs/config.js`](docs/config.js):
