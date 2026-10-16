@@ -97,30 +97,23 @@ function zapatilla() {
   const suela = perfil([[-2.06,.62],[-2.22,.4],[-2.12,.2],[0,.18],[2.2,.2],[2.42,.38],[2.36,.64],[2.12,.6],[0,.56],[-2.06,.62]]);
   const DS = 1.16, geoS = afinar(new THREE.ExtrudeGeometry(suela, { depth: DS, bevelEnabled: true, bevelThickness: .16, bevelSize: .1, bevelSegments: 10, curveSegments: 60 }), DS);
   add(geoS, mat({ ...BORDE, a0: .38, a1: .9, base: 0xfcd0f1 }));
-  for (let k = 0; k < 7; k++) {
-    const x = -1.8 + k * .66, w = ancho(x);
-    for (const z of [-1, 1]) add(new RoundedBoxGeometry(.5, .36, .42, 5, .13), mat({ ...BORDE, a0: .42, a1: .95 }), [x, .14, z * (DS / 2) * w * .74]);
+  for (let k = 0; k < 5; k++) {
+    const x = -1.7 + k * .92, w = ancho(x);
+    for (const z of [-1, 1]) add(new RoundedBoxGeometry(.72, .38, .46, 5, .16), mat({ ...BORDE, a0: .42, a1: .95 }), [x, .14, z * (DS / 2) * w * .74]);
   }
-  // costuras: borde de la suela, puntera, contrafuerte, ojalillos y cuello
-  const B = mat(BORDE), Bfino = mat({ ...BORDE, a0: .45 });
+  // solo dos costuras: el borde de la suela y el cuello
+  const B = mat(BORDE);
   for (const z of [-1, 1]) {
     tubo([[-1.98,.66],[-1.2,.62],[0,.6],[1.2,.62],[2.1,.66],[2.3,.7]], .045, B, z);
-    tubo([[1.0,.62],[1.12,.98],[1.4,1.18],[1.8,1.08],[2.12,.84]], .03, Bfino, z);
-    tubo([[-2.0,1.2],[-1.6,1.12],[-1.2,.9],[-1.0,.64]], .03, Bfino, z);
-    tubo([[-.34,2.0],[-.1,1.7],[.3,1.4],[.84,1.06]], .035, Bfino, z);
   }
   const cuello = new THREE.CatmullRomCurve3([V3(-1.92, 2.12, 0), V3(-1.66, 2.2, lado(-1.66)), V3(-1.2, 1.96, lado(-1.2) * .9), V3(-.7, 1.9, lado(-.7) * .7), V3(-.4, 2.0, 0), V3(-.7, 1.9, -lado(-.7) * .7), V3(-1.2, 1.96, -lado(-1.2) * .9), V3(-1.66, 2.2, -lado(-1.66))], true);
   add(new THREE.TubeGeometry(cuello, 120, .06, 12, true), B);
-  // perforaciones de la puntera
-  for (let a = 0; a < 3; a++) for (let b = 0; b < 4 - a; b++) add(new THREE.SphereGeometry(.028, 10, 8), mat({ ...BORDE, a0: .8 }), [1.5 + b * .16 + a * .08, .86 + a * .13, lado(1.5 + b * .16) + .005]);
   // cordones de vidrio que cruzan por arriba
-  for (let k = 0; k < 5; k++) {
-    const x = -.18 + k * .24, y = 2.0 - k * .17, w = lado(x) * .62;
+  for (let k = 0; k < 4; k++) {
+    const x = -.12 + k * .3, y = 1.98 - k * .21, w = lado(x) * .62;
     const c = new THREE.CatmullRomCurve3([V3(x - .1, y - .02, -w), V3(x - .02, y + .16, -w * .45), V3(x + .03, y + .2, 0), V3(x + .08, y + .16, w * .45), V3(x + .16, y - .02, w)]);
     add(new THREE.TubeGeometry(c, 40, .055, 12), mat({ ...BORDE, a0: .6, a1: 1 }));
   }
-  // costura central de la puntera, como el contorno de la referencia
-  add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([[.62,1.9],[1.12,1.56],[1.8,1.26],[2.24,1.0],[2.42,.7]].map(([x, y]) => V3(x, y, 0))), 60, .04, 10), B);
   // las tres tiras: vidrio azul translúcido con contorno de neón
   for (let i = 0; i < 3; i++) {
     const x0 = -.66 + i * .32;

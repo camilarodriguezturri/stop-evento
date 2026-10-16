@@ -5,9 +5,9 @@ window.CAPSULA_CONFIG = {
   EVENTO_ACTUAL: { nombre: 'la app SPOT!', fecha: '2026-10-09T18:00:00-03:00' },
 
   // El evento donde se desbloquea. Cuando llega esta fecha, la cápsula se puede abrir.
-  PROXIMO_EVENTO: { nombre: 'stop.', fecha: '2026-10-27T18:00:00-03:00' },
+  PROXIMO_EVENTO: { nombre: 'stop.', fecha: '2026-11-28T18:00:00-03:00' },
 
-  // Muestra el botón "Demo: simular que llegó el 27/10" (también con ?demo en el link).
+  // Muestra el botón "Demo: simular que llegó el 28/11" (también con ?demo en el link).
   DEMO: true,
 
   // Canciones para elegir en el paso 3 (también se puede escribir otra).

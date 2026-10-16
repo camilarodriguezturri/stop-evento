@@ -1,6 +1,6 @@
 # Cápsula del tiempo · stop.
 
-Para **stop.** (27 de octubre). Extensión de la app SPOT! con la identidad de
+Para **stop.** (28 de noviembre). Extensión de la app SPOT! con la identidad de
 [Dedicatorias post.](https://estefigarrido.github.io/dedicatorias-post/) (Sora / Reddit Sans / JetBrains Mono,
 notita festoneada, botones pill) y la estructura de la *Spotify Time Capsule*.
 
@@ -21,8 +21,8 @@ notita festoneada, botones pill) y la estructura de la *Spotify Time Capsule*.
 7. **Paso 5 · Sellala** (negro): la cápsula llena con su silueta de puntos detrás y la nota asomando por detrás del vidrio; mantener presionado.
 8. **Carga** con stickers motivacionales (se puede omitir) → **¡Sellada!**: toda la pantalla en negro es la
    pieza para compartir en historias o share, o con tu grupo dentro de SPOT!.
-9. **Esperando** (negro): candado y cuenta regresiva al 27/10.
-10. **El 27/10** (azul): se abre como *stories*: los stickers salen volando → tu nota → tu canción →
+9. **Esperando** (negro): candado y cuenta regresiva al 28/11.
+10. **El 28/11** (azul): se abre como *stories*: los stickers salen volando → tu nota → tu canción →
     ¿dónde estás hoy? → una pantalla por objetivo → resumen → logro **Viaje en el tiempo** (un reloj hecho
     de puntos, como los logros de post.). Todo se puede compartir con tu grupo.
 11. **Sellar una nueva** arranca desde los números de hoy.
@@ -51,9 +51,9 @@ sitio normal (por ejemplo GitHub Pages); en entornos que bloquean audio externo 
 
 Todo en [`docs/config.js`](docs/config.js):
 
-- `PROXIMO_EVENTO`: nombre y fecha de apertura (27/10/2026, 18 h). La cápsula se abre sola cuando llega.
+- `PROXIMO_EVENTO`: nombre y fecha de apertura (28/11/2026, 18 h). La cápsula se abre sola cuando llega.
 - `EVENTO_ACTUAL`: dónde se arma (aparece en "La sellaste el … en …").
-- `DEMO`: muestra "Demo: simular que llegó el 27/10" para probar la apertura sin esperar (también `?demo`).
+- `DEMO`: muestra "Demo: simular que llegó el 28/11" para probar la apertura sin esperar (también `?demo`).
 - `CANCIONES` y `GRUPOS`: canciones del paso 3 y grupos de SPOT! (de ejemplo) para compartir.
 - `OBJETIVOS`: lista con nombre, unidad, rango, paso, valores iniciales y la pregunta del paso 2 (hasta 6 por cápsula).
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#7aa1ff">
-  <meta name="description" content="Guardá tus objetivos y una nota para vos. Tu cápsula se abre el 27 de octubre en stop. y te muestra cuánto creciste.">
+  <meta name="description" content="Guardá tus objetivos y una nota para vos mismo. Tu cápsula se abre el 28 de noviembre en stop. y te muestra cuánto creciste.">
   <title>Cápsula del tiempo · stop.</title>
   <link rel="icon" href="assets/marca/logo-stop.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -52,7 +52,7 @@
             <span class="sticker sticker--tiempo" data-texto="tiempo">tiempo</span>
           </h1>
         </div>
-        <p class="bajada bajada--centro" data-anim>Guardá hoy tus objetivos y una nota para vos. Se abre el <strong data-fecha-evento>27 de octubre</strong> en stop. y te muestra cuánto creciste.</p>
+        <p class="bajada bajada--centro" data-anim>Guardá hoy tus objetivos y una nota para vos mismo. Se abre el <strong data-fecha-evento>28 de noviembre</strong> en stop., el evento de la marca, y te muestra cuánto creciste.</p>
       </div>
 
       <!-- estado: sellada, esperando -->
@@ -99,7 +99,7 @@
           </button>
           <button class="btn btn--secundario" id="btn-inicio-2" type="button" hidden></button>
         </div>
-        <button class="link" id="btn-simular" type="button" hidden>Demo: simular que llegó el 27/10</button>
+        <button class="link" id="btn-simular" type="button" hidden>Demo: simular que llegó el 28/11</button>
       </footer>
     </section>
 
@@ -220,7 +220,7 @@
       </header>
 
       <div class="contenido">
-        <p class="bajada bajada--centro" data-anim>La que te pone en movimiento. Va a sonar cuando abras la cápsula el 27/10.</p>
+        <p class="bajada bajada--centro" data-anim>La que te pone en movimiento. Va a sonar cuando abras la cápsula el 28/11.</p>
         <div class="disco-elegido" id="disco-elegido" data-anim aria-live="polite"></div>
         <div class="buscador" data-anim>
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
@@ -259,7 +259,7 @@
 
       <div class="contenido">
         <div class="preview" data-anim>
-          <span class="preview__label">Así la vas a leer el 27/10</span>
+          <span class="preview__label">Así la vas a leer el 28/11</span>
           <div class="deco" id="deco-nota" aria-hidden="true"></div>
           <div class="nota-slot" id="slot-nota" role="img" aria-label="Vista previa de tu nota"></div>
         </div>
@@ -320,7 +320,7 @@
         </button>
         <div class="header__centro">
           <span class="paso">paso 5 de 5</span>
-          <h1 class="header__titulo" id="t-sellar" tabindex="-1">Sellala y mandala al 27/10</h1>
+          <h1 class="header__titulo" id="t-sellar" tabindex="-1">Sellala y mandala al 28/11</h1>
         </div>
         <span class="header__lado" aria-hidden="true"></span>
       </header>
@@ -411,14 +411,23 @@
       <button class="btn btn--secundario" id="grupo-cancelar" type="button">Cancelar</button>
     </div>
   </dialog>
+  <dialog class="sheet sheet--logros" id="dlg-logros" aria-labelledby="dlg-logros-titulo">
+    <span class="sheet__asa" aria-hidden="true"></span>
+    <h2 id="dlg-logros-titulo">Mis logros</h2>
+    <p id="dlg-logros-texto"></p>
+    <ul class="logros" id="logros"></ul>
+    <div class="acciones">
+      <button class="btn btn--primario btn--ancho" id="logros-cerrar" type="button">Listo</button>
+    </div>
+  </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <dialog class="sheet" id="dlg-borrar" aria-labelledby="dlg-titulo">
-    <h2 id="dlg-titulo">¿Romper la cápsula?</h2>
-    <p>Se borra la que tenés sellada en este teléfono y empezás de nuevo.</p>
+    <h2 id="dlg-titulo">¿Cambiar tu cápsula?</h2>
+    <p>Se borra la que tenés sellada en este teléfono y armás una nueva.</p>
     <div class="acciones">
       <button class="btn btn--primario" id="dlg-seguir" type="button">Mejor no</button>
-      <button class="btn btn--secundario" id="dlg-confirmar" type="button">Romperla</button>
+      <button class="btn btn--secundario" id="dlg-confirmar" type="button">Cambiarla</button>
     </div>
   </dialog>
 </body>

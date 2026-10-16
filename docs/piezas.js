@@ -8,9 +8,9 @@
   // Cada cápsula son dos imágenes alineadas (fondo y vidrio de adelante); los stickers van en el medio.
   // zona = [x0, y0, x1, y1] en % de la caja: dónde se apilan. mascara = recortar al interior.
   const CAPSULAS = [
-    { id: 'trofeo', nombre: 'Un trofeo', para: 'para tus logros', zona: [24, 8, 76, 50], mascara: true },
-    { id: 'zapatilla', nombre: 'Una zapatilla', para: 'para cada kilómetro', zona: [10, 26, 76, 56], mascara: true, max: 6, cols: 3 },
     { id: 'botella', nombre: 'Una botella de agua', para: 'para cada entrenamiento', zona: [30, 24, 74, 90], mascara: true },
+    { id: 'zapatilla', nombre: 'Una zapatilla', para: 'para cada kilómetro', zona: [10, 26, 76, 56], mascara: true, max: 6, cols: 3 },
+    { id: 'trofeo', nombre: 'Un trofeo', para: 'para tus logros', zona: [24, 8, 76, 50], mascara: true },
   ];
   const ENVASES = CAPSULAS; // compatibilidad
   const imgCapa = (id, capa) => `assets/capsulas/${id}-${capa}.png`;
@@ -127,7 +127,7 @@
     { txt: '¡dale!', tipo: 'flor', color: 'rosa' },
     { tipo: 'estrella', color: 'rosa' },
     { txt: 'tu mejor versión', tipo: 'pastilla', color: 'crema' },
-    { txt: 'nos vemos el 27/10', tipo: 'pastilla', color: 'azul' },
+    { txt: 'nos vemos el 28/11', tipo: 'pastilla', color: 'azul' },
     { txt: '+1', tipo: 'circulo', color: 'crema' },
     { tipo: 'cara', cara: 'puntos', color: 'rosa' },
     { txt: 'a tu ritmo', tipo: 'pastilla', color: 'rosa' },

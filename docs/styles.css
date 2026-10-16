@@ -506,7 +506,10 @@ img { max-width: 100%; }
 }
 .pregunta-card__texto { margin: 0 0 14px; font: 700 21px/1.25 var(--f-titulo); letter-spacing: -.01em; min-height: 52px; }
 .pregunta-card__texto.cambia { animation: entrar .45s var(--ease-rebote); }
-.pregunta-card__acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+.pregunta-card__acciones { display: flex; gap: 6px; }
+/* las tres opciones siempre en la misma fila, también en celulares angostos */
+.pregunta-card__acciones .mini-btn { flex: 1 1 auto; justify-content: center; min-width: 0; padding: 8px 9px; gap: 5px; white-space: nowrap; font-size: clamp(11px, 3.3vw, 13px); }
+.pregunta-card__acciones .mini-btn svg { flex: none; width: 15px; height: 15px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .chip {
   min-height: 40px;
@@ -614,6 +617,9 @@ form { margin: 0; }
 .escena--sellar { flex: 1; min-height: 440px; display: grid; place-items: center; }
 .escena--sellar > .envase-slot, .escena--sellar > .silueta { grid-area: 1 / 1; }
 .escena--sellar .envase-slot { z-index: 2; margin-top: 118px; }
+/* cuando la notita entra, la cápsula sube y crece hasta ocupar el alto que tenía la nota */
+.escena--sellar > .envase-slot, .escena--sellar > .silueta { transition: margin-top .7s var(--ease-out), scale .7s var(--ease-rebote); }
+.escena--sellar.sin-nota > .envase-slot, .escena--sellar.sin-nota > .silueta { margin-top: 0; scale: 1.32; }
 .silueta {
   z-index: 1;
   width: min(270px, 68vw);
@@ -879,6 +885,9 @@ form { margin: 0; }
 /* ---------- botón de play (vista previa) ---------- */
 .canciones li { display: flex; align-items: center; gap: 6px; }
 .canciones li .cancion { flex: 1; min-width: 0; }
+.desplegar { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; margin-top: 2px; border: 0; border-radius: 22px; background: var(--t-10); color: var(--fg); font: 700 14px var(--f-texto); }
+.desplegar svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s var(--ease-out); }
+.desplegar[aria-expanded="true"] svg { transform: rotate(180deg); }
 .play {
   flex: none;
   position: relative;
@@ -1016,3 +1025,20 @@ form { margin: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ---------- mis logros ---------- */
+.logros { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 10px; }
+.logros__item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 18px; background: rgba(37, 37, 37, .06); }
+.logros__item--bloqueado { opacity: .55; }
+.logros__icono { flex: none; display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: var(--oscuro); }
+.logros__icono svg { width: 44px; height: 44px; }
+.logros__item--bloqueado .logros__icono svg { width: 24px; height: 24px; }
+.logros__txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.logros__txt strong { font: 700 16px var(--f-titulo); }
+.logros__txt small { font-size: 13px; color: rgba(37, 37, 37, .7); }
+
+/* ---------- cierre: nos vemos el año que viene ---------- */
+.chau__logo { width: 150px; height: auto; margin: 36px auto 18px; display: block; }
+.chau__titulo { margin: 0 0 14px; display: flex; flex-direction: column; align-items: center; }
+.chau__sticker { font-size: 38px; margin: 0; white-space: nowrap; max-width: none; }
+.chau__sticker--2 { margin-top: 2px; }

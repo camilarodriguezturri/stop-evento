@@ -62,7 +62,7 @@
     return cap;
   }
   function nuevoBorrador(objetivos = []) {
-    return { envase: 'trofeo', objetivos, cancion: null, para: 'mi yo del futuro', mensaje: '', color: 'azul' };
+    return { envase: 'botella', objetivos, cancion: null, para: 'mi yo del futuro', mensaje: '', color: 'azul' };
   }
 
   function estadoCapsula() {
@@ -203,7 +203,7 @@
       $('#espera-fecha').textContent = 'El ' + fecha(c.abreEn, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       btnInicio.hidden = true;
       btnInicio2.hidden = false;
-      btnInicio2.textContent = 'Romper la cápsula';
+      btnInicio2.textContent = 'Cambiar mi cápsula';
       btnSimular.hidden = !DEMO;
       tic();
       reloj = setInterval(tic, 1000);
@@ -301,37 +301,46 @@
   // ---------- cómo funciona (se puede omitir) ----------
   const INTRO = [
     { titulo: 'Una cápsula del tiempo para tu progreso', texto: 'Guardás dónde estás hoy y a dónde querés llegar. Te sirve para medir tu progreso, seguir tu proceso y motivarte.' },
-    { titulo: 'Se abre en cada evento de stop.', texto: 'Tu cápsula queda sellada hasta la próxima fecha de la marca. La próxima es el 27/10.' },
-    { titulo: 'Cada fecha es tu punto de comparación', texto: 'Ese día cargás tus números y los comparás con los de la última vez. Después sellás una nueva hasta el próximo evento.' },
+    { titulo: 'Se abre en stop., el evento de la marca', texto: 'Tu cápsula queda sellada hasta el próximo evento stop. El próximo es el 28/11 y ese día la abrís.' },
+    { titulo: 'Cada fecha es tu punto de comparación', texto: 'Ese día cargás tus números y los comparás con los de la última vez. Al finalizar sellás una cápsula nueva para el próximo evento.' },
   ];
-  let introIdx = 0, introTimer = 0, introAnim = null;
+  // Se pasa a mano (botón o deslizando), sin tiempo: así da para leer tranquilo.
+  let introIdx = 0;
   function pintarIntro(i) {
+    const atras = i < introIdx;
     introIdx = i;
-    clearTimeout(introTimer);
-    introAnim?.cancel();
     const d = INTRO[i];
     $('#t-intro').textContent = d.titulo;
     $('#intro-texto').textContent = d.texto;
     $('#intro-paso').textContent = `${i + 1} de ${INTRO.length}`;
     $('.btn__texto', $('#intro-sig')).textContent = i === INTRO.length - 1 ? 'Empezar' : 'Siguiente';
     // La pila de stickers crece en cada paso.
-    P.collage($('#collage-intro'), { n: 3 + i * 2, nuevosDesde: i ? 1 + i * 2 : 0 });
+    P.collage($('#collage-intro'), { n: 3 + i * 2, nuevosDesde: i && !atras ? 1 + i * 2 : 3 + i * 2 });
     [...$('#barras-intro').children].forEach((b, k) => {
       if (!b.firstChild) b.append(document.createElement('b'));
-      b.classList.toggle('hecha', k < i);
+      b.classList.toggle('hecha', k <= i);
     });
     if (!REDUCIDO) {
       $$('.intro__textos > *', pantallas.intro).forEach((el, k) => el.animate(
-        { opacity: [0, 1], transform: ['translateY(12px)', 'none'] }, { duration: 400, delay: k * 60, fill: 'backwards' }));
-      introAnim = $('#barras-intro').children[i].firstChild.animate({ transform: ['scaleX(0)', 'scaleX(1)'] }, { duration: 5000, easing: 'linear', fill: 'forwards' });
-      if (i < INTRO.length - 1) introTimer = setTimeout(() => pintarIntro(i + 1), 5000);
+        { opacity: [0, 1], transform: [`translateX(${atras ? -24 : 24}px)`, 'none'] }, { duration: 380, delay: k * 50, fill: 'backwards', easing: 'cubic-bezier(.2,.8,.3,1)' }));
     }
   }
-  al.intro = () => requestAnimationFrame(() => pintarIntro(0));
-  const salirIntro = () => { clearTimeout(introTimer); introAnim?.cancel(); ir('envase'); };
+  al.intro = () => { introIdx = 0; requestAnimationFrame(() => pintarIntro(0)); };
+  const salirIntro = () => ir('envase');
   $('#intro-sig').addEventListener('click', () => (introIdx < INTRO.length - 1 ? pintarIntro(introIdx + 1) : salirIntro()));
   $('#intro-omitir').addEventListener('click', salirIntro);
-  $('[data-volver]', pantallas.intro).addEventListener('click', () => { clearTimeout(introTimer); introAnim?.cancel(); });
+  // deslizar a los costados para pasar de una a otra
+  let toqueX = null, toqueY = 0;
+  pantallas.intro.addEventListener('pointerdown', (e) => { if (!e.target.closest('button')) { toqueX = e.clientX; toqueY = e.clientY; } });
+  pantallas.intro.addEventListener('pointerup', (e) => {
+    if (toqueX === null) return;
+    const dx = e.clientX - toqueX, dy = e.clientY - toqueY;
+    toqueX = null;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+    if (dx < 0 && introIdx < INTRO.length - 1) { sonar('avanzar'); pintarIntro(introIdx + 1); }
+    else if (dx > 0 && introIdx > 0) { sonar('volver'); pintarIntro(introIdx - 1); }
+  });
+  pantallas.intro.addEventListener('pointercancel', () => { toqueX = null; });
 
   // ---------- paso 1: envase ----------
   const carrusel = $('#carrusel');
@@ -769,11 +778,18 @@
   const tapa = (c, i = 0) => `<span class="tapa tapa--${COLOR_TAPA[i % 3]}" aria-hidden="true"><b>${esc(iniciales(c.titulo))}</b></span>`;
   const mismaCancion = (a, b) => a && b && a.titulo === b.titulo && a.artista === b.artista;
 
+  // Se ven 5 y el resto se despliega con la flecha, así el botón Siguiente queda a mano.
+  const VISIBLES = 5;
+  let cancionesAbiertas = false;
   function pintarCanciones() {
     const q = inCancion.value.trim().toLowerCase();
     const lista = CFG.CANCIONES.filter((c) => !q || (c.titulo + ' ' + c.artista).toLowerCase().includes(q));
+    const plegable = !q && lista.length > VISIBLES;
+    let mostradas = plegable && !cancionesAbiertas ? lista.slice(0, VISIBLES) : lista;
+    const elegida = lista.find((c) => mismaCancion(c, borrador.cancion));
+    if (elegida && !mostradas.includes(elegida)) mostradas = [...mostradas, elegida];
     listaCanciones.textContent = '';
-    lista.forEach((c) => {
+    mostradas.forEach((c) => {
       const i = CFG.CANCIONES.indexOf(c);
       const li = document.createElement('li');
       li.innerHTML = `<button type="button" class="cancion" role="option">${tapa(c, i)}<span class="cancion__txt"><strong>${esc(c.titulo)}</strong><small>${esc(c.artista)}</small></span><span class="cancion__check" aria-hidden="true"></span></button>`;
@@ -783,6 +799,12 @@
       li.append(botonPlay(c, { segundos: 12 }));
       listaCanciones.append(li);
     });
+    if (plegable) {
+      const li = document.createElement('li');
+      li.innerHTML = `<button type="button" class="desplegar" aria-expanded="${cancionesAbiertas}">${cancionesAbiertas ? 'Ver menos' : `Ver ${lista.length - VISIBLES} canciones más`}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>`;
+      $('button', li).addEventListener('click', () => { cancionesAbiertas = !cancionesAbiertas; pintarCanciones(); });
+      listaCanciones.append(li);
+    }
     // Si no está en la lista, se puede guardar igual.
     if (q && !lista.length) {
       const li = document.createElement('li');
@@ -900,6 +922,7 @@
     P.pintarNota(notaSellar, borrador);
     notaSellar.style.cssText = '';
     $('#slot-sellar').style.cssText = '';
+    $('.escena--sellar').classList.remove('sin-nota');
     requestAnimationFrame(() => P.escalarNota(notaSellar, 175, 150));
     [$('#sello'), $('#destello'), $('#envase-sellar')].forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
     avance.style.strokeDashoffset = LARGO;
@@ -974,6 +997,8 @@
         [{ transform: 'none' }, { transform: 'translateY(-20px) rotate(-4deg)', offset: .3 }, { transform: `translateY(${dy}px) scale(.35)`, opacity: 0 }],
         { duration: 700, easing: 'cubic-bezier(.5,0,.6,1)', fill: 'forwards' },
       ).finished;
+      $('.escena--sellar').classList.add('sin-nota');
+      await new Promise((r) => setTimeout(r, 450));
       P.llenar(env, stickersDe(borrador, { nota: true }), { animar: true, desde: stickersDe(borrador).length });
       await new Promise((r) => setTimeout(r, 400));
       await new Promise((r) => setTimeout(r, 900));
@@ -989,7 +1014,7 @@
       await new Promise((r) => setTimeout(r, 650));
     }
     pila.length = 0;
-    await cargar('Mandando tu cápsula al 27/10…');
+    await cargar('Mandando tu cápsula al 28/11…');
     ir('sellada');
   }
 
@@ -1000,7 +1025,7 @@
     $('#pieza-texto').textContent = `Se abre el ${fecha(c.abreEn, { day: 'numeric', month: 'long' })} en ${c.evento}`;
     const datosPieza = [`${c.objetivos.length} ${c.objetivos.length === 1 ? 'objetivo' : 'objetivos'}`, c.cancion && `♪ ${c.cancion.titulo}`, 'una nota para mí'].filter(Boolean);
     $('#pieza-datos').innerHTML = datosPieza.map((d) => `<li>${esc(d)}</li>`).join('');
-    $('[data-grupo]', pantallas.sellada).dataset.grupoTexto = 'Tu grupo va a ver que sellaste tu cápsula hasta el 27/10.';
+    $('[data-grupo]', pantallas.sellada).dataset.grupoTexto = 'Tu grupo va a ver que sellaste tu cápsula hasta el 28/11.';
     P.decorar($('#deco-exito'), P.mezcla(1, 7, { y0: 8, y1: 50 }));
     if (!REDUCIDO) {
       $('#t-sellada').animate(
@@ -1300,17 +1325,19 @@
         '<h2 class="slide__titulo">Viaje en el tiempo</h2>' +
         '<p class="slide__texto">Abriste tu cápsula y te comparaste con tu yo del pasado.</p>' +
         '<div class="slide__pie" style="margin-top:auto;padding-top:20px">' +
-          '<button class="btn btn--primario" type="button" data-grupo data-grupo-texto="Tu grupo va a ver tu logro “Viaje en el tiempo”.">Compartir con mi grupo</button>' +
-          '<button class="btn btn--secundario" type="button" data-nueva>Sellar una nueva cápsula</button>' +
-          '<button class="link" type="button" data-cerrar>Cerrar</button>' +
+          '<button class="btn btn--primario" type="button" data-ver-logros>Ver mis logros</button>' +
+          '<button class="btn btn--secundario" type="button" data-grupo data-grupo-texto="Tu grupo va a ver tu logro “Viaje en el tiempo”.">Compartir con mi grupo</button>' +
+          '<button class="link" type="button" data-seguir-fin>Seguir</button>' +
         '</div>',
       alEntrar: (el) => {
         datos.logros ||= {};
         datos.logros.viajeEnElTiempo ||= new Date().toISOString();
         setTimeout(() => sonar('logro'), REDUCIDO ? 0 : 350);
         guardar();
-        $('[data-nueva]', el).onclick = () => { cerrarHistoria(); btnInicio.click(); };
-        $('[data-cerrar]', el).onclick = cerrarHistoria;
+        if (c.objetivos.length && c.objetivos.every((o) => comparar(o).llego)) datos.logros.metasCumplidas ||= new Date().toISOString();
+        guardar();
+        $('[data-ver-logros]', el).onclick = abrirLogros;
+        $('[data-seguir-fin]', el).onclick = () => mostrar(idx + 1);
         if (!REDUCIDO) {
           $('.logro__insignia', el).animate(
             { transform: ['scale(0) rotate(-40deg)', 'scale(1.15) rotate(8deg)', 'scale(1) rotate(-4deg)'] },
@@ -1324,8 +1351,56 @@
         }
       },
     });
-    return [...lista, final, logro];
+    // Cierre: guiño al próximo evento.
+    const chau = slide({
+      tema: 'rosa',
+      interactiva: true,
+      deco: P.mezcla(42, 6, { y0: 4, y1: 30 }),
+      html:
+        '<img class="chau__logo" src="assets/marca/logo-stop.png" alt="STOP" width="1604" height="742">' +
+        '<h2 class="chau__titulo" aria-label="¡Nos vemos el año que viene!"><span class="sticker sticker--azul sticker--grande chau__sticker" data-texto="¡Nos vemos" aria-hidden="true">¡Nos vemos</span>' +
+        '<span class="sticker sticker--crema sticker--grande chau__sticker chau__sticker--2" data-texto="el año" aria-hidden="true">el año</span>' +
+        '<span class="sticker sticker--azul sticker--grande chau__sticker chau__sticker--2" data-texto="que viene!" aria-hidden="true">que viene!</span></h2>' +
+        '<p class="slide__texto">Sellá una cápsula nueva hoy y abrila en el próximo stop. para ver cuánto más creciste.</p>' +
+        '<div class="slide__pie" style="margin-top:auto;padding-top:20px">' +
+          '<button class="btn btn--primario" type="button" data-nueva>Sellar una nueva cápsula<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg></button>' +
+          '<button class="link" type="button" data-cerrar>Cerrar</button>' +
+        '</div>',
+      alEntrar: (el) => {
+        $('[data-nueva]', el).onclick = () => { cerrarHistoria(); btnInicio.click(); };
+        $('[data-cerrar]', el).onclick = cerrarHistoria;
+        if (!REDUCIDO) $$('.chau__sticker, .chau__logo', el).forEach((s, i) => s.animate(
+          { transform: ['scale(.3) rotate(-14deg)', 'scale(1.1) rotate(-4deg)', 'scale(1) rotate(-4deg)'] },
+          { duration: 650, delay: 150 + i * 160, easing: 'cubic-bezier(.3,1.5,.5,1)', fill: 'both' },
+        ));
+      },
+    });
+    return [...lista, final, logro, chau];
   }
+
+  // Mis logros: los que ya tenés y los que faltan.
+  const LOGROS = [
+    { id: 'viajeEnElTiempo', nombre: 'Viaje en el tiempo', como: 'Abrí tu primera cápsula y comparate con tu yo del pasado.' },
+    { id: 'metasCumplidas', nombre: 'Meta cumplida', como: 'Llegá a todas las metas de una cápsula.' },
+    { id: 'dobleViaje', nombre: 'Doble viaje', como: 'Abrí cápsulas en dos eventos stop. seguidos.' },
+  ];
+  function abrirLogros() {
+    const tengo = datos.logros || {};
+    if ((datos.historial || []).length >= 2) tengo.dobleViaje ||= new Date().toISOString();
+    const n = LOGROS.filter((l) => tengo[l.id]).length;
+    $('#dlg-logros-texto').textContent = `Tenés ${n} de ${LOGROS.length}. Los próximos se desbloquean en el próximo stop.`;
+    const ul = $('#logros');
+    ul.textContent = '';
+    LOGROS.forEach((l, i) => {
+      const li = document.createElement('li');
+      li.className = 'logros__item' + (tengo[l.id] ? '' : ' logros__item--bloqueado');
+      li.innerHTML = `<span class="logros__icono logros__icono--${COLOR_TAPA[i % 3]}" aria-hidden="true">${tengo[l.id] ? P.insigniaReloj() : '<svg viewBox="0 0 100 100"><use href="#d-candado"/></svg>'}</span>` +
+        `<span class="logros__txt"><strong>${esc(l.nombre)}</strong><small>${tengo[l.id] ? 'Lo ganaste el ' + fecha(tengo[l.id], { day: 'numeric', month: 'long' }) : esc(l.como)}</small></span>`;
+      ul.append(li);
+    });
+    $('#dlg-logros').showModal();
+  }
+  $('#logros-cerrar').addEventListener('click', () => $('#dlg-logros').close());
 
   function pintarBarras() {
     barras.textContent = '';
