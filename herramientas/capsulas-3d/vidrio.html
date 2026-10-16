@@ -5,6 +5,7 @@
 // Cápsulas de vidrio rosa (estilo de referencia): dos capas alineadas.
 // ?obj=trofeo|botella|zapatilla  &capa=atras|frente
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 const P = new URLSearchParams(location.search);
 const OBJ = P.get('obj') || 'trofeo', CAPA = P.get('capa') || 'frente';
 const SIZE = 900;
@@ -72,43 +73,71 @@ function botella() {
 
 
 function zapatilla() {
-  // Zapatilla urbana básica de tres tiras (estilo adidas), de perfil y un poco de tres cuartos.
-  const perfil = (pts) => { const s = new THREE.Shape(); const c = spl(pts, 120); s.moveTo(c[0].x, c[0].y); c.slice(1).forEach((v) => s.lineTo(v.x, v.y)); return s; };
-  const ancho = (x) => 1 - .3 * THREE.MathUtils.smoothstep(x, 1.0, 2.3) - .12 * THREE.MathUtils.smoothstep(-x, 1.4, 2.2);
+  // Zapatilla de vidrio transparente (referencia: escultura/tienda de vidrio): costuras marcadas con tubo,
+  // cordones de vidrio, suela gruesa con tacos y las tres tiras de adidas con contorno de neón.
+  const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+  const perfil = (pts) => { const s = new THREE.Shape(); const c = spl(pts, 140); s.moveTo(c[0].x, c[0].y); c.slice(1).forEach((v) => s.lineTo(v.x, v.y)); return s; };
+  const ancho = (x) => 1 - .3 * THREE.MathUtils.smoothstep(x, 1.0, 2.3) - .1 * THREE.MathUtils.smoothstep(-x, 1.4, 2.2);
   const afinar = (geo, d) => { geo.translate(0, 0, -d / 2); const p = geo.attributes.position; for (let i = 0; i < p.count; i++) p.setZ(i, p.getZ(i) * ancho(p.getX(i))); geo.computeVertexNormals(); return geo; };
-  const capellada = perfil([[-1.86,.32],[-2.04,.9],[-2.02,1.6],[-1.88,2.02],[-1.6,2.08],[-1.22,1.84],[-.66,1.76],[-.22,1.98],[.1,1.94],[.55,1.62],[1.15,1.26],[1.78,1.0],[2.14,.74],[2.2,.4],[2.0,.3],[0,.28],[-1.86,.32]]);
-  const D = 1.0, geoC = afinar(new THREE.ExtrudeGeometry(capellada, { depth: D, bevelEnabled: true, bevelThickness: .26, bevelSize: .2, bevelSegments: 10, curveSegments: 60 }), D);
-  const suela = perfil([[-2.02,.5],[-2.16,.28],[-2.06,.02],[0,0],[2.14,.02],[2.36,.2],[2.3,.5],[2.1,.48],[0,.46],[-2.02,.5]]);
-  const DS = 1.12, geoS = afinar(new THREE.ExtrudeGeometry(suela, { depth: DS, bevelEnabled: true, bevelThickness: .14, bevelSize: .08, bevelSegments: 8, curveSegments: 60 }), DS);
-  if (frente) {
-    add(geoC, mat(FRENTE));
-    add(geoS, mat({ ...FRENTE, a0: .96, a1: 1, base: 0xfcdcf4, rim: 0xe08acb, pw: 1.3, depthWrite: true })).renderOrder = -1;
-    // tres tiras inclinadas sobre el lateral que mira a cámara
-    const zLado = (x) => (D / 2 + .26) * ancho(x) + .015;
-    for (let i = 0; i < 3; i++) {
-      const x0 = -.62 + i * .3;
-      const s = new THREE.Shape(); s.moveTo(x0, .5); s.lineTo(x0 + .14, .5); s.lineTo(x0 + .74, 1.68); s.lineTo(x0 + .6, 1.7); s.lineTo(x0, .5);
-      const t = new THREE.ExtrudeGeometry(s, { depth: .01, bevelEnabled: true, bevelThickness: .015, bevelSize: .02, bevelSegments: 3 });
-      add(t, mat({ ...SOLIDO, base: 0x7aa1ff, rim: 0x3e5fc4 }), [0, 0, zLado(x0 + .3)]);
-    }
-    // cordones
-    for (let i = 0; i < 4; i++) {
-      const x = .14 + i * .3, y = 1.96 - i * .2;
-      add(new THREE.CapsuleGeometry(.04, 1.05 * ancho(x), 6, 12), mat(SOLIDO), [x, y + .12, 0], [Math.PI / 2, 0, 0]);
-    }
-    // talonera
-    add(new THREE.CapsuleGeometry(.09, .55, 6, 16), mat({ ...SOLIDO, base: 0x7aa1ff, rim: 0x3e5fc4 }), [-2.04, 1.35, 0], [0, 0, -.1]);
-  } else {
-    add(geoC, mat(ATRAS));
+  const D = 1.0, BT = .26;
+  const lado = (x) => (D / 2 + BT) * ancho(x);              // z de la cara lateral que mira a cámara
+  const tubo = (pts, r, m, z = 1, n = 80) => add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(([x, y]) => V3(x, y, z * (lado(x) + .01)))), n, r, 12), m);
+
+  const CRISTAL = { base: 0xfde3f6, rim: 0xd560bd, a0: .03, a1: .72, spec: 1.1, pw: 2.4 };
+  const BORDE = { base: 0xf7b6e8, rim: 0xb94aa3, a0: .55, a1: .95, spec: 1.2, pw: 1.6 };
+  const NEON = { base: 0x9db8ff, rim: 0x4f74e6, a0: 1, a1: 1, spec: 1.3, pw: 1.2, depthWrite: true };
+
+  const capellada = perfil([[-1.86,.5],[-2.06,1.0],[-2.04,1.7],[-1.9,2.12],[-1.62,2.2],[-1.24,1.94],[-.7,1.86],[-.26,2.14],[.06,2.1],[.5,1.76],[1.12,1.36],[1.8,1.06],[2.18,.8],[2.24,.54],[2.04,.46],[0,.46],[-1.86,.5]]);
+  const geoC = afinar(new THREE.ExtrudeGeometry(capellada, { depth: D, bevelEnabled: true, bevelThickness: BT, bevelSize: .2, bevelSegments: 12, curveSegments: 80 }), D);
+
+  if (!frente) { add(geoC, mat({ ...ATRAS, a0: .32, a1: .8 })); g.rotation.set(.22, -.42, .04); return; }
+
+  add(geoC, mat(CRISTAL));
+  // suela gruesa de vidrio esmerilado + tacos redondeados (como la escultura de la referencia)
+  const suela = perfil([[-2.06,.62],[-2.22,.4],[-2.12,.2],[0,.18],[2.2,.2],[2.42,.38],[2.36,.64],[2.12,.6],[0,.56],[-2.06,.62]]);
+  const DS = 1.16, geoS = afinar(new THREE.ExtrudeGeometry(suela, { depth: DS, bevelEnabled: true, bevelThickness: .16, bevelSize: .1, bevelSegments: 10, curveSegments: 60 }), DS);
+  add(geoS, mat({ ...BORDE, a0: .38, a1: .9, base: 0xfcd0f1 }));
+  for (let k = 0; k < 7; k++) {
+    const x = -1.8 + k * .66, w = ancho(x);
+    for (const z of [-1, 1]) add(new RoundedBoxGeometry(.5, .36, .42, 5, .13), mat({ ...BORDE, a0: .42, a1: .95 }), [x, .14, z * (DS / 2) * w * .74]);
   }
-  g.rotation.set(.26, -.42, .04);
+  // costuras: borde de la suela, puntera, contrafuerte, ojalillos y cuello
+  const B = mat(BORDE), Bfino = mat({ ...BORDE, a0: .45 });
+  for (const z of [-1, 1]) {
+    tubo([[-1.98,.66],[-1.2,.62],[0,.6],[1.2,.62],[2.1,.66],[2.3,.7]], .045, B, z);
+    tubo([[1.0,.62],[1.12,.98],[1.4,1.18],[1.8,1.08],[2.12,.84]], .03, Bfino, z);
+    tubo([[-2.0,1.2],[-1.6,1.12],[-1.2,.9],[-1.0,.64]], .03, Bfino, z);
+    tubo([[-.34,2.0],[-.1,1.7],[.3,1.4],[.84,1.06]], .035, Bfino, z);
+  }
+  const cuello = new THREE.CatmullRomCurve3([V3(-1.92, 2.12, 0), V3(-1.66, 2.2, lado(-1.66)), V3(-1.2, 1.96, lado(-1.2) * .9), V3(-.7, 1.9, lado(-.7) * .7), V3(-.4, 2.0, 0), V3(-.7, 1.9, -lado(-.7) * .7), V3(-1.2, 1.96, -lado(-1.2) * .9), V3(-1.66, 2.2, -lado(-1.66))], true);
+  add(new THREE.TubeGeometry(cuello, 120, .06, 12, true), B);
+  // perforaciones de la puntera
+  for (let a = 0; a < 3; a++) for (let b = 0; b < 4 - a; b++) add(new THREE.SphereGeometry(.028, 10, 8), mat({ ...BORDE, a0: .8 }), [1.5 + b * .16 + a * .08, .86 + a * .13, lado(1.5 + b * .16) + .005]);
+  // cordones de vidrio que cruzan por arriba
+  for (let k = 0; k < 5; k++) {
+    const x = -.18 + k * .24, y = 2.0 - k * .17, w = lado(x) * .62;
+    const c = new THREE.CatmullRomCurve3([V3(x - .1, y - .02, -w), V3(x - .02, y + .16, -w * .45), V3(x + .03, y + .2, 0), V3(x + .08, y + .16, w * .45), V3(x + .16, y - .02, w)]);
+    add(new THREE.TubeGeometry(c, 40, .055, 12), mat({ ...BORDE, a0: .6, a1: 1 }));
+  }
+  // costura central de la puntera, como el contorno de la referencia
+  add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([[.62,1.9],[1.12,1.56],[1.8,1.26],[2.24,1.0],[2.42,.7]].map(([x, y]) => V3(x, y, 0))), 60, .04, 10), B);
+  // las tres tiras: vidrio azul translúcido con contorno de neón
+  for (let i = 0; i < 3; i++) {
+    const x0 = -.66 + i * .32;
+    const q = [[x0, .62], [x0 + .16, .62], [x0 + .8, 1.84], [x0 + .64, 1.86]];
+    const sh = new THREE.Shape(); sh.moveTo(...q[0]); q.slice(1).forEach((v) => sh.lineTo(...v)); sh.lineTo(...q[0]);
+    add(new THREE.ShapeGeometry(sh), mat({ base: 0x9db8ff, rim: 0x7aa1ff, a0: .5, a1: .5, spec: .4, side: THREE.DoubleSide }), [0, 0, lado(x0 + .4) + .02]);
+    const c = new THREE.CatmullRomCurve3([...q, q[0]].map(([x, y]) => V3(x, y, lado(x0 + .4) + .03)), false, 'catmullrom', 0);
+    add(new THREE.TubeGeometry(c, 80, .028, 10), mat(NEON));
+  }
+  g.rotation.set(.22, -.42, .04);
 }
 
 ({ trofeo, botella, zapatilla })[OBJ]();
 // encuadre fijo por objeto: se calcula con la capa de frente siempre, para alinear ambas capas
 const ref = new THREE.Group();
 const box = new THREE.Box3().setFromObject(g);
-const ENC = { trofeo: [0, 2.0, 0, 5.6], botella: [0, 2.05, 0, 5.2], zapatilla: [.1, .95, 0, 5.2] }[OBJ];
+const ENC = { trofeo: [0, 2.0, 0, 5.6], botella: [0, 2.05, 0, 5.2], zapatilla: [.1, 1.12, 0, 5.3] }[OBJ];
 const cam = new THREE.PerspectiveCamera(26, 1, .1, 100);
 const dist = ENC[3] / (2 * Math.tan(THREE.MathUtils.degToRad(13)));
 cam.position.set(ENC[0], ENC[1], dist); cam.lookAt(ENC[0], ENC[1], ENC[2]);
