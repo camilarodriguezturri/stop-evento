@@ -144,11 +144,12 @@
   document.addEventListener('animationend', (e) => e.target.classList?.remove('sacudir'));
 
   // ---------- misceláneas, estrellitas y objetos flotantes ----------
-  $$('.cielo').forEach((c, i) => P.cielo(c, i + 1));
+  // estrellitas + franjas diagonales de STOP (la de carga usa la banda grande)
+  $$('.cielo').forEach((c, i) => { P.cielo(c, i + 1); P.franjas(c, c.closest('#carga') ? 2 : c.closest('#p-inicio') ? 0 : 3 + (i % 2)); });
   [
     { id: 'trofeo', x: '-6%', y: '0%', s: 150, r: -14, items: MUESTRA.slice(0, 3) },
     { id: 'botella', x: '72%', y: '-4%', s: 140, r: 16, items: MUESTRA.slice(3, 6) },
-    { id: 'sobre', x: '64%', y: '58%', s: 150, r: -8, items: MUESTRA.slice(1, 4) },
+    { id: 'zapatilla', x: '62%', y: '68%', s: 150, r: -8, items: MUESTRA.slice(1, 4) },
   ].forEach((f, i) => {
     const cap = P.envase(f.id);
     cap.style.setProperty('--x', f.x);
@@ -161,14 +162,15 @@
     requestAnimationFrame(() => P.llenar(cap, f.items, { animar: true, demora: 500 + i * 300 }));
   });
   P.decorar($('#deco-inicio'), [
-    { t: 'flor', x: '40%', y: '0%', s: 34, c: 'rosa' },
-    { t: 'punto', x: '28%', y: '30%', s: 14, c: 'crema' },
-    { t: 'aro', x: '88%', y: '40%', s: 24 },
-    { t: 'punto-o', x: '58%', y: '10%', s: 18, c: 'rosa' },
-    { t: 'flor-hueca', x: '6%', y: '44%', s: 30 },
-    { t: 'punto', x: '22%', y: '90%', s: 18, c: 'rosa' },
-    { t: 'flor', x: '62%', y: '92%', s: 26, c: 'crema', p: 8 },
-    { t: 'punto', x: '90%', y: '86%', s: 10, c: 'crema' },
+    { t: 'estrella-llena', x: '36%', y: '0%', s: 38, c: 'rosa' },
+    { t: 'x-puntos', x: '60%', y: '4%', s: 34 },
+    { t: 'punto', x: '26%', y: '30%', s: 14, c: 'crema' },
+    { t: 'aro-puntos', x: '84%', y: '38%', s: 40 },
+    { t: 'circulo', x: '60%', y: '18%', s: 16, c: 'rosa' },
+    { t: 'explosion', x: '4%', y: '46%', s: 38 },
+    { t: 'rayos', x: '14%', y: '84%', s: 62 },
+    { t: 'flor', x: '50%', y: '94%', s: 26, c: 'crema', p: 8 },
+    { t: 'explosion-llena', x: '88%', y: '88%', s: 30, c: 'rosa' },
   ]);
   P.decorar($('#deco-espera'), P.mezcla(3, 9));
   P.decorar($('#deco-lista'), P.mezcla(5, 9));
@@ -1067,7 +1069,8 @@
     el.dataset.tema = tema;
     el.hidden = true;
     el.innerHTML = '<div class="cielo" aria-hidden="true"></div><div class="deco" aria-hidden="true"></div>' + html;
-    P.cielo($('.cielo', el), semillaCielo++);
+    P.cielo($('.cielo', el), semillaCielo);
+    P.franjas($('.cielo', el), 3 + (semillaCielo++ % 2));
     P.decorar($('.deco', el), deco);
     return { el, tema, auto, interactiva, alEntrar };
   }

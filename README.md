@@ -13,7 +13,7 @@ notita festoneada, botones pill) y la estructura de la *Spotify Time Capsule*.
 2. **Contexto** (negro, 3 pantallas, se puede **Omitir**): la cápsula sirve para medir tu progreso, seguir tu
    proceso y motivarte; se abre en cada evento de la marca; cada fecha es el punto de comparación.
    Una pila de stickers motivacionales crece en cada pantalla.
-3. **Paso 1 · Elegí tu cápsula** (negro): trofeo, sobre o botella de agua, de vidrio rosa translúcido.
+3. **Paso 1 · Elegí tu cápsula** (negro): trofeo, botella de agua o zapatilla, de vidrio rosa translúcido.
 4. **Paso 2 · Sumá tus objetivos** (azul): preguntas con *Sumar*, *Otra pregunta* y *Aleatorio* (hasta 6).
    Cada objetivo cae como sticker adentro de la cápsula.
 5. **Paso 3 · Tu canción** (negro): buscás una canción motivadora (o escribís la tuya); entra como sticker.

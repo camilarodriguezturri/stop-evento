@@ -9,7 +9,7 @@
   // zona = [x0, y0, x1, y1] en % de la caja: dónde se apilan. mascara = recortar al interior.
   const CAPSULAS = [
     { id: 'trofeo', nombre: 'Un trofeo', para: 'para tus logros', zona: [24, 8, 76, 50], mascara: true },
-    { id: 'sobre', nombre: 'Un sobre', para: 'para tus mensajes', zona: [30, 30, 72, 62], mascara: false, max: 5 },
+    { id: 'zapatilla', nombre: 'Una zapatilla', para: 'para cada kilómetro', zona: [10, 26, 76, 56], mascara: true, max: 6, cols: 3 },
     { id: 'botella', nombre: 'Una botella de agua', para: 'para cada entrenamiento', zona: [30, 24, 74, 90], mascara: true },
   ];
   const ENVASES = CAPSULAS; // compatibilidad
@@ -71,9 +71,9 @@
     const c = CAPSULAS.find((x) => x.id === cap.dataset.id);
     const rel = cap.querySelector('.capsula__relleno');
     const [x0, y0, x1, y1] = c.zona;
-    // El sobre lleva pocos stickers, asomando del bolsillo; en las otras se apilan todos.
+    // La zapatilla es baja y ancha: menos stickers, en tres columnas; en las otras se apilan todos.
     if (c.max) items = items.slice(0, c.max);
-    const cols = 2;
+    const cols = c.cols || 2;
     const altoFila = Math.min(12, (y1 - y0) / Math.max(3, Math.ceil(items.length / cols)));
     [...rel.children].slice(desde).forEach((n) => n.remove());
     semillaSt = 7 + desde * 13;
@@ -226,7 +226,7 @@
   function confeti(cont, n = 34) {
     if (!cont) return;
     cont.textContent = '';
-    const tipos = ['punto', 'punto-o', 'flor', 'aro', 'punto'];
+    const tipos = ['punto', 'estrella-llena', 'flor', 'explosion-llena', 'punto', 'circulo'];
     const colores = ['azul', 'crema', 'azul', 'crema', 'oscuro'];
     for (let i = 0; i < n; i++) {
       const it = { t: tipos[i % tipos.length], c: colores[(i * 3) % colores.length] };
@@ -301,8 +301,35 @@
   const FLOR = { 11: florPath(11), 8: florPath(8, 40, 6) };
   const COL = { azul: 'var(--azul)', rosa: 'var(--rosa)', crema: 'var(--crema)', oscuro: 'var(--oscuro)' };
 
+  // Elementos de STOP (Figma "Identidad general"): estrellas, explosión, X y rayos de puntos, aro punteado.
+  function estrellaPath(puntas, rExt, rInt) {
+    let d = '';
+    for (let i = 0; i < puntas * 2; i++) {
+      const a = (i / (puntas * 2)) * Math.PI * 2 - Math.PI / 2;
+      const r = i % 2 ? rInt : rExt;
+      d += (i ? 'L' : 'M') + (50 + r * Math.cos(a)).toFixed(2) + ' ' + (50 + r * Math.sin(a)).toFixed(2);
+    }
+    return d + 'Z';
+  }
+  const ESTRELLA = estrellaPath(6, 46, 19);
+  const EXPLOSION = estrellaPath(12, 47, 31);
+  const puntos = (pts, r, color) => pts.map(([x, y]) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${color}"/>`).join('');
+  const X_PUNTOS = (() => { const p = []; for (let i = 0; i < 7; i++) { const t = 8 + i * 14; p.push([t, t], [100 - t, t]); } return p.filter(([x, y], i, a) => a.findIndex(([u, v]) => u === x && v === y) === i); })();
+  const RAYOS = (() => {
+    const p = [[50, 50]];
+    for (let k = 0; k < 8; k++) {
+      const a = (k / 8) * Math.PI * 2;
+      (k % 2 ? [17, 31, 44] : [13, 25, 37, 49]).forEach((r) => p.push([50 + r * Math.cos(a), 50 + r * Math.sin(a)]));
+    }
+    return p;
+  })();
+  const ARO_PUNTOS = Array.from({ length: 11 }, (_, k) => { const a = (k / 11) * Math.PI * 2; return [50 + 43 * Math.cos(a), 50 + 43 * Math.sin(a)]; });
+  const LINEA = 'var(--fg)';
+
   // t: 'punto' (SPOT!: color con borde), 'punto-o' (post.: oscuro con borde de color),
-  //    'aro', 'flor' (oscura con borde de color), 'flor-hueca' (solo contorno). c: azul | rosa | crema
+  //    'aro', 'flor' (oscura con borde de color), 'flor-hueca' (solo contorno),
+  //    STOP: 'estrella' / 'explosion' (contorno fino), 'estrella-llena' / 'explosion-llena' (color con contorno fino),
+  //    'x-puntos', 'rayos', 'aro-puntos' (de puntos), 'circulo' (aro fino de color). c: azul | rosa | crema
   function forma(it) {
     const c = COL[it.c || 'azul'];
     switch (it.t) {
@@ -314,9 +341,52 @@
         return `<circle cx="50" cy="50" r="40" fill="none" stroke="${it.c ? c : 'var(--oscuro)'}" stroke-width="9"/>`;
       case 'flor':
         return `<path d="${FLOR[it.p || 11]}" fill="var(--oscuro)" stroke="${c}" stroke-width="7" stroke-linejoin="round"/>`;
+      case 'estrella':
+      case 'explosion':
+        return `<path d="${it.t === 'estrella' ? ESTRELLA : EXPLOSION}" fill="none" stroke="${LINEA}" stroke-width="3" stroke-linejoin="round"/>`;
+      case 'estrella-llena':
+      case 'explosion-llena':
+        return `<path d="${it.t === 'estrella-llena' ? ESTRELLA : EXPLOSION}" fill="${c}" stroke="${LINEA}" stroke-width="3" stroke-linejoin="round"/>`;
+      case 'x-puntos':
+        return puntos(X_PUNTOS, 4.6, LINEA);
+      case 'rayos':
+        return puntos(RAYOS, 2.9, LINEA);
+      case 'aro-puntos':
+        return puntos(ARO_PUNTOS, 4.4, LINEA);
+      case 'circulo':
+        return `<circle cx="50" cy="50" r="42" fill="none" stroke="${c}" stroke-width="6"/>`;
       default: // flor-hueca
         return `<path d="${FLOR[it.p || 11]}" fill="none" stroke="${it.c ? c : 'var(--oscuro)'}" stroke-width="6" stroke-linejoin="round"/>`;
     }
+  }
+
+  // Franjas diagonales con línea de puntos (piezas "STOP OFICIAL"): planas, siempre desde las esquinas.
+  // v: 0 / 1 = esquinas de arriba y abajo (portada), 2 = banda grande (como "STOP OFICIAL 2"),
+  //    3 / 4 = solo en las esquinas de abajo, para no cruzar los títulos.
+  const FRANJAS = [
+    '<g class="fr fr--a"><path class="fr__2" d="M0 128L0 144L206 0L184 0Z"/><path class="fr__1" d="M0 158L0 214L268 0L222 0Z"/></g>' +
+      '<path class="fr__pts" d="M-10 300L360 -14"/>' +
+      '<g class="fr fr--b"><path class="fr__2" d="M390 688L390 744L170 860L120 860Z"/></g><path class="fr__pts" d="M400 632L40 870"/>',
+    '<g class="fr fr--a"><path class="fr__1" d="M390 120L390 168L150 0L196 0Z"/><path class="fr__2" d="M390 184L390 198L214 0L232 0Z"/></g>' +
+      '<path class="fr__pts" d="M400 268L46 -14"/>' +
+      '<g class="fr fr--b"><path class="fr__1" d="M0 700L0 742L226 860L276 860Z"/></g><path class="fr__pts" d="M-10 650L330 870"/>',
+    '<g class="fr fr--a"><path class="fr__1" d="M0 0L250 0L0 300Z"/></g><path class="fr__pts" d="M-10 812L400 520"/>' +
+      '<g class="fr fr--b"><path class="fr__2" d="M390 600L390 690L0 900L0 840Z"/></g>',
+    '<g class="fr fr--b"><path class="fr__2" d="M390 704L390 716L232 844L210 844Z"/><path class="fr__1" d="M390 730L390 780L292 844L236 844Z"/></g>' +
+      '<path class="fr__pts" d="M400 656L150 860"/><g class="fr fr--a"><path class="fr__1" d="M0 52L0 62L70 0L56 0Z"/></g>',
+    '<g class="fr fr--b2"><path class="fr__1" d="M0 708L0 756L112 844L166 844Z"/><path class="fr__2" d="M0 772L0 784L76 844L96 844Z"/></g>' +
+      '<path class="fr__pts" d="M-10 650L246 860"/><g class="fr fr--a2"><path class="fr__2" d="M390 52L390 62L320 0L334 0Z"/></g>',
+  ];
+  function franjas(cont, v = 0) {
+    if (!cont) return;
+    cont.querySelector('.franjas')?.remove();
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'franjas');
+    svg.setAttribute('viewBox', '0 0 390 844');
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.innerHTML = FRANJAS[v % FRANJAS.length];
+    cont.prepend(svg);
   }
 
   // items: [{ t, x, y, s, c?, p? }]
@@ -340,10 +410,12 @@
   }
 
   // Genera una mezcla repetible (misma semilla = mismo dibujo), pegada a los bordes para no tapar el texto.
+  // Los elementos de STOP mandan; los puntos de SPOT! y las flores de post. acompañan.
   const TIPOS = [
-    { t: 'flor', s: [30, 44] }, { t: 'punto', s: [10, 18] }, { t: 'aro', s: [14, 24] },
-    { t: 'punto-o', s: [12, 22] }, { t: 'flor-hueca', s: [28, 40] }, { t: 'punto', s: [16, 26] },
-    { t: 'flor', s: [22, 30], p: 8 }, { t: 'punto', s: [8, 12] },
+    { t: 'rayos', s: [54, 70] }, { t: 'punto', s: [10, 18] }, { t: 'estrella-llena', s: [30, 40] },
+    { t: 'x-puntos', s: [28, 38] }, { t: 'circulo', s: [12, 20] }, { t: 'explosion', s: [32, 44] },
+    { t: 'flor', s: [26, 36] }, { t: 'aro-puntos', s: [34, 46] }, { t: 'estrella', s: [26, 36] },
+    { t: 'punto-o', s: [12, 20] }, { t: 'explosion-llena', s: [28, 38] }, { t: 'punto', s: [8, 12] },
   ];
   function mezcla(semilla, n = 7, { y0 = 4, y1 = 92 } = {}) {
     let x = semilla * 9301 + 49297;
@@ -355,12 +427,12 @@
         t: tipo.t,
         p: tipo.p,
         s: Math.round(tipo.s[0] + rnd() * (tipo.s[1] - tipo.s[0])),
-        c: ['azul', 'rosa', 'azul', 'crema', 'rosa'][(i + semilla) % 5],
+        c: ['rosa', 'azul', 'rosa', 'crema', 'azul'][(i + semilla) % 5],
         x: (izq ? 2 + rnd() * 16 : 76 + rnd() * 16).toFixed(1) + '%',
         y: (y0 + ((i + rnd() * 0.8) / n) * (y1 - y0)).toFixed(1) + '%',
       };
     });
   }
 
-  window.Piezas = { COLORES, CAPSULAS, insigniaReloj, ENVASES, envase, sticker, llenar, vaciar, collage, cielo, confeti, crearNota, pintarNota, escalarNota, decorar, mezcla, limpiar };
+  window.Piezas = { COLORES, CAPSULAS, insigniaReloj, ENVASES, envase, sticker, llenar, vaciar, collage, cielo, franjas, confeti, crearNota, pintarNota, escalarNota, decorar, mezcla, limpiar };
 })();
