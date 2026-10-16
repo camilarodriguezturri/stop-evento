@@ -360,35 +360,6 @@
     }
   }
 
-  // Franjas diagonales con línea de puntos (piezas "STOP OFICIAL"): planas, siempre desde las esquinas.
-  // v: 0 / 1 = esquinas de arriba y abajo (portada), 2 = banda grande (como "STOP OFICIAL 2"),
-  //    3 / 4 = solo en las esquinas de abajo, para no cruzar los títulos.
-  const FRANJAS = [
-    '<g class="fr fr--a"><path class="fr__2" d="M0 128L0 144L206 0L184 0Z"/><path class="fr__1" d="M0 158L0 214L268 0L222 0Z"/></g>' +
-      '<path class="fr__pts" d="M-10 300L360 -14"/>' +
-      '<g class="fr fr--b"><path class="fr__2" d="M390 688L390 744L170 860L120 860Z"/></g><path class="fr__pts" d="M400 632L40 870"/>',
-    '<g class="fr fr--a"><path class="fr__1" d="M390 120L390 168L150 0L196 0Z"/><path class="fr__2" d="M390 184L390 198L214 0L232 0Z"/></g>' +
-      '<path class="fr__pts" d="M400 268L46 -14"/>' +
-      '<g class="fr fr--b"><path class="fr__1" d="M0 700L0 742L226 860L276 860Z"/></g><path class="fr__pts" d="M-10 650L330 870"/>',
-    '<g class="fr fr--a"><path class="fr__1" d="M0 0L250 0L0 300Z"/></g><path class="fr__pts" d="M-10 812L400 520"/>' +
-      '<g class="fr fr--b"><path class="fr__2" d="M390 600L390 690L0 900L0 840Z"/></g>',
-    '<g class="fr fr--b"><path class="fr__2" d="M390 704L390 716L232 844L210 844Z"/><path class="fr__1" d="M390 730L390 780L292 844L236 844Z"/></g>' +
-      '<path class="fr__pts" d="M400 656L150 860"/><g class="fr fr--a"><path class="fr__1" d="M0 52L0 62L70 0L56 0Z"/></g>',
-    '<g class="fr fr--b2"><path class="fr__1" d="M0 708L0 756L112 844L166 844Z"/><path class="fr__2" d="M0 772L0 784L76 844L96 844Z"/></g>' +
-      '<path class="fr__pts" d="M-10 650L246 860"/><g class="fr fr--a2"><path class="fr__2" d="M390 52L390 62L320 0L334 0Z"/></g>',
-  ];
-  function franjas(cont, v = 0) {
-    if (!cont) return;
-    cont.querySelector('.franjas')?.remove();
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('class', 'franjas');
-    svg.setAttribute('viewBox', '0 0 390 844');
-    svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-    svg.setAttribute('aria-hidden', 'true');
-    svg.innerHTML = FRANJAS[v % FRANJAS.length];
-    cont.prepend(svg);
-  }
-
   // items: [{ t, x, y, s, c?, p? }]
   function decorar(cont, items) {
     if (!cont) return;
@@ -434,5 +405,5 @@
     });
   }
 
-  window.Piezas = { COLORES, CAPSULAS, insigniaReloj, ENVASES, envase, sticker, llenar, vaciar, collage, cielo, franjas, confeti, crearNota, pintarNota, escalarNota, decorar, mezcla, limpiar };
+  window.Piezas = { COLORES, CAPSULAS, insigniaReloj, ENVASES, envase, sticker, llenar, vaciar, collage, cielo, confeti, crearNota, pintarNota, escalarNota, decorar, mezcla, limpiar };
 })();

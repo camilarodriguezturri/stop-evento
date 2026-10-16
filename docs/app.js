@@ -144,8 +144,7 @@
   document.addEventListener('animationend', (e) => e.target.classList?.remove('sacudir'));
 
   // ---------- misceláneas, estrellitas y objetos flotantes ----------
-  // estrellitas + franjas diagonales de STOP (la de carga usa la banda grande)
-  $$('.cielo').forEach((c, i) => { P.cielo(c, i + 1); P.franjas(c, c.closest('#carga') ? 2 : c.closest('#p-inicio') ? 0 : 3 + (i % 2)); });
+  $$('.cielo').forEach((c, i) => P.cielo(c, i + 1));
   [
     { id: 'trofeo', x: '-6%', y: '0%', s: 150, r: -14, items: MUESTRA.slice(0, 3) },
     { id: 'botella', x: '72%', y: '-4%', s: 140, r: 16, items: MUESTRA.slice(3, 6) },
@@ -1069,8 +1068,7 @@
     el.dataset.tema = tema;
     el.hidden = true;
     el.innerHTML = '<div class="cielo" aria-hidden="true"></div><div class="deco" aria-hidden="true"></div>' + html;
-    P.cielo($('.cielo', el), semillaCielo);
-    P.franjas($('.cielo', el), 3 + (semillaCielo++ % 2));
+    P.cielo($('.cielo', el), semillaCielo++);
     P.decorar($('.deco', el), deco);
     return { el, tema, auto, interactiva, alEntrar };
   }
