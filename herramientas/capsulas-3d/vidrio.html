@@ -96,10 +96,10 @@ function zapatilla() {
   // suela gruesa de vidrio esmerilado + tacos redondeados (como la escultura de la referencia)
   const suela = perfil([[-2.06,.62],[-2.22,.4],[-2.12,.2],[0,.18],[2.2,.2],[2.42,.38],[2.36,.64],[2.12,.6],[0,.56],[-2.06,.62]]);
   const DS = 1.16, geoS = afinar(new THREE.ExtrudeGeometry(suela, { depth: DS, bevelEnabled: true, bevelThickness: .16, bevelSize: .1, bevelSegments: 10, curveSegments: 60 }), DS);
-  add(geoS, mat({ ...BORDE, a0: .38, a1: .9, base: 0xfcd0f1 }));
+  add(geoS, mat({ ...BORDE, a0: .38, a1: .9, base: 0xfcd0f1, spec: 0 }));
   for (let k = 0; k < 5; k++) {
     const x = -1.7 + k * .92, w = ancho(x);
-    for (const z of [-1, 1]) add(new RoundedBoxGeometry(.72, .38, .46, 5, .16), mat({ ...BORDE, a0: .42, a1: .95 }), [x, .14, z * (DS / 2) * w * .74]);
+    for (const z of [-1, 1]) add(new RoundedBoxGeometry(.72, .38, .46, 5, .16), mat({ ...BORDE, a0: .42, a1: .95, spec: 0 }), [x, .14, z * (DS / 2) * w * .74]);
   }
   // solo dos costuras: el borde de la suela y el cuello
   const B = mat(BORDE);
