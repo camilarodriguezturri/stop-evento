@@ -16,6 +16,15 @@
   const leer = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
   const guardar = () => { try { localStorage.setItem(KEY, JSON.stringify(datos)); } catch { /* sin storage */ } };
   const datos = leer();
+  // Si llega desde la landing con su pase (#nombre=…&dorsal=…&pase=…&palabra=…), guardamos el titular.
+  {
+    const h = new URLSearchParams(location.hash.slice(1));
+    if (h.get('nombre')) {
+      datos.titular = { nombre: h.get('nombre').slice(0, 40), dorsal: (h.get('dorsal') || '').replace(/\D/g, '').slice(0, 5), pase: h.get('pase') || 'completo', palabra: (h.get('palabra') || '').slice(0, 24) };
+      try { localStorage.setItem(KEY, JSON.stringify(datos)); } catch { /* sin storage */ }
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+  }
   datos.historial ||= [];
 
   const objetivo = (id) => CFG.OBJETIVOS.find((o) => o.id === id);
@@ -1426,13 +1435,46 @@
     for (let f = 0; f < n; f++) for (let c = 0; c < n; c++) if (oscuro(f, c)) d += `M${c} ${f}h1v1h-1z`;
     cont.innerHTML = `<svg viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" aria-hidden="true"><path d="${d}" fill="#252525"/></svg>`;
   }
-  const textoQR = (cod) => 'STOP-CAPSULA:' + cod;
+  // El QR abre la vista de staff con el dorsal y la botella; los datos viajan en el propio QR.
+  const URL_ESTACION = 'https://camilarodriguezturri.github.io/stop-evento/estacion.html';
+  const textoQR = (cod) => {
+    const t = datos.titular || {}, c = datos.capsula || {};
+    const q = new URLSearchParams({ c: cod, n: t.nombre || '', d: t.dorsal || '', p: t.pase || 'completo', e: c.envase || '', o: (c.objetivos || []).length });
+    if (t.palabra) q.set('w', t.palabra);
+    return URL_ESTACION + '#' + q.toString();
+  };
+  const numeroCapsula = (cod) => 'Cápsula N° ' + cod.replace(/\D/g, '');
+  function verQR(editar) {
+    const t = datos.titular;
+    const pedir = editar || !t?.nombre;
+    $('#qr-form').hidden = !pedir;
+    $('#qr-ver').hidden = pedir;
+    if (pedir) {
+      $('#qr-nombre').value = t?.nombre || '';
+      $('#qr-dorsal').value = t?.dorsal || '';
+      return;
+    }
+    const cod = datos.capsula.codigo;
+    pintarQR($('#qr-caja'), textoQR(cod));
+    $('#qr-codigo').textContent = numeroCapsula(cod);
+    $('#qr-titular').textContent = `${t.nombre} · dorsal ${t.dorsal}`;
+  }
+  $('#qr-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nombre = P.limpiar($('#qr-nombre').value).slice(0, 40);
+    if (nombre.length < 3) { const i = $('#qr-nombre').closest('.input'); i.classList.remove('sacudir'); void i.offsetWidth; i.classList.add('sacudir'); $('#qr-nombre').focus(); return; }
+    // En el prototipo, si no lo sabe, le asignamos un número de dorsal de prueba.
+    const dorsal = $('#qr-dorsal').value.replace(/\D/g, '').slice(0, 5) || String(1000 + Math.floor(Math.random() * 8999));
+    datos.titular = { ...(datos.titular || {}), nombre, dorsal, pase: datos.titular?.pase || 'completo' };
+    guardar();
+    verQR(false);
+  });
+  $('#qr-editar').addEventListener('click', () => verQR(true));
   function abrirQR() {
     const c = datos.capsula;
     if (!c) return;
     if (!c.codigo) { c.codigo = datos.codigo ||= nuevoCodigo(); guardar(); }
-    pintarQR($('#qr-caja'), textoQR(c.codigo));
-    $('#qr-codigo').textContent = c.codigo;
+    verQR(false);
     $('#dlg-qr').showModal();
   }
   $('#btn-qr').addEventListener('click', abrirQR);
@@ -1455,10 +1497,11 @@
     x.fillStyle = '#fff'; x.fillRect(ox - 30, oy - 30, lado + 60, lado + 60);
     x.fillStyle = '#252525';
     for (let f = 0; f < n; f++) for (let c = 0; c < n; c++) if (oscuro(f, c)) x.fillRect(ox + c * m, oy + f * m, Math.ceil(m), Math.ceil(m));
-    x.font = '800 48px "JetBrains Mono", monospace'; x.fillText(cod, W / 2, oy + lado + 110);
+    x.font = '800 44px "JetBrains Mono", monospace'; x.fillText(numeroCapsula(cod).toUpperCase(), W / 2, oy + lado + 110);
+    if (datos.titular) { x.font = '700 24px "JetBrains Mono", monospace'; x.fillText(`${datos.titular.nombre} · dorsal ${datos.titular.dorsal}`.toUpperCase(), W / 2, oy + lado + 148); }
     x.font = '400 26px "Reddit Sans", sans-serif';
-    x.fillText('Estación de cápsulas · terraza del Palacio Libertad', W / 2, oy + lado + 170);
-    x.fillText('28/11 al cierre · llevá tu DNI', W / 2, oy + lado + 210);
+    x.fillText('Estación de cápsulas · terraza del Palacio Libertad', W / 2, oy + lado + 196);
+    x.fillText('28/11 al cierre · llevá tu DNI', W / 2, oy + lado + 232);
     const a = document.createElement('a');
     a.href = cv.toDataURL('image/png'); a.download = `stop-capsula-${cod}.png`;
     document.body.append(a); a.click(); a.remove();

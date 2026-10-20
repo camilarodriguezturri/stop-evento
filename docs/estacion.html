@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1d1d1f">
+  <meta name="robots" content="noindex">
+  <title>Estación de cápsulas · stop.</title>
+  <link rel="icon" href="assets/marca/logo-stop.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=Reddit+Sans:wght@400;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Vista de staff: se abre al escanear el QR de una cápsula en la Estación de cápsulas. */
+    :root {
+      --noche: #1d1d1f; --oscuro: #252525; --crema: #ede8db; --azul: #7aa1ff; --rosa: #f79ee1;
+      --f-titulo: 'Sora', system-ui, sans-serif; --f-texto: 'Reddit Sans', system-ui, sans-serif; --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --ease-rebote: cubic-bezier(.3, 1.5, .5, 1);
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; min-height: 100vh; background: var(--noche); color: var(--crema); font: 400 16px/1.5 var(--f-texto); -webkit-font-smoothing: antialiased; }
+    .app { max-width: 460px; margin: 0 auto; padding: max(18px, env(safe-area-inset-top)) 18px calc(28px + env(safe-area-inset-bottom)); display: grid; gap: 22px; }
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .top img { width: 92px; height: auto; }
+    .rol { padding: 6px 12px; border-radius: 20px; background: rgba(237, 232, 219, .1); font: 800 11px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; }
+    .aviso { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 18px; font-size: 15px; line-height: 1.4; color: var(--oscuro); box-shadow: 0 0 0 2px var(--oscuro); }
+    .aviso b { display: block; font: 700 17px var(--f-titulo); }
+    .aviso--ok { background: var(--azul); }
+    .aviso--alerta { background: var(--rosa); }
+    .aviso--info { background: var(--crema); }
+    .aviso__ico { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--oscuro); color: var(--crema); display: grid; place-items: center; font: 800 16px var(--f-mono); }
+
+    .botella { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 14px; align-items: end; padding: 20px; border-radius: 22px; background: var(--rosa); color: var(--oscuro); box-shadow: 0 0 0 2px var(--oscuro), 6px 6px 0 2px var(--azul); }
+    .botella__rotulo { grid-column: 1 / -1; font: 800 11px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; }
+    .botella__numero { font: 800 clamp(44px, 14vw, 64px)/.95 var(--f-titulo); letter-spacing: -.05em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .botella__estante { justify-self: end; text-align: center; padding: 8px 12px; border-radius: 14px; background: var(--oscuro); color: var(--crema); }
+    .botella__estante small { display: block; font: 800 10px var(--f-mono); letter-spacing: .1em; opacity: .7; }
+    .botella__estante strong { font: 800 26px var(--f-mono); }
+    .botella__dato { grid-column: 1 / -1; font-size: 14px; opacity: .8; }
+
+    /* dorsal: el mismo de la landing */
+    .dorsal { position: relative; width: min(330px, 92%); justify-self: center; border-radius: 14px; background: #fff; color: var(--oscuro); box-shadow: 0 0 0 2.5px var(--oscuro), 8px 8px 0 2.5px var(--rosa); rotate: -2deg; overflow: hidden; text-align: left; margin-block: 6px 10px; animation: entrar .7s var(--ease-rebote) both; }
+    @keyframes entrar { from { opacity: 0; transform: translateY(30px) rotate(-12deg) scale(.8); } }
+    .dorsal__ojal { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--crema); box-shadow: inset 0 0 0 2px var(--oscuro), 0 0 0 3px #d9d4c8; z-index: 2; }
+    .dorsal__ojal:nth-of-type(1) { left: 10px; top: 10px; } .dorsal__ojal:nth-of-type(2) { right: 10px; top: 10px; }
+    .dorsal__ojal:nth-of-type(3) { left: 10px; bottom: 14px; } .dorsal__ojal:nth-of-type(4) { right: 10px; bottom: 14px; }
+    .dorsal__banda { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 16px 38px; background: var(--rosa); border-bottom: 2.5px solid var(--oscuro); }
+    .dorsal__banda img { width: 64px; height: auto; }
+    .dorsal__banda span { font: 800 10px var(--f-mono); letter-spacing: .08em; text-transform: uppercase; }
+    .dorsal__cuerpo { padding: 18px 26px 20px; display: grid; gap: 12px; justify-items: center; text-align: center; }
+    .dorsal__numero { font: 800 clamp(84px, 24vw, 108px)/.95 var(--f-titulo); letter-spacing: -.06em; font-variant-numeric: tabular-nums; }
+    .dorsal__nombre { font: 800 15px var(--f-mono); text-transform: uppercase; letter-spacing: .06em; }
+    .dorsal__etiquetas { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 6px; }
+    .dorsal__etiquetas span { padding: 4px 10px; border-radius: 12px; font: 800 11px var(--f-mono); text-transform: uppercase; letter-spacing: .04em; box-shadow: 0 0 0 2px var(--oscuro); }
+    .dorsal__cat { background: var(--azul); }
+    .dorsal__palabra { background: var(--crema); }
+    .dorsal__chip { display: flex; align-items: center; gap: 10px; margin: 6px 26px 0; padding: 10px 12px; border-radius: 8px; background: var(--oscuro); color: var(--crema); font: 800 10px var(--f-mono); letter-spacing: .1em; }
+    .dorsal__chip i { flex: 1; height: 16px; background: repeating-linear-gradient(90deg, var(--crema) 0 2px, transparent 2px 4px, var(--crema) 4px 5px, transparent 5px 8px); opacity: .85; }
+    .dorsal__talon { margin-top: 18px; padding: 14px 38px 16px; border-top: 2.5px dashed var(--oscuro); display: grid; justify-items: center; text-align: center; gap: 2px; font: 700 11px var(--f-mono); text-transform: uppercase; letter-spacing: .04em; background: #f7f3ea; }
+
+    .pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: p; }
+    .pasos li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: start; font-size: 16px; line-height: 1.45; }
+    .pasos li::before { counter-increment: p; content: counter(p); display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--crema); color: var(--oscuro); font: 800 14px var(--f-mono); }
+    .pasos b { color: var(--rosa); white-space: nowrap; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 56px; padding: 0 24px; border: 0; border-radius: 30px; font: 700 17px var(--f-texto); cursor: pointer; transition: transform .15s; }
+    .btn:active { transform: scale(.97); }
+    .btn--crema { background: var(--crema); color: var(--oscuro); box-shadow: 0 5px 0 var(--rosa); }
+    .btn--borde { background: transparent; color: var(--crema); box-shadow: inset 0 0 0 2px rgba(237, 232, 219, .4); min-height: 48px; font-size: 15px; }
+    .acciones { display: grid; gap: 14px; margin-top: 4px; }
+    .vacio { text-align: center; padding-top: 18vh; display: grid; gap: 14px; justify-items: center; }
+    .vacio h1 { margin: 0; font: 700 28px var(--f-titulo); }
+    .vacio p { margin: 0; opacity: .75; max-width: 32ch; }
+    @media (prefers-reduced-motion: reduce) { .dorsal { animation: none; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <img src="assets/marca/logo-stop.png" alt="STOP" width="535" height="248">
+      <span class="rol">Estación de cápsulas · staff</span>
+    </header>
+
+    <section id="ficha" hidden>
+      <div style="display:grid;gap:22px">
+        <div class="aviso aviso--alerta" id="aviso-entregada" hidden><span class="aviso__ico">!</span><span><b>Esta cápsula ya se entregó</b><span id="aviso-entregada-txt"></span></span></div>
+        <div class="aviso aviso--info" id="aviso-sinpost" hidden><span class="aviso__ico">i</span><span><b>Pase sin post</b>No incluye botellita. Ofrecé sumarse al post en el stand de Stop.</span></div>
+
+        <div class="botella">
+          <span class="botella__rotulo">Cápsula · botella</span>
+          <span class="botella__numero" id="b-numero">N° 0000</span>
+          <span class="botella__estante"><small>ESTANTE</small><strong id="b-estante">A-01</strong></span>
+          <span class="botella__dato" id="b-dato"></span>
+        </div>
+
+        <div class="dorsal" aria-label="Dorsal del corredor">
+          <i class="dorsal__ojal"></i><i class="dorsal__ojal"></i><i class="dorsal__ojal"></i><i class="dorsal__ojal"></i>
+          <div class="dorsal__banda"><img src="assets/marca/logo-stop.png" alt="Stop" width="535" height="248"><span>Night 10K · 28.11</span></div>
+          <div class="dorsal__cuerpo">
+            <div class="dorsal__numero" id="d-numero">0000</div>
+            <div class="dorsal__nombre" id="d-nombre"></div>
+            <div class="dorsal__etiquetas"><span class="dorsal__cat" id="d-pase">Carrera + post</span><span class="dorsal__palabra" id="d-palabra" hidden></span></div>
+          </div>
+          <div class="dorsal__chip" aria-hidden="true">CHIP<i></i></div>
+          <div class="dorsal__talon"><span id="d-talon">Post · Palacio Libertad</span><span id="d-cod"></span></div>
+        </div>
+
+        <ol class="pasos">
+          <li><span>Pedí el DNI y verificá que diga <b id="p-nombre"></b>.</span></li>
+          <li><span>Buscá la botella <b id="p-botella"></b> en el estante <b id="p-estante"></b>.</span></li>
+          <li><span>Entregala con la frase de cierre: <i>“Esto te lo dejaste vos antes de largar”</i>.</span></li>
+        </ol>
+
+        <div class="aviso aviso--ok" id="aviso-ok" hidden><span class="aviso__ico">✓</span><span><b>Entregada</b><span id="aviso-ok-txt"></span></span></div>
+        <div class="acciones">
+          <button class="btn btn--crema" id="btn-entregar" type="button">Marcar como entregada</button>
+          <button class="btn btn--borde" id="btn-deshacer" type="button" hidden>Deshacer entrega</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="vacio" id="vacio" hidden>
+      <h1>QR no válido</h1>
+      <p>Este código no corresponde a una cápsula. Pedile a la persona que abra su QR desde la app y buscala por DNI.</p>
+    </section>
+  </main>
+
+  <script>
+  (() => {
+    'use strict';
+    const $ = (s) => document.querySelector(s);
+    const q = new URLSearchParams(location.hash.slice(1) || location.search.slice(1));
+    const cod = (q.get('c') || '').toUpperCase();
+    const num = (cod.match(/^CAP-(\d{3,6})$/) || [])[1];
+    if (!num) { $('#vacio').hidden = false; return; }
+
+    // El estante sale del número de cápsula: 6 estantes (A–F) de 30 lugares.
+    const n = Number(num);
+    const estante = 'ABCDEF'[n % 6] + '-' + String(Math.floor(n / 6) % 30 + 1).padStart(2, '0');
+    const nombre = (q.get('n') || 'Sin nombre').slice(0, 40);
+    const dorsal = (q.get('d') || '').replace(/\D/g, '').slice(0, 5) || '—';
+    const conPost = q.get('p') !== 'carrera';
+    const palabra = (q.get('w') || '').slice(0, 24);
+    const ENVASE = { botella: 'Botella de agua', trofeo: 'Trofeo', zapatilla: 'Zapatilla' };
+    const envase = ENVASE[q.get('e')] || '';
+    const obj = Number(q.get('o')) || 0;
+
+    $('#b-numero').textContent = 'N° ' + num;
+    $('#b-estante').textContent = estante;
+    $('#b-dato').textContent = [envase && 'Eligió: ' + envase, obj && `${obj} ${obj === 1 ? 'objetivo' : 'objetivos'} adentro`].filter(Boolean).join(' · ');
+    $('#d-numero').textContent = dorsal;
+    $('#d-nombre').textContent = nombre;
+    $('#d-pase').textContent = conPost ? 'Carrera + post' : 'Carrera';
+    $('#d-palabra').hidden = !palabra;
+    $('#d-palabra').textContent = palabra ? 'Llegás con: ' + palabra : '';
+    $('#d-talon').textContent = conPost ? 'Post · Palacio Libertad' : 'Pre · Parque M. Argentinas';
+    $('#d-cod').textContent = 'Cápsula ' + cod;
+    $('#p-nombre').textContent = nombre;
+    $('#p-botella').textContent = 'N° ' + num;
+    $('#p-estante').textContent = estante;
+    $('#aviso-sinpost').hidden = conPost;
+    document.title = `Cápsula N° ${num} · ${nombre}`;
+
+    // Entregas: se guardan en el teléfono del staff (en la versión real, en el sistema de la estación).
+    const KEY = 'stop-estacion-entregas';
+    const leer = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
+    const escribir = (o) => { try { localStorage.setItem(KEY, JSON.stringify(o)); } catch { /* sin almacenamiento */ } };
+    const hora = (iso) => new Date(iso).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+    function pintar(recien) {
+      const cuando = leer()[cod];
+      $('#aviso-entregada').hidden = !cuando || recien;
+      $('#aviso-entregada-txt').textContent = cuando ? ` a las ${hora(cuando)} h. Verificá el DNI antes de volver a entregar.` : '';
+      $('#aviso-ok').hidden = !(cuando && recien);
+      $('#aviso-ok-txt').textContent = cuando ? ` a las ${hora(cuando)} h. En la versión real, su cápsula se desbloquea en la app.` : '';
+      $('#btn-entregar').hidden = !!cuando || !conPost;
+      $('#btn-deshacer').hidden = !cuando;
+    }
+    $('#btn-entregar').addEventListener('click', () => {
+      const o = leer(); o[cod] = new Date().toISOString(); escribir(o);
+      navigator.vibrate?.(30);
+      pintar(true);
+    });
+    $('#btn-deshacer').addEventListener('click', () => { const o = leer(); delete o[cod]; escribir(o); pintar(false); });
+    pintar(false);
+    $('#ficha').hidden = false;
+  })();
+  </script>
+</body>
+</html>

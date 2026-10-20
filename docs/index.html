@@ -430,13 +430,28 @@
     <span class="sheet__asa" aria-hidden="true"></span>
     <p class="qr__kicker">tu pase de cápsula</p>
     <h2 id="dlg-qr-titulo">Retirá tu botellita</h2>
+    <form class="qr__form" id="qr-form" hidden novalidate>
+      <p class="qr__texto">Tu QR lleva tu nombre y tu dorsal para que el staff encuentre tu botella.</p>
+      <div class="campo">
+        <label class="campo__label" for="qr-nombre">Nombre y apellido</label>
+        <div class="input"><input id="qr-nombre" type="text" maxlength="40" autocomplete="name" enterkeyhint="next"></div>
+      </div>
+      <div class="campo">
+        <label class="campo__label" for="qr-dorsal">Número de dorsal <small class="qr__ayuda">· está en tu pase</small></label>
+        <div class="input"><input id="qr-dorsal" type="text" inputmode="numeric" maxlength="5" placeholder="Ej. 3043" enterkeyhint="done"></div>
+      </div>
+      <div class="acciones"><button class="btn btn--primario btn--ancho" type="submit">Ver mi QR</button></div>
+    </form>
+    <div id="qr-ver">
     <div class="qr__caja" id="qr-caja" role="img" aria-label="Código QR de tu cápsula"></div>
     <p class="qr__codigo" id="qr-codigo"></p>
+    <p class="qr__titular"><span id="qr-titular"></span> · <button class="qr__editar" id="qr-editar" type="button">cambiar</button></p>
     <p class="qr__texto">Mostralo en la <strong>Estación de cápsulas</strong>, en la terraza del Palacio Libertad, al cierre del 28/11. Llevá tu DNI.</p>
     <p class="qr__nota">Es personal: no lo compartas en tus historias.</p>
     <div class="acciones">
       <button class="btn btn--primario btn--ancho" id="qr-guardar" type="button">Guardar en el celu</button>
       <button class="btn btn--secundario" id="qr-cerrar" type="button">Listo</button>
+    </div>
     </div>
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
