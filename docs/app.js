@@ -181,6 +181,7 @@
   // ---------- inicio ----------
   const btnInicio = $('#btn-inicio');
   const btnInicio2 = $('#btn-inicio-2');
+  const btnQRInicio = $('#btn-qr-inicio');
   const btnSimular = $('#btn-simular');
   let reloj = 0;
 
@@ -193,6 +194,7 @@
     clearInterval(reloj);
     btnInicio.hidden = false;
     btnInicio2.hidden = true;
+    btnQRInicio.hidden = true;
     btnSimular.hidden = true;
 
     if (est === 'vacio') {
@@ -204,6 +206,7 @@
       btnInicio.hidden = true;
       btnInicio2.hidden = false;
       btnInicio2.textContent = 'Cambiar mi cápsula';
+      btnQRInicio.hidden = false;
       btnSimular.hidden = !DEMO;
       tic();
       reloj = setInterval(tic, 1000);
@@ -978,6 +981,8 @@
     const env = $('#envase-sellar .envase');
     const slot = $('#slot-sellar');
     const ahora = new Date();
+    datos.codigo ||= nuevoCodigo();
+    recienSellada = true;
     datos.capsula = {
       envase: borrador.envase,
       para: P.limpiar(borrador.para) || 'mi yo del futuro',
@@ -986,6 +991,7 @@
       objetivos: borrador.objetivos.map((o) => ({ id: o.id, antes: o.hoy, meta: o.meta })),
       cancion: borrador.cancion,
       selladaEn: ahora.toISOString(),
+      codigo: datos.codigo,
       eventoOrigen: CFG.EVENTO_ACTUAL.nombre,
       evento: CFG.PROXIMO_EVENTO.nombre,
       abreEn: new Date(Math.max(new Date(CFG.PROXIMO_EVENTO.fecha).getTime(), ahora.getTime() + 60e3)).toISOString(),
@@ -1027,6 +1033,7 @@
     $('#pieza-datos').innerHTML = datosPieza.map((d) => `<li>${esc(d)}</li>`).join('');
     $('[data-grupo]', pantallas.sellada).dataset.grupoTexto = 'Tu grupo va a ver que sellaste tu cápsula hasta el 28/11.';
     P.decorar($('#deco-exito'), P.mezcla(1, 7, { y0: 8, y1: 50 }));
+    if (recienSellada) { recienSellada = false; setTimeout(() => { if (!pantallas.sellada.hidden) abrirQR(); }, REDUCIDO ? 300 : 2200); }
     if (!REDUCIDO) {
       $('#t-sellada').animate(
         { transform: ['scale(.4) rotate(-12deg)', 'scale(1.08) rotate(-4deg)', 'scale(1) rotate(-4deg)'], opacity: [0, 1, 1] },
@@ -1203,6 +1210,7 @@
         $('[data-ver]', el).onclick = () => {
           c.objetivos = ahora;
           c.abierta = true;
+          datos.codigo = null;
           c.abiertaEn ||= (c.simulada ? c.abreEn : new Date().toISOString());
           guardar();
           // Rearmar las slides de comparación con los números nuevos.
@@ -1401,6 +1409,61 @@
     $('#dlg-logros').showModal();
   }
   $('#logros-cerrar').addEventListener('click', () => $('#dlg-logros').close());
+
+  // ---------- pase de cápsula: el QR que se escanea en la Estación de cápsulas ----------
+  let recienSellada = false;
+  function nuevoCodigo() { return 'CAP-' + String(Math.floor(1000 + Math.random() * 9000)); }
+  function modulosQR(texto) {
+    const q = qrcode(0, 'M');
+    q.addData(texto);
+    q.make();
+    const n = q.getModuleCount();
+    return { n, oscuro: (f, c) => q.isDark(f, c) };
+  }
+  function pintarQR(cont, texto) {
+    const { n, oscuro } = modulosQR(texto);
+    let d = '';
+    for (let f = 0; f < n; f++) for (let c = 0; c < n; c++) if (oscuro(f, c)) d += `M${c} ${f}h1v1h-1z`;
+    cont.innerHTML = `<svg viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" aria-hidden="true"><path d="${d}" fill="#252525"/></svg>`;
+  }
+  const textoQR = (cod) => 'STOP-CAPSULA:' + cod;
+  function abrirQR() {
+    const c = datos.capsula;
+    if (!c) return;
+    if (!c.codigo) { c.codigo = datos.codigo ||= nuevoCodigo(); guardar(); }
+    pintarQR($('#qr-caja'), textoQR(c.codigo));
+    $('#qr-codigo').textContent = c.codigo;
+    $('#dlg-qr').showModal();
+  }
+  $('#btn-qr').addEventListener('click', abrirQR);
+  btnQRInicio.addEventListener('click', abrirQR);
+  $('#qr-cerrar').addEventListener('click', () => $('#dlg-qr').close());
+  $('#dlg-qr').addEventListener('click', (e) => { if (e.target === $('#dlg-qr')) $('#dlg-qr').close(); });
+  // Guarda una imagen del pase (QR + código + dónde mostrarlo).
+  $('#qr-guardar').addEventListener('click', () => {
+    const cod = datos.capsula?.codigo;
+    if (!cod) return;
+    const { n, oscuro } = modulosQR(textoQR(cod));
+    const W = 720, H = 960, cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    const x = cv.getContext('2d');
+    x.fillStyle = '#ede8db'; x.fillRect(0, 0, W, H);
+    x.fillStyle = '#252525'; x.textAlign = 'center';
+    x.font = '800 26px "JetBrains Mono", monospace'; x.fillText('TU PASE DE CÁPSULA · STOP.', W / 2, 96);
+    x.font = '700 44px Sora, sans-serif'; x.fillText('Retirá tu botellita', W / 2, 160);
+    const lado = 440, ox = (W - lado) / 2, oy = 210, m = lado / n;
+    x.fillStyle = '#fff'; x.fillRect(ox - 30, oy - 30, lado + 60, lado + 60);
+    x.fillStyle = '#252525';
+    for (let f = 0; f < n; f++) for (let c = 0; c < n; c++) if (oscuro(f, c)) x.fillRect(ox + c * m, oy + f * m, Math.ceil(m), Math.ceil(m));
+    x.font = '800 48px "JetBrains Mono", monospace'; x.fillText(cod, W / 2, oy + lado + 110);
+    x.font = '400 26px "Reddit Sans", sans-serif';
+    x.fillText('Estación de cápsulas · terraza del Palacio Libertad', W / 2, oy + lado + 170);
+    x.fillText('28/11 al cierre · llevá tu DNI', W / 2, oy + lado + 210);
+    const a = document.createElement('a');
+    a.href = cv.toDataURL('image/png'); a.download = `stop-capsula-${cod}.png`;
+    document.body.append(a); a.click(); a.remove();
+    const b = $('#qr-guardar'); b.textContent = '¡Guardado!'; setTimeout(() => { b.textContent = 'Guardar en el celu'; }, 2000);
+  });
 
   function pintarBarras() {
     barras.textContent = '';

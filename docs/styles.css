@@ -1051,3 +1051,21 @@ form { margin: 0; }
 .puntos { margin-top: 18px; }
 .slide__pie { gap: 18px; padding-top: 34px !important; }
 .logros { margin-bottom: 30px; }
+
+/* ---------- pase de cápsula con QR ---------- */
+.pase-qr { display: flex; align-items: center; gap: 12px; width: min(100%, 360px); padding: 10px 14px 10px 10px; border: 0; border-radius: 18px; background: var(--rosa); color: var(--oscuro); text-align: left; box-shadow: 0 0 0 2px var(--oscuro), 4px 4px 0 2px var(--oscuro); transition: transform .15s var(--ease-out); }
+.pase-qr:active { transform: scale(.97); }
+.pase-qr__icono { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--oscuro); color: var(--crema); }
+.pase-qr__icono svg { width: 24px; height: 24px; }
+.pase-qr__txt { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.pase-qr__txt strong { font: 700 15px/1.2 var(--f-titulo); }
+.pase-qr__txt small { font-size: 12px; opacity: .75; }
+.pase-qr__flecha { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+#btn-qr-inicio svg { animation: none; }
+.sheet--qr p { margin: 0; }
+.qr__kicker { font: 800 11px var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: rgba(37, 37, 37, .6) !important; margin-bottom: 6px !important; }
+.qr__caja { width: 220px; height: 220px; margin: 20px auto 14px; padding: 14px; background: #fff; border-radius: 20px; box-shadow: 0 0 0 2px var(--oscuro), 6px 6px 0 2px var(--rosa); }
+.qr__caja svg { display: block; width: 100%; height: 100%; }
+.qr__codigo { font: 800 24px var(--f-mono); letter-spacing: .08em; color: var(--oscuro) !important; }
+.qr__texto { margin: 12px auto 6px !important; max-width: 320px; }
+.qr__nota { font-size: 13px !important; opacity: .7; margin-bottom: 24px !important; }

@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=Reddit+Sans:wght@400;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="config.js"></script>
+  <script src="qrcode.js" defer></script>
   <script src="piezas.js" defer></script>
   <script src="app.js" defer></script>
 </head>
@@ -97,6 +98,7 @@
             <span class="btn__texto">Armar mi cápsula</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M14 5l7 7-7 7"/></svg>
           </button>
+          <button class="btn btn--primario" id="btn-qr-inicio" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 14h3v3h-3zM18 18h2v2h-2zM14 19h2v1h-2zM19 14h1v2h-1z" fill="currentColor"/></svg>Mi QR para la botellita</button>
           <button class="btn btn--secundario" id="btn-inicio-2" type="button" hidden></button>
         </div>
         <button class="link" id="btn-simular" type="button" hidden>Demo: simular que llegó el 28/11</button>
@@ -363,7 +365,11 @@
         <ul class="pieza__datos" id="pieza-datos"></ul>
       </div>
       <footer class="pie pie--compartir">
-        <p class="ayuda ayuda--centro">Sacale captura y compartila en tus historias o share.</p>
+        <button class="pase-qr" id="btn-qr" type="button">
+          <span class="pase-qr__icono"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 14h3v3h-3zM18 18h2v2h-2zM14 19h2v1h-2zM19 14h1v2h-1z" fill="currentColor"/></svg></span>
+          <span class="pase-qr__txt"><strong>Tu QR para retirar tu botellita</strong><small>Mostralo al cierre, en la terraza</small></span>
+          <svg class="pase-qr__flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
         <div class="acciones acciones--fila">
           <button class="btn btn--primario" id="btn-historias" type="button">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
@@ -418,6 +424,19 @@
     <ul class="logros" id="logros"></ul>
     <div class="acciones">
       <button class="btn btn--primario btn--ancho" id="logros-cerrar" type="button">Listo</button>
+    </div>
+  </dialog>
+  <dialog class="sheet sheet--qr" id="dlg-qr" aria-labelledby="dlg-qr-titulo">
+    <span class="sheet__asa" aria-hidden="true"></span>
+    <p class="qr__kicker">tu pase de cápsula</p>
+    <h2 id="dlg-qr-titulo">Retirá tu botellita</h2>
+    <div class="qr__caja" id="qr-caja" role="img" aria-label="Código QR de tu cápsula"></div>
+    <p class="qr__codigo" id="qr-codigo"></p>
+    <p class="qr__texto">Mostralo en la <strong>Estación de cápsulas</strong>, en la terraza del Palacio Libertad, al cierre del 28/11. Llevá tu DNI.</p>
+    <p class="qr__nota">Es personal: no lo compartas en tus historias.</p>
+    <div class="acciones">
+      <button class="btn btn--primario btn--ancho" id="qr-guardar" type="button">Guardar en el celu</button>
+      <button class="btn btn--secundario" id="qr-cerrar" type="button">Listo</button>
     </div>
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
