@@ -1357,7 +1357,7 @@
       interactiva: true,
       deco: P.mezcla(42, 6, { y0: 4, y1: 30 }),
       html:
-        '<img class="chau__logo" src="assets/marca/logo-stop.png" alt="STOP" width="1604" height="742">' +
+        '<img class="chau__logo" src="assets/marca/logo-stop.png" alt="STOP" width="535" height="248">' +
         '<h2 class="chau__titulo" aria-label="¡Nos vemos el año que viene!"><span class="sticker sticker--azul sticker--grande chau__sticker" data-texto="¡Nos vemos" aria-hidden="true">¡Nos vemos</span>' +
         '<span class="sticker sticker--crema sticker--grande chau__sticker chau__sticker--2" data-texto="el año" aria-hidden="true">el año</span>' +
         '<span class="sticker sticker--azul sticker--grande chau__sticker chau__sticker--2" data-texto="que viene!" aria-hidden="true">que viene!</span></h2>' +
