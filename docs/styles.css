@@ -1042,3 +1042,12 @@ form { margin: 0; }
 .chau__titulo { margin: 0 0 14px; display: flex; flex-direction: column; align-items: center; }
 .chau__sticker { font-size: 38px; margin: 0; white-space: nowrap; max-width: none; }
 .chau__sticker--2 { margin-top: 2px; }
+
+/* ---------- aire alrededor de los botones ---------- */
+.pie { gap: 22px; padding-top: 34px; }
+.acciones { gap: 16px; }
+.acciones--fila { gap: 12px; }
+.pie--compartir { gap: 20px; padding-top: 20px; }
+.puntos { margin-top: 18px; }
+.slide__pie { gap: 18px; padding-top: 34px !important; }
+.logros { margin-bottom: 30px; }
