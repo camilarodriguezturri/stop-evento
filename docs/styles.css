@@ -1077,11 +1077,60 @@ form { margin: 0; }
 .qr__editar { border: 0; background: none; padding: 0; font: inherit; color: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; text-transform: lowercase; }
 
 /* ---------- tablet / iPad ----------
-   En pantallas grandes la app se agranda entera (zoom) para que mantenga
-   el diseño del celu a escala, en vez de quedar como una columna chiquita. */
+   La app ocupa todo el ancho de la tablet: pantallas a sangre, contenido centrado
+   más ancho y un poco más grande (zoom). En horizontal, las pantallas con
+   formulario pasan a dos columnas. */
 :root { --z: 1; }
 body { zoom: var(--z); }
-@media (orientation: portrait) and (min-width: 700px) and (min-height: 900px) { :root { --z: 1.4; } }
-@media (orientation: portrait) and (min-width: 1000px) and (min-height: 1300px) { :root { --z: 1.75; } }
-@media (orientation: landscape) and (min-width: 900px) and (min-height: 700px) { :root { --z: 1.1; } }
-@media (orientation: landscape) and (min-width: 1200px) and (min-height: 1000px) { :root { --z: 1.3; } }
+@media (min-width: 744px) {
+  :root { --z: 1.15; }
+  body { padding-block: 0; }
+  .app { max-width: none; }
+  .pantalla { min-height: calc(100dvh / var(--z)); border-radius: 0; }
+  .top { padding: 24px 40px 0; }
+  .header { padding: 14px 32px; }
+  .contenido { width: 100%; max-width: 640px; margin-inline: auto; padding-inline: 32px; }
+  .pregunta, .intro__textos, .bajada--centro { max-width: 560px; margin-inline: auto; }
+  .pie { padding-bottom: calc(36px + env(safe-area-inset-bottom)); }
+  .btn--ancho { min-width: 280px; }
+
+  .hero { min-height: 540px; }
+  .hero__titulo .sticker { font-size: 84px; }
+  .hero__del { font-size: 22px; }
+  .flotantes { inset: -10px 8%; }
+  .collage { height: 420px; width: min(560px, 100%); margin-inline: auto; }
+  .opcion__escena { min-height: 420px; }
+  .opcion__escena .envase { width: 360px; }
+  .opcion__nombre { font-size: 34px; }
+  .escena--espera { min-height: 420px; }
+  .envase-slot--grande .envase { width: 330px; }
+  .envase-slot--pieza .envase { width: 340px; }
+  .pieza .sticker--grande { font-size: 52px; }
+  .pieza__texto { font-size: 26px; }
+  .preview { height: 330px; }
+
+  .historia, .carga { max-width: none; }
+  .slide { padding-inline: max(32px, calc((100vw / var(--z) - 640px) / 2)); }
+  .carga .collage { height: 440px; }
+  .sheet { max-width: 560px; }
+}
+@media (min-width: 1000px) and (orientation: landscape) {
+  .contenido { max-width: 1040px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 48px; align-items: start; }
+  .contenido > * { grid-column: 1; }
+  /* objetivos: pregunta y chips a la izquierda, metas a la derecha */
+  #p-objetivos .metas { grid-column: 2; grid-row: 1 / span 5; margin-top: 0; }
+  /* canción: el disco a la izquierda, buscador y lista a la derecha */
+  #p-cancion .buscador, #p-cancion .canciones { grid-column: 2; }
+  #p-cancion .buscador { grid-row: 1; margin-top: 0; }
+  #p-cancion .canciones { grid-row: 2 / span 3; }
+  /* nota: vista previa a la izquierda, formulario a la derecha */
+  #p-nota .preview { position: sticky; top: 16px; height: 420px; }
+  #p-nota form { grid-column: 2; grid-row: 1 / span 3; }
+  #p-nota form .campo:first-child { margin-top: 0; }
+  .hero { min-height: 440px; }
+  .escena--espera { min-height: 340px; }
+  .envase-slot--pieza .envase { width: 270px; }
+  .escena--sellar { min-height: 0; }
+  .escena--sellar .envase-slot--grande .envase { width: 240px; }
+  .escena--sellar .envase-slot { margin-top: 100px; }
+}
