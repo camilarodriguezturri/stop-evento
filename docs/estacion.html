@@ -72,7 +72,19 @@
     .vacio { text-align: center; padding-top: 18vh; display: grid; gap: 14px; justify-items: center; }
     .vacio h1 { margin: 0; font: 700 28px var(--f-titulo); }
     .vacio p { margin: 0; opacity: .75; max-width: 32ch; }
+    .ficha { display: grid; gap: 22px; }
     @media (prefers-reduced-motion: reduce) { .dorsal { animation: none; } }
+
+    /* tablet / iPad: vertical se agranda entero; horizontal pasa a dos columnas (datos a la izquierda, dorsal a la derecha) */
+    @media (orientation: portrait) and (min-width: 700px) { body { zoom: 1.2; } }
+    @media (orientation: portrait) and (min-width: 1000px) { body { zoom: 1.5; } }
+    @media (orientation: landscape) and (min-width: 900px) {
+      body { zoom: 1.3; }
+      .app { max-width: 980px; padding-inline: 32px; }
+      .ficha { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-auto-flow: row dense; gap: 22px 48px; align-items: start; }
+      .ficha > * { grid-column: 1; }
+      .ficha > .dorsal { grid-column: 2; grid-row: 1 / span 7; align-self: center; width: min(360px, 100%); }
+    }
   </style>
 </head>
 <body>
@@ -83,7 +95,7 @@
     </header>
 
     <section id="ficha" hidden>
-      <div style="display:grid;gap:22px">
+      <div class="ficha">
         <div class="aviso aviso--alerta" id="aviso-entregada" hidden><span class="aviso__ico">!</span><span><b>Esta cápsula ya se entregó</b><span id="aviso-entregada-txt"></span></span></div>
         <div class="aviso aviso--info" id="aviso-sinpost" hidden><span class="aviso__ico">i</span><span><b>Pase sin post</b>No incluye botellita. Ofrecé sumarse al post en el stand de Stop.</span></div>
 

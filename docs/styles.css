@@ -79,7 +79,7 @@ img { max-width: 100%; }
   grid-template-columns: minmax(0, 1fr);
   max-width: 440px;
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: calc(100dvh / var(--z));
   margin: 0 auto;
 }
 .pantalla {
@@ -89,7 +89,7 @@ img { max-width: 100%; }
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: calc(100dvh / var(--z));
   padding-top: env(safe-area-inset-top);
   background: var(--bg);
   color: var(--fg);
@@ -1019,7 +1019,7 @@ form { margin: 0; }
 
 @media (min-width: 600px) {
   body { padding-block: 16px; }
-  .pantalla { min-height: calc(100dvh - 32px); border-radius: 36px; }
+  .pantalla { min-height: calc(100dvh / var(--z) - 32px); border-radius: 36px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1075,3 +1075,13 @@ form { margin: 0; }
 .qr__ayuda { font-weight: 400; color: rgba(37, 37, 37, .6); }
 .qr__titular { margin-top: 6px !important; font: 700 13px var(--f-mono) !important; text-transform: uppercase; letter-spacing: .04em; color: var(--oscuro) !important; }
 .qr__editar { border: 0; background: none; padding: 0; font: inherit; color: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; text-transform: lowercase; }
+
+/* ---------- tablet / iPad ----------
+   En pantallas grandes la app se agranda entera (zoom) para que mantenga
+   el diseño del celu a escala, en vez de quedar como una columna chiquita. */
+:root { --z: 1; }
+body { zoom: var(--z); }
+@media (orientation: portrait) and (min-width: 700px) and (min-height: 900px) { :root { --z: 1.4; } }
+@media (orientation: portrait) and (min-width: 1000px) and (min-height: 1300px) { :root { --z: 1.75; } }
+@media (orientation: landscape) and (min-width: 900px) and (min-height: 700px) { :root { --z: 1.1; } }
+@media (orientation: landscape) and (min-width: 1200px) and (min-height: 1000px) { :root { --z: 1.3; } }
